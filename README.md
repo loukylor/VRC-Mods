@@ -9,7 +9,7 @@ So just, stay safe, and don't be stupid and run around saying you use mods, and 
 
 # Installation 
 1. Simply follow the instructions on the [MelonLoader wiki](https://melonwiki.xyz/#/) on installing MelonLoader (MelonLoader is the mod loader which will allow my mods to run). 
-2. Then download the mod(s) you would like to install from the [releases](https://github.com/loukylor/VRC-Mods/) section of this repository.
+2. Then download the mod(s) you would like to install from the [releases](https://github.com/loukylor/VRC-Mods/releases) section of this repository.
 3. And finally, drag and drop the downloaded mod(s) into the newly created `Mods` folder in the `VRChat` folder.
 More detailed instructions and more mods can be found in the [VRChat Modding Group Discord](https://discord.gg/rCqKSvR).
 
