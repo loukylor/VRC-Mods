@@ -1,3 +1,23 @@
+# Disclaimer!!!
+VRChat does **not** condone the use of mods, and, if found to be modifying the client, then you **will** be punished.
+
+**That being said,** there is no anticheat of any sort (file integrity check, position check, etc.) placed on the client.
+The only anticheat (if it could be called that) in VRChat is an API limiter, and Photon checks, and the mods listed in this repository, will not trigger any of those.
+The real only way to get punished on this game is to piss of the aforementioned anticheats, or be reported by a user with video evidence of you using a mod (whether this be you flying or verbally admitting you mod the game).
+
+So just, stay safe, and don't be stupid and run around saying you use mods, and you'll be a-ok.
+
+# Installation 
+1. Simply follow the instructions on the [MelonLoader wiki](https://melonwiki.xyz/#/) on installing MelonLoader (MelonLoader is the mod loader which will allow my mods to run). 
+2. Then download the mod(s) you would like to install from the [releases](https://github.com/loukylor/VRC-Mods/) section of this repository.
+3. And finally, drag and drop the downloaded mod(s) into the newly created `Mods` folder in the `VRChat` folder.
+More detailed instructions and more mods can be found in the [VRChat Modding Group Discord](https://discord.gg/rCqKSvR).
+
+# Mod List
+- [AskToPortal](#asktoportal)
+- [CloningBeGone](#cloningbegone)
+- [UserInfoExtensions](#userinfoextensions)
+
 # AskToPortal
 A mod that makees sure you want to enter a portal, every time you enter a portal
 
@@ -33,7 +53,7 @@ Adding individually toggleable buttons that allow you to:
 The buttons can always be accessed in a popup attached to the User Details Page.
 
 ## Requirements
- - [UIExpansionKit](https://github.com/knah/VRCMods/tree/master/UIExpansionKit)
+ - [UIExpansionKit](https://github.com/knah/VRCMods/)
 
 ## Credits
  - [Ben](https://github.com/BenjaminZehowlt) because I referenced his code a lot to implement Xref Scanning
