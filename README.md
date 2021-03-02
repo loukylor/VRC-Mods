@@ -1,0 +1,1 @@
+Turns off cloning when you join an instance.
