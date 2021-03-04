@@ -16,6 +16,7 @@ More detailed instructions and more mods can be found in the [VRChat Modding Gro
 # Mod List
 - [AskToPortal](#asktoportal)
 - [CloningBeGone](#cloningbegone)
+- [PlayerList](#playerlist)
 - [UserInfoExtensions](#userinfoextensions)
 
 # AskToPortal
@@ -35,6 +36,37 @@ AskToPortal is NOT Portal Confirmation by 404. AskToPortal is simply a replaceme
 
 # CloningBeGone
 Turns off cloning when you join an instance. It's really that simple lol.
+
+# PlayerList
+Adds a player list to the ShortcutMenu
+
+## Features
+Adds a player list to the menu that includes player count.
+Each entry to the player list is a button that will open the user in the QuickMenu on click.
+The player's name will be colored to the rank they are (OGTrustRanks compatible!), each entry also has the player's ping, fps and platform
+
+There is also a list of info about the game and world you are in.
+It lists:
+- Time since joining the instance (Room Time)
+- System time in 12hr format and 24hr format (this will be configurable in the future, I just got lazy)
+- Game build number (Game Version)
+- Position in world (Coordinate Position)
+- World Name
+- World Author Name
+- Instance Master (The person who get the host glitch)
+- Instance Creator (The person who has moderation powers in the instance, only applicable to non-public instances)
+
+Keep in mind to fit all this stuff I had to expand the QuickMenu's hitbox horizontally by a ton, so keep that in mind.
+
+I also plan to make these toggable in the future (and add more please ping or DM with ideas. I don't bite!)
+Oh yea, also report any errors to me. You can make an issue or ping/DM me.
+
+## Credits
+- [KortyBoi](https://github.com/KortyBoi) as he let me use the layout from his player list, and helped me with getting some of the information
+- [knah](https://github.com/knah) as I use [Join Notifier's](https://github.com/knah/VRCMods) join/leave system.
+
+## Picture of List
+![Picture of List](https://i.imgur.com/beIZBQX.png)
 
 # UserInfoExtensions
 A mod that adds buttons to the to make VRChat more convenient
@@ -56,5 +88,5 @@ The buttons can always be accessed in a popup attached to the User Details Page.
  - [UIExpansionKit](https://github.com/knah/VRCMods/)
 
 ## Credits
- - [Ben](https://github.com/BenjaminZehowlt) because I referenced his code a lot to implement Xref Scanning
- - [knah](https://github.com/knah) because he helped me with Async stuff
+ - [Ben](https://github.com/BenjaminZehowlt) as I referenced his code a lot to implement Xref Scanning
+ - [knah](https://github.com/knah) as he helped me a ton with Async stuff
