@@ -5,6 +5,8 @@ namespace PlayerList.Entries
 {
     class InstanceCreatorEntry : EntryBase
     {
+        public override string Name { get { return "Instance Creator"; } }
+
         public string creatorTag;
         public string lastUserDisplayName;
         public override void ProcessText(object[] parameters = null)

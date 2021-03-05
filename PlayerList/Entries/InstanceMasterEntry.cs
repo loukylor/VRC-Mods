@@ -4,6 +4,8 @@ namespace PlayerList.Entries
 {
     class InstanceMasterEntry : EntryBase
     {
+        public override string Name { get { return "Instance Master"; } }
+
         public override void ProcessText(object[] parameters = null)
         {
             if (PlayerManager.field_Private_Static_PlayerManager_0 == null) return;

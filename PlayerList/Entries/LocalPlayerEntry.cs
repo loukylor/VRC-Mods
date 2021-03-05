@@ -6,6 +6,8 @@ namespace PlayerList.Entries
 {
     class LocalPlayerEntry : EntryBase
     {
+        public override string Name { get { return "Local Player"; } }
+
         public override void Init(object[] parameters) => gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new System.Action(() => PlayerEntry.OpenPlayerInQuickMenu(Player.prop_Player_0)));
         public override void ProcessText(object[] parameters)
         {

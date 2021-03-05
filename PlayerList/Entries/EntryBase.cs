@@ -1,10 +1,15 @@
-﻿using UnityEngine;
+﻿using MelonLoader;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace PlayerList.Entries
 {
     public class EntryBase
     {
+        public virtual string Name { get; }
+
+        public MelonPreferences_Entry<bool> prefEntry;
+
         private string _originalText;
         public string OriginalText
         {
@@ -35,7 +40,7 @@ namespace PlayerList.Entries
         {
         }
 
-        public static EntryBase CreateInstance<T>(GameObject gameObject, object[] parameters = null) where T : EntryBase, new()
+        public static T CreateInstance<T>(GameObject gameObject, object[] parameters = null, bool includeConfig = false) where T : EntryBase, new()
         {
             EntryBase entry = new T();
 
@@ -43,10 +48,14 @@ namespace PlayerList.Entries
             entry.gameObject = gameObject;
             entry.textComponent = gameObject.GetComponent<Text>();
             entry._originalText = entry.textComponent.text;
-
+            if (includeConfig)
+            { 
+                entry.prefEntry = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(Config.categoryIdentifier, entry.Name.Replace(" ", ""), true, is_hidden: true);
+                entry.gameObject.SetActive(entry.prefEntry.Value);
+            }
             entry.Init(parameters);
 
-            return entry;
+            return (T)entry;
         }
         public void ChangeEntry(string identifier, string value) => textComponent.text = textComponent.text.Replace($"{{{identifier}}}", value);
         public void ChangeEntry(string identifier, object value) => textComponent.text = textComponent.text.Replace($"{{{identifier}}}", value.ToString());

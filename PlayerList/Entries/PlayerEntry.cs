@@ -5,6 +5,8 @@ namespace PlayerList.Entries
 {
     public class PlayerEntry : EntryBase
     {
+        public override string Name { get { return "Player"; } }
+
         public Player player;
 
         public override void Init(object[] parameters)
@@ -38,7 +40,19 @@ namespace PlayerList.Entries
             else
                 return "Quest";
         }
-        public static void OpenPlayerInQuickMenu(Player player) => QuickMenu.prop_QuickMenu_0.Method_Public_Void_Player_0(player);
+        public static void OpenPlayerInQuickMenu(Player player)
+        {
+            VRCUiCursor cursor = GameObject.Find("_Application/CursorManager/BlueFireballMouse").GetComponent<VRCSpaceUiCursor>();
+            if (cursor.gameObject.activeSelf) cursor.Method_Public_Void_VRCPlayer_PDM_0(player.field_Internal_VRCPlayer_0);
+
+            cursor = GameObject.Find("_Application/CursorManager/RightHandBeam").GetComponent<VRCSpaceUiPointer>();
+            if (cursor.gameObject.activeSelf) cursor.Method_Public_Void_VRCPlayer_PDM_0(player.field_Internal_VRCPlayer_0);
+
+            cursor = GameObject.Find("_Application/CursorManager/LeftHandBeam").GetComponent<VRCSpaceUiPointer>();
+            if (cursor.gameObject.activeSelf) cursor.Method_Public_Void_VRCPlayer_PDM_0(player.field_Internal_VRCPlayer_0);
+
+            QuickMenuContextualDisplay.Method_Public_Static_Void_VRCPlayer_0(player.field_Internal_VRCPlayer_0);
+        }
         public static string GetPingColor(int ping)
         {
             if (ping <= 75)
