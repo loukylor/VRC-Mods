@@ -35,7 +35,11 @@ AskToPortal is NOT Portal Confirmation by 404. AskToPortal is simply a replaceme
 ![Image of user prompt](https://i.imgur.com/uvUeUmL.png)
 
 # CloningBeGone
-Turns off cloning when you join an instance. It's really that simple lol.
+Turns off cloning when you join an instance.
+
+## Features
+You can configure whether you want cloning to be on or off, based off instance type.
+So, you can say, have cloning on in Invite+ worlds and off in all the other instance types.
 
 # PlayerList
 Adds a player list to the ShortcutMenu
@@ -56,9 +60,11 @@ It lists:
 - Instance Master (The person who get the host glitch)
 - Instance Creator (The person who has moderation powers in the instance, only applicable to non-public instances)
 
+And Each of these can be individually toggled on or off.
+
 Keep in mind to fit all this stuff I had to expand the QuickMenu's hitbox horizontally by a ton, so keep that in mind.
 
-I also plan to make these toggable in the future (and add more please ping or DM with ideas. I don't bite!)
+I also plan to add more entries, please ping or DM with ideas. I don't bite!
 Oh yea, also report any errors to me. You can make an issue or ping/DM me.
 
 ## Credits
