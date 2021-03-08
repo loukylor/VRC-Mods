@@ -17,6 +17,7 @@ More detailed instructions and more mods can be found in the [VRChat Modding Gro
 - [AskToPortal](#asktoportal)
 - [CloningBeGone](#cloningbegone)
 - [PlayerList](#playerlist)
+- [ReloadAvatars](#reloadavatars)
 - [UserInfoExtensions](#userinfoextensions)
 
 # AskToPortal
@@ -73,6 +74,15 @@ Oh yea, also report any errors to me. You can make an issue or ping/DM me.
 
 ## Picture of List
 ![Picture of List](https://i.imgur.com/beIZBQX.png)
+
+# PlayerList
+Adds buttons to reload a single user's avatar or all users' avatar.
+
+## Features
+The buttons can each be turned on and off (without a restart :3, yes this is coming to UserInfoExtensions soon)
+
+## Requirements
+ - [UIExpansionKit](https://github.com/knah/VRCMods/)
 
 # UserInfoExtensions
 A mod that adds buttons to the to make VRChat more convenient
