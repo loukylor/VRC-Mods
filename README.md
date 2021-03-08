@@ -75,7 +75,7 @@ Oh yea, also report any errors to me. You can make an issue or ping/DM me.
 ## Picture of List
 ![Picture of List](https://i.imgur.com/beIZBQX.png)
 
-# PlayerList
+# ReloadAvatars
 Adds buttons to reload a single user's avatar or all users' avatar.
 
 ## Features
