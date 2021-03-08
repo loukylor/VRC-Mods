@@ -15,9 +15,9 @@ namespace ReloadAvatars
 
         public override void OnApplicationStart()
         {
-            MelonPreferences.CreateCategory("TargetReload", "TargetReload Settings");
-            MelonPreferences.CreateEntry("TargetReload", "ReloadAvatar", true, "Enable/Disable Reload Avatar Button");
-            MelonPreferences.CreateEntry("TargetReload", "ReloadAllAvatars", true, "Enable/Disable Reload All Avatars Button");
+            MelonPreferences.CreateCategory("ReloadAvatars", "ReloadAvatars Settings");
+            MelonPreferences.CreateEntry("ReloadAvatars", "ReloadAvatar", true, "Enable/Disable Reload Avatar Button");
+            MelonPreferences.CreateEntry("ReloadAvatars", "ReloadAllAvatars", true, "Enable/Disable Reload All Avatars Button");
 
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.UserQuickMenu).AddSimpleButton("Reload Avatar", new Action(() =>
             {
@@ -26,7 +26,7 @@ namespace ReloadAvatars
                     VRCPlayer.Method_Public_Static_Void_APIUser_0(QuickMenu.prop_QuickMenu_0.prop_APIUser_0);
                 }
                 catch { } // Ignore
-            }), new Action<GameObject>((gameObject) => { reloadAvatarButton = gameObject; reloadAvatarButton.SetActive(MelonPreferences.GetEntryValue<bool>("TargetReload", "ReloadAvatar")); }));
+            }), new Action<GameObject>((gameObject) => { reloadAvatarButton = gameObject; reloadAvatarButton.SetActive(MelonPreferences.GetEntryValue<bool>("ReloadAvatars", "ReloadAvatar")); }));
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.QuickMenu).AddSimpleButton("Reload All Avatars", new Action(() =>
             {
                 try
@@ -34,12 +34,12 @@ namespace ReloadAvatars
                     VRCPlayer.field_Internal_Static_VRCPlayer_0.Method_Public_Void_Boolean_0();
                 }
                 catch { } // Ignore
-            }), new Action<GameObject>((gameObject) => { reloadAllAvatarsButton = gameObject; reloadAllAvatarsButton.SetActive(MelonPreferences.GetEntryValue<bool>("TargetReload", "ReloadAllAvatars")); }));
+            }), new Action<GameObject>((gameObject) => { reloadAllAvatarsButton = gameObject; reloadAllAvatarsButton.SetActive(MelonPreferences.GetEntryValue<bool>("ReloadAvatars", "ReloadAllAvatars")); }));
         }
         public override void OnPreferencesSaved()
         {
-            reloadAvatarButton.SetActive(MelonPreferences.GetEntryValue<bool>("TargetReload", "ReloadAvatar"));
-            reloadAllAvatarsButton.SetActive(MelonPreferences.GetEntryValue<bool>("TargetReload", "ReloadAllAvatars"));
+            reloadAvatarButton.SetActive(MelonPreferences.GetEntryValue<bool>("ReloadAvatars", "ReloadAvatar"));
+            reloadAllAvatarsButton.SetActive(MelonPreferences.GetEntryValue<bool>("ReloadAvatars", "ReloadAllAvatars"));
         }
     }
 }
