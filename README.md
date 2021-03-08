@@ -7,6 +7,11 @@ The real only way to get punished on this game is to piss of the aforementioned 
 
 So just, stay safe, and don't be stupid and run around saying you use mods, and you'll be a-ok.
 
+Also, for my sake, **I am not responsible for any bans using my mods may cause**. 
+I do my abselute best to make sure none of my mods, verified or unverified, will increase your chance of getting banned by any amount.
+And in fact, only one of my mods could trigger any anticheat in any way (UserInfoExtensions), but there are limits in place that completely prevent this.
+**But**, no matter how small, there is always a chance. 
+
 # Installation 
 1. Simply follow the instructions on the [MelonLoader wiki](https://melonwiki.xyz/#/) on installing MelonLoader (MelonLoader is the mod loader which will allow my mods to run). 
 2. Then download the mod(s) you would like to install from the [releases](https://github.com/loukylor/VRC-Mods/releases) section of this repository.
