@@ -202,6 +202,7 @@ namespace UserInfoExtentions.Modules
         }
         public static void OnPageOpen(VRCUiPage __0)
         {
+            if (__0 == null) return;
             // This field (which is very important) is literally changed at random during runtime, it changes to random numbers to an invalid string so i have to set it before the page opens
             if (__0.TryCast<BioLanguagesPopup>() != null) __0.field_Public_String_0 = "LINKS_POPUP";
             if (__0.TryCast<BioLinksPopup>() != null) __0.field_Public_String_0 = "BIO_LINKS";
