@@ -7,7 +7,7 @@ using UserInfoExtentions.Modules;
 using UserInfoExtentions.Utilities;
 using VRC.UI;
 
-[assembly: MelonInfo(typeof(UserInfoExtensions.UserInfoExtensionsMod), "UserInfoExtensions", "2.3.2", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(UserInfoExtensions.UserInfoExtensionsMod), "UserInfoExtensions", "2.3.3", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace UserInfoExtensions
@@ -29,7 +29,6 @@ namespace UserInfoExtensions
 
             Harmony.Patch(AccessTools.Method(typeof(MenuController), "Method_Public_Void_APIUser_0"), postfix: new HarmonyMethod(typeof(UserInfoExtensionsMod).GetMethod("OnUserInfoOpen", BindingFlags.Static | BindingFlags.Public)));
             Harmony.Patch(AccessTools.Method(typeof(PageUserInfo), "Back"), postfix: new HarmonyMethod(typeof(UserInfoExtensionsMod).GetMethod("OnUserInfoClose", BindingFlags.Static | BindingFlags.Public)));
-            Harmony.Patch(typeof(VRCUiManager).GetMethod("Method_Public_VRCUiPage_VRCUiPage_0"), new HarmonyMethod(typeof(UserInfoExtensionsMod).GetMethod("OnPageOpen")));
             UIExpansionKit.API.LayoutDescription popupLayout = new UIExpansionKit.API.LayoutDescription
             {
                 RowHeight = 80,
