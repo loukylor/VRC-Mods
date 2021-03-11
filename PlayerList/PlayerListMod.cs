@@ -178,7 +178,7 @@ namespace PlayerList
 
             new ToggleButton(playerListMenus[0].path, new Vector3(5, -1), "Enabled on Start", "Disabled", new Action<bool>((state) => { Config.enabledOnStart.Value = state; hasConfigChanged = true; }), "Toggle if the list is toggled hidden on start", "Toggle if the list is toggled hidden on start", "EnabledOnStartToggle", Config.enabledOnStart.Value, true);
 
-            new ToggleButton(playerListMenus[0].path, new Vector3(5, 1), "Condense Text", "Regular Text", new Action<bool>((state) => { Config.condensedText.Value = !Config.condensedText.Value; RefreshPlayerEntries(); }), "Toggle if text should be condensed", "Toggle if text should be condensed", "CondensedTextToggle", Config.condensedText.Value, true);
+            new ToggleButton(playerListMenus[0].path, new Vector3(5, 1), "Condense Text", "Regular Text", new Action<bool>((state) => { Config.condensedText.Value = !Config.condensedText.Value; RefreshPlayerEntries(); hasConfigChanged = true; }), "Toggle if text should be condensed", "Toggle if text should be condensed", "CondensedTextToggle", Config.condensedText.Value, true);
 
             new SingleButton(playerListMenus[0].path, new Vector3(0, -1), "Font Size +", new Action(() => FontSize++), "Increase font size of the list by 1", "IncreaseFontSizeButton");
             new SingleButton(playerListMenus[0].path, new Vector3(0, 1), "Font Size -", new Action(() => FontSize--), "Decrease font size of the list by 1", "DecreaseFontSizeButton");
