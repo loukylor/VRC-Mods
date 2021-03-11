@@ -51,9 +51,9 @@ So, you can say, have cloning on in Invite+ worlds and off in all the other inst
 Adds a player list to the ShortcutMenu
 
 ## Features
-Adds a player list to the menu that includes player count.
 Each entry to the player list is a button that will open the user in the QuickMenu on click.
-The player's name will be colored to the rank they are (OGTrustRanks compatible!), each entry also has the player's ping, fps and platform
+The player's name will be colored to the rank they are (OGTrustRanks compatible!), each entry also has the player's ping, fps, platform and avatar performance.
+You may also toggle each of these on and off, so if you don't like how the avatar performance takes up space, you can turn it off.
 
 There is also a list of info about the game and world you are in.
 It lists:
@@ -68,17 +68,18 @@ It lists:
 
 And Each of these can be individually toggled on or off.
 
-Keep in mind to fit all this stuff I had to expand the QuickMenu's hitbox horizontally by a ton, so keep that in mind.
+Now for more customizable things, you can change fontsize, the list's position (the QuickMenu hitbox will scale automatically), and the PlayerList button position.
 
 I also plan to add more entries, please ping or DM with ideas. I don't bite!
 Oh yea, also report any errors to me. You can make an issue or ping/DM me.
 
 ## Credits
-- [KortyBoi](https://github.com/KortyBoi) as he let me use the layout from his player list, and helped me with getting some of the information
+- [KortyBoi](https://github.com/KortyBoi) as he let me use the layout from his player list, and helped me with getting some of the information.
 - [knah](https://github.com/knah) as I use [Join Notifier's](https://github.com/knah/VRCMods) join/leave system.
+- [DubyaDude](https://github.com/DubyaDude) as I used his [RubyButtonAPI](https://github.com/DubyaDude/RubyButtonAPI) as reference for my button API.
 
 ## Picture of List
-![Picture of List](https://i.imgur.com/beIZBQX.png)
+![Picture of List](https://i.imgur.com/Tt6ZYqB.png)
 
 # ReloadAvatars
 Adds buttons to reload a single user's avatar or all users' avatar.
