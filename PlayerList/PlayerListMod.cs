@@ -14,7 +14,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using VRC;
 
-[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.2.1", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.2.2", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace PlayerList
@@ -525,7 +525,7 @@ namespace PlayerList
             }
             catch (Exception ex)
             {
-                MelonLogger.Error($"Error while processing text of entry with text {entry.OriginalText}:\n" + ex.ToString());
+                MelonLogger.Error($"Error while processing text of entry with name of {entry.Name}:\n" + ex.ToString());
             }
         }
         public static void SetLayerRecursive(GameObject gameObject, int layer)

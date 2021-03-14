@@ -9,6 +9,6 @@ namespace PlayerList.Entries
 
         public static int buildNumber = Resources.FindObjectsOfTypeAll<VRCApplicationSetup>().First().field_Public_Int32_0;
 
-        public override void ProcessText(object[] parameters = null) => ChangeEntry("gameversion", buildNumber);
+        protected override void ProcessText(object[] parameters = null) => ChangeEntry("gameversion", buildNumber);
     }
 }

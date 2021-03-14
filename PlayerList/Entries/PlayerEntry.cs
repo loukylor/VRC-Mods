@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using UnityEngine;
 using VRC;
 
@@ -7,6 +6,7 @@ namespace PlayerList.Entries
 {
     public class PlayerEntry : EntryBase
     {
+        // - <color={pingcolor}>{ping}ms</color> | <color={fpscolor}>{fps}</color> | {platform} | <color={perfcolor}>{perf}</color> | <color={rankcolor}>{displayname}</color>
         public override string Name { get { return "Player"; } }
 
         public Player player;
@@ -14,90 +14,108 @@ namespace PlayerList.Entries
         public PlayerNet playerNet;
         public TMPro.TextMeshProUGUI perfText;
 
+        public bool blockedYou;
+        public bool youBlocked;
+        public bool publicBanned;
+
         public override void Init(object[] parameters)
         {
             player = (Player)parameters[0];
             userID = player.field_Private_APIUser_0.id;
             playerNet = player.GetComponent<PlayerNet>();
 
-            gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new System.Action(() => OpenPlayerInQuickMenu(player)));
+            gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new Action(() => OpenPlayerInQuickMenu(player)));
             perfText = player.transform.Find("Player Nameplate/Canvas/Nameplate/Contents/Quick Stats/Performance Text").GetComponent<TMPro.TextMeshProUGUI>();
         }
-        public override void ProcessText(object[] parameters)
+        protected override void ProcessText(object[] parameters = null)
         {
-            if (player == null) // Sometimes ppl will desync causing the leave event to not call
-            {
-                PlayerListMod.playerEntries.Remove(userID);
-                PlayerListMod.entries.Remove(Identifier);
-                Object.DestroyImmediate(gameObject);
-                return;
-            }
-            if (Config.condensedText.Value && !Config.HasSomethingOff)
-                textComponent.text = textComponent.text.Replace(" ", "");
+            if (player == null) Remove(); // Sometimes ppl will desync causing the leave event to not call
+
+            if (Config.condensedText.Value)
+                AddText("-");
+            else
+                AddText(" - ");
 
             if (playerNet != null)
             {
                 if (Config.pingToggle.Value)
                 {
-                    ChangeEntry("pingcolor", GetPingColor(playerNet.prop_Int16_0));
-                    ChangeEntry("ping", playerNet.prop_Int16_0.ToString().PadRight(4));
+                    short ping = playerNet.prop_Int16_0;
+                    AddColor(GetPingColor(ping));
+                    if (ping < 9999 && ping > -999)
+                        AddEndColor(ping.ToString().PadRight(4) + "ms");
+                    else
+                        AddEndColor(((double)(ping / 1000)).ToString("N1").PadRight(5) + "s");
+                    AddSpacer();
                 }
 
                 // I STG if I have to remove fps because skids start walking up to people saying poeple's fps im gonna murder someone
                 if (Config.fpsToggle.Value)
                 {
-                    ChangeEntry("fpscolor", GetFpsColor((int)(1000f / playerNet.field_Private_Byte_0)));
+                    AddColor(GetFpsColor((int)(1000f / playerNet.field_Private_Byte_0)));
                     if (playerNet.field_Private_Byte_0 == 0)
-                        ChangeEntry("fps", "?".PadRight(3));
+                        AddEndColor("?".PadRight(3));
                     else
-                        ChangeEntry("fps", ((int)(1000f / playerNet.field_Private_Byte_0)).ToString().PadRight(3));
+                        AddEndColor(((int)(1000f / playerNet.field_Private_Byte_0)).ToString().PadRight(3));
+                    AddSpacer();
                 }
             }
             else
             {
                 if (Config.pingToggle.Value)
                 {
-                    ChangeEntry("pingcolor", "#ff0000");
-                    ChangeEntry("ping", "?".PadRight(4));
+                    AddColoredText("#ff0000", "?".PadRight(4));
+                    AddSpacer();
                 }
-
 
                 // I STG if I have to remove fps because skids start walking up to people saying poeple's fps im gonna murder someone
                 if (Config.fpsToggle.Value)
                 {
-                    ChangeEntry("fpscolor", "#ff0000");
-                    ChangeEntry("fps", "?".PadRight(3));
+                    AddColoredText("#ff0000", "?".PadRight(3));
+                    AddSpacer();
                 }
 
                 playerNet = player.GetComponent<PlayerNet>();
             }
 
             if (Config.platformToggle.Value)
-                ChangeEntry("platform", ParsePlatform(player));
+            {
+                AddText(ParsePlatform(player).PadRight(5));
+                AddSpacer();
+            }
 
             if (Config.perfToggle.Value)
             {
                 if (perfText != null)
                 {
-                    ChangeEntry("perfcolor", "#" + ColorUtility.ToHtmlStringRGB(perfText.color));
-                    ChangeEntry("perf", ParsePerformanceText(perfText.text).PadRight(5));
+                    AddColoredText("#" + ColorUtility.ToHtmlStringRGB(perfText.color), ParsePerformanceText(perfText.text).PadRight(5));
+                    AddSpacer();
                 }
                 else
                 {
                     perfText = player.transform.Find("Player Nameplate/Canvas/Nameplate/Contents/Quick Stats/Performance Text").GetComponent<TMPro.TextMeshProUGUI>();
-                    ChangeEntry("perfcolor", "#ff00000");
-                    ChangeEntry("perf", "???");
+                    AddColoredText("#ff00000", "???");
+                    AddSpacer();
                 }
             }
 
             if (Config.displayNameToggle.Value) // Why?
             {
-                ChangeEntry("rankcolor", "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(player.field_Private_APIUser_0)));
-                ChangeEntry("displayname", player.field_Private_APIUser_0.displayName);
+                AddColoredText("#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(player.field_Private_APIUser_0)), player.field_Private_APIUser_0.displayName);
+                AddSpacer();
             }
 
-            if (Config.HasSomethingOff)
-                textComponent.text = " - " + RemoveOffToggles(textComponent.text.Substring(3));
+            if (Config.condensedText.Value)
+                textComponent.text = textComponent.text.Remove(textComponent.text.Length - 1, 1);
+            else
+                textComponent.text = textComponent.text.Remove(textComponent.text.Length - 3, 3);
+        }
+        public void Remove()
+        {
+            PlayerListMod.playerEntries.Remove(userID);
+            PlayerListMod.entries.Remove(Identifier);
+            UnityEngine.Object.DestroyImmediate(gameObject);
+            return;
         }
 
         public static string ParsePlatform(Player player)
@@ -165,51 +183,6 @@ namespace PlayerList.Entries
                 default:
                     return perfText;
             }
-        }
-        public static string RemoveOffToggles(string originalString)
-        {
-            int totalRemoved = 0;
-            List<string> splitText;
-            splitText = originalString.Split(new string[] { " | " }, System.StringSplitOptions.None).ToList();
-
-            if (!Config.pingToggle.Value)
-            {
-                splitText.RemoveAt(0);
-                totalRemoved++;
-            }
-            if (!Config.fpsToggle.Value)
-            {
-                splitText.RemoveAt(1 - totalRemoved);
-                totalRemoved++;
-            }
-            if (!Config.platformToggle.Value)
-            {
-                splitText.RemoveAt(2 - totalRemoved);
-                totalRemoved++;
-            }
-            if (!Config.perfToggle.Value)
-            {
-                splitText.RemoveAt(3 - totalRemoved);
-                totalRemoved++;
-            }
-            if (!Config.displayNameToggle.Value)
-            {
-                splitText.RemoveAt(4 - totalRemoved);
-            }
-
-            string finalString = "";
-            for (int i = 0; i < splitText.Count; i++)
-            {
-                finalString += splitText[i];
-                if (i + 1 == splitText.Count) continue;
-
-                if (Config.condensedText.Value)
-                    finalString += "|";
-                else
-                    finalString += " | ";
-            }
-
-            return finalString;
         }
     }
 }

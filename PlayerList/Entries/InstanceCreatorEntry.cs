@@ -9,7 +9,7 @@ namespace PlayerList.Entries
 
         public string creatorTag;
         public string lastUserDisplayName;
-        public override void ProcessText(object[] parameters = null)
+        protected override void ProcessText(object[] parameters = null)
         {
             if (RoomManager.field_Internal_Static_ApiWorldInstance_0 != null)
             {

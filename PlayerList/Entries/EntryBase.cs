@@ -10,14 +10,14 @@ namespace PlayerList.Entries
 
         public MelonPreferences_Entry<bool> prefEntry;
 
+        public GameObject gameObject;
+        public Text textComponent;
+
         private string _originalText;
         public string OriginalText
         {
             get { return _originalText; }
         }
-
-        public GameObject gameObject;
-        public Text textComponent;
 
         private int _identifier;
         public int Identifier
@@ -27,16 +27,15 @@ namespace PlayerList.Entries
 
         public virtual void Init(object[] parameters = null)
         {
-
         }
 
         public void Refresh(object[] parameters = null)
         {
-            textComponent.text = _originalText;
+            textComponent.text = OriginalText;
             ProcessText(parameters);
         }
 
-        public virtual void ProcessText(object[] parameters = null)
+        protected virtual void ProcessText(object[] parameters = null)
         {
         }
 
@@ -57,7 +56,24 @@ namespace PlayerList.Entries
 
             return (T)entry;
         }
+        public void AddText(string value) => textComponent.text += value;
+        public void AddText(object value) => textComponent.text += value.ToString();
+        public void AddColor(string color) => textComponent.text += "<color=" + color + ">";
+        public void AddEndColor(string beforeText = null) => textComponent.text += NullText(beforeText) + "</color>";
+        public void AddColoredText(string color, string coloredText, string afterText = null) => textComponent.text += "<color=" + color + ">" + coloredText + "</color>" + NullText(afterText);
+        public void AddSpacer()
+        {
+            if (Config.condensedText.Value)
+                textComponent.text += "|";
+            else
+                textComponent.text += " | ";
+        }
+        private string NullText(string text)
+        {
+            return text ?? "";
+        }
         public void ChangeEntry(string identifier, string value) => textComponent.text = textComponent.text.Replace($"{{{identifier}}}", value);
         public void ChangeEntry(string identifier, object value) => textComponent.text = textComponent.text.Replace($"{{{identifier}}}", value.ToString());
+
     }
 }

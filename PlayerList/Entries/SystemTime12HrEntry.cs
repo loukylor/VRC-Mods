@@ -7,6 +7,6 @@ namespace PlayerList.Entries
     {
         public override string Name { get { return "System Time 12Hr"; } }
 
-        public override void ProcessText(object[] parameters = null) => ChangeEntry("systemtime12hr", DateTime.Now.ToString(@"hh\:mm\:ss tt", CultureInfo.InvariantCulture));
+        protected override void ProcessText(object[] parameters = null) => ChangeEntry("systemtime12hr", DateTime.Now.ToString(@"hh\:mm\:ss tt", CultureInfo.InvariantCulture));
     }
 }
