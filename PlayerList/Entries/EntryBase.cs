@@ -56,8 +56,8 @@ namespace PlayerList.Entries
 
             return (T)entry;
         }
-        public void AddText(string value) => textComponent.text += value;
-        public void AddText(object value) => textComponent.text += value.ToString();
+        public void AddText(string value) => textComponent.text += NullText(value);
+        public void AddText(object value) => textComponent.text += NullText(value.ToString());
         public void AddColor(string color) => textComponent.text += "<color=" + color + ">";
         public void AddEndColor(string beforeText = null) => textComponent.text += NullText(beforeText) + "</color>";
         public void AddColoredText(string color, string coloredText, string afterText = null) => textComponent.text += "<color=" + color + ">" + coloredText + "</color>" + NullText(afterText);

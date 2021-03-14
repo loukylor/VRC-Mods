@@ -5,20 +5,18 @@ using UnityEngine;
 using VRC;
 using VRC.Core;
 using VRC.Management;
+using VRCSDK2.Validation.Performance;
 
 namespace PlayerList.Entries
 {
     class LocalPlayerEntry : EntryBase
     {
-        // " - <color={pingcolor}>{ping}ms</color> | <color={fpscolor}>{fps}</color> | {platform} | <color={perfcolor}>{perf}</color> | <color={rankcolor}>{displayname}</color>"
+        // " - <color={pingcolor}>{ping}ms</color> | <color={fpscolor}>{fps}</color> | {platform} | <color={perfcolor}>{perf}</color> | {relationship} | <color={rankcolor}>{displayname}</color>"
         public override string Name { get { return "Local Player"; } }
-
-        public TMPro.TextMeshProUGUI perfText;
 
         public override void Init(object[] parameters)
         {
             gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new Action(() => PlayerEntry.OpenPlayerInQuickMenu(Player.prop_Player_0)));
-            perfText = Player.prop_Player_0.transform.Find("Player Nameplate/Canvas/Nameplate/Contents/Quick Stats/Performance Text").GetComponent<TMPro.TextMeshProUGUI>();
         }
         protected override void ProcessText(object[] parameters)
         {
@@ -67,29 +65,22 @@ namespace PlayerList.Entries
             // I STG if I have to remove fps because skids start walking up to people saying poeple's fps im gonna murder someone
             if (Config.fpsToggle.Value)
             {
-                AddColoredText(PlayerEntry.GetFpsColor((int)(1f / Time.deltaTime)), ((int)(1f / Time.deltaTime)).ToString().PadRight(3));
+                int fps = (int)(1f / Time.deltaTime) < -99 ? -99 : Math.Min((int)(1f / Time.deltaTime), 999);
+                AddColoredText(PlayerEntry.GetFpsColor(fps), fps.ToString().PadRight(3));
                 AddSpacer();
             }
 
             if (Config.platformToggle.Value)
             { 
-                AddText(PlayerEntry.ParsePlatform(Player.prop_Player_0).PadRight(5));
+                AddText(PlayerEntry.ParsePlatform(Player.prop_Player_0).PadRight(2));
                 AddSpacer();
             }
 
             if (Config.perfToggle.Value)
-            { 
-                if (perfText != null)
-                {
-                    AddColoredText("#" + ColorUtility.ToHtmlStringRGB(perfText.color), PlayerEntry.ParsePerformanceText(perfText.text).PadRight(5));
-                    AddSpacer();
-                }
-                else
-                {
-                    perfText = Player.prop_Player_0.transform.Find("Player Nameplate/Canvas/Nameplate/Contents/Quick Stats/Performance Text").GetComponent<TMPro.TextMeshProUGUI>();
-                    AddColoredText("#ff00000", "???");
-                    AddSpacer();
-                }
+            {
+                PerformanceRating rating = Player.prop_Player_0.field_Internal_VRCPlayer_0.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall]; // Get from cache so it doesnt calculate perf all at once
+                AddColoredText("#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, rating)), PlayerEntry.ParsePerformanceText(rating).PadRight(5));
+                AddSpacer();
             }
 
             if (Config.displayNameToggle.Value)
@@ -97,6 +88,7 @@ namespace PlayerList.Entries
                 AddColoredText("#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(APIUser.CurrentUser)), APIUser.CurrentUser.displayName);
                 AddSpacer();
             }
+
 
             if (Config.condensedText.Value)
                 textComponent.text = textComponent.text.Remove(textComponent.text.Length - 1, 1);

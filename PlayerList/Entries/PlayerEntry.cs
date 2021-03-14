@@ -1,22 +1,21 @@
 ﻿using System;
 using UnityEngine;
 using VRC;
+using VRCSDK2.Validation.Performance;
 
 namespace PlayerList.Entries
 {
     public class PlayerEntry : EntryBase
     {
-        // - <color={pingcolor}>{ping}ms</color> | <color={fpscolor}>{fps}</color> | {platform} | <color={perfcolor}>{perf}</color> | <color={rankcolor}>{displayname}</color>
+        // - <color={pingcolor}>{ping}ms</color> | <color={fpscolor}>{fps}</color> | {platform} | <color={perfcolor}>{perf}</color> | {relationship} | <color={rankcolor}>{displayname}</color>
         public override string Name { get { return "Player"; } }
 
         public Player player;
         public string userID;
         public PlayerNet playerNet;
-        public TMPro.TextMeshProUGUI perfText;
 
         public bool blockedYou;
         public bool youBlocked;
-        public bool publicBanned;
 
         public override void Init(object[] parameters)
         {
@@ -25,7 +24,6 @@ namespace PlayerList.Entries
             playerNet = player.GetComponent<PlayerNet>();
 
             gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new Action(() => OpenPlayerInQuickMenu(player)));
-            perfText = player.transform.Find("Player Nameplate/Canvas/Nameplate/Contents/Quick Stats/Performance Text").GetComponent<TMPro.TextMeshProUGUI>();
         }
         protected override void ProcessText(object[] parameters = null)
         {
@@ -52,11 +50,13 @@ namespace PlayerList.Entries
                 // I STG if I have to remove fps because skids start walking up to people saying poeple's fps im gonna murder someone
                 if (Config.fpsToggle.Value)
                 {
-                    AddColor(GetFpsColor((int)(1000f / playerNet.field_Private_Byte_0)));
+                    int fps = (int)(1000f / playerNet.field_Private_Byte_0) < -99 ? -99 : Math.Min((int)(1000f / playerNet.field_Private_Byte_0), 999);
+
+                    AddColor(GetFpsColor(fps));
                     if (playerNet.field_Private_Byte_0 == 0)
                         AddEndColor("?".PadRight(3));
                     else
-                        AddEndColor(((int)(1000f / playerNet.field_Private_Byte_0)).ToString().PadRight(3));
+                        AddEndColor(fps.ToString().PadRight(3));
                     AddSpacer();
                 }
             }
@@ -80,23 +80,15 @@ namespace PlayerList.Entries
 
             if (Config.platformToggle.Value)
             {
-                AddText(ParsePlatform(player).PadRight(5));
+                AddText(ParsePlatform(player).PadRight(2));
                 AddSpacer();
             }
 
             if (Config.perfToggle.Value)
             {
-                if (perfText != null)
-                {
-                    AddColoredText("#" + ColorUtility.ToHtmlStringRGB(perfText.color), ParsePerformanceText(perfText.text).PadRight(5));
-                    AddSpacer();
-                }
-                else
-                {
-                    perfText = player.transform.Find("Player Nameplate/Canvas/Nameplate/Contents/Quick Stats/Performance Text").GetComponent<TMPro.TextMeshProUGUI>();
-                    AddColoredText("#ff00000", "???");
-                    AddSpacer();
-                }
+                PerformanceRating rating = player.field_Internal_VRCPlayer_0.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall]; // Get from cache so it doesnt calculate perf all at once
+                AddColoredText("#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, rating)), ParsePerformanceText(rating));
+                AddSpacer();
             }
 
             if (Config.displayNameToggle.Value) // Why?
@@ -122,11 +114,11 @@ namespace PlayerList.Entries
         {
             if (player.field_Private_APIUser_0.last_platform == "standalonewindows")
                 if (player.field_Private_VRCPlayerApi_0.IsUserInVR())
-                    return "VR".PadRight(5);
+                    return "VR".PadRight(2);
                 else
-                    return "PC".PadRight(5);
+                    return "PC".PadRight(2);
             else
-                return "Quest".PadRight(5);
+                return "Q".PadRight(2);
         }
         
         public static void OpenPlayerInQuickMenu(Player player)
@@ -166,22 +158,22 @@ namespace PlayerList.Entries
             else
                 return "#ff0000";
         }
-        public static string ParsePerformanceText(string perfText)
+        public static string ParsePerformanceText(PerformanceRating rating)
         {
-            switch (perfText.ToLower())
+            switch (rating)
             {
-                case "very poor":
-                    return "Awful";
-                case "poor":
-                    return "Poor";
-                case "medium":
-                    return "Med";
-                case "good":
-                    return "Good";
-                case "excellent":
-                    return "Great";
+                case PerformanceRating.VeryPoor:
+                    return "Awful".PadRight(5);
+                case PerformanceRating.Poor:
+                    return "Poor".PadRight(5);
+                case PerformanceRating.Medium:
+                    return "Med".PadRight(5);
+                case PerformanceRating.Good:
+                    return "Good".PadRight(5);
+                case PerformanceRating.Excellent:
+                    return "Great".PadRight(5);
                 default:
-                    return perfText;
+                    return rating.ToString().PadRight(5);
             }
         }
     }
