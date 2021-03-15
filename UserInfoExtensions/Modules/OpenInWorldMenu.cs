@@ -63,7 +63,7 @@ namespace UserInfoExtentions.Modules
             }
             else
             {
-                VRCUtils.OpenPopupV2("Notice", "Cannot grab this user's world", "Close", new Action(() => VRCUtils.ClosePopup()));
+                VRCUtils.OpenPopupV2("Notice", "Cannot grab this user's world", "Close", new Action(VRCUtils.ClosePopup));
             }
         }
     }

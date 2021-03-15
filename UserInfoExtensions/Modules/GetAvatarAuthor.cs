@@ -55,16 +55,23 @@ namespace UserInfoExtentions.Modules
         }
         public static void OnUserInfoOpen()
         {
-            avatarLink = new Il2CppSystem.Uri(VRCUtils.ActiveUser.currentAvatarImageUrl);
-
-            string adjustedLink = string.Format("https://{0}", avatarLink.Authority);
-
-            for (int i = 0; i < avatarLink.Segments.Length - 2; i++)
+            try
             {
-                adjustedLink += avatarLink.Segments[i];
-            }
+                avatarLink = new Il2CppSystem.Uri(VRCUtils.ActiveUser.currentAvatarImageUrl);
 
-            avatarLink = new Il2CppSystem.Uri(adjustedLink.Trim("/".ToCharArray()));
+                string adjustedLink = string.Format("https://{0}", avatarLink.Authority);
+
+                for (int i = 0; i < avatarLink.Segments.Length - 2; i++)
+                {
+                    adjustedLink += avatarLink.Segments[i];
+                }
+
+                avatarLink = new Il2CppSystem.Uri(adjustedLink.Trim("/".ToCharArray()));
+            }
+            catch
+            {
+                avatarLink = null;
+            }
         }
 
         public static async void FromSocial()
@@ -73,8 +80,13 @@ namespace UserInfoExtentions.Modules
 
             if (!canGet)
             {
-                VRCUtils.OpenPopupV2("Slow down!", "Please wait a little in between button presses", "Close", new Action(() => VRCUtils.ClosePopup()));
+                VRCUtils.OpenPopupV2("Slow down!", "Please wait a little in between button presses", "Close", new Action(VRCUtils.ClosePopup));
                 return;
+            }
+
+            if (avatarLink == null)
+            {
+                VRCUtils.OpenPopupV2("Error!", "Something went wrong and the avatar author could not be retreived. Please try again", "Close", new Action(VRCUtils.ClosePopup));
             }
 
             MelonCoroutines.Start(StartTimer());
@@ -98,7 +110,7 @@ namespace UserInfoExtentions.Modules
             }
             catch
             {
-                VRCUtils.OpenPopupV2("Error!", "Something went wrong and the author could not be retreived. Please try again", "Close", new Action(() => VRCUtils.ClosePopup()));
+                VRCUtils.OpenPopupV2("Error!", "Something went wrong and the author could not be retreived. Please try again", "Close", new Action(VRCUtils.ClosePopup));
                 return;
             }
         }
@@ -109,7 +121,7 @@ namespace UserInfoExtentions.Modules
 
             if (!canGet)
             {
-                VRCUtils.OpenPopupV2("Slow down!", "Please wait a little in between button presses", "Close", new Action(() => VRCUtils.ClosePopup()));
+                VRCUtils.OpenPopupV2("Slow down!", "Please wait a little in between button presses", "Close", new Action(VRCUtils.ClosePopup));
                 return;
             }
 
@@ -134,12 +146,12 @@ namespace UserInfoExtentions.Modules
             yield break;
         }
 
-        public static void OpenUserInSocialMenu(string userId) => APIUser.FetchUser(userId, new Action<APIUser>(OnUserFetched), new Action<string>((thing) => { VRCUtils.OpenPopupV2("Error!", "Something went wrong and the author could not be retreived.", "Close", new Action(() => VRCUtils.ClosePopup())); }));
+        public static void OpenUserInSocialMenu(string userId) => APIUser.FetchUser(userId, new Action<APIUser>(OnUserFetched), new Action<string>((thing) => { VRCUtils.OpenPopupV2("Error!", "Something went wrong and the author could not be retreived.", "Close", new Action(VRCUtils.ClosePopup)); }));
         private static void OnUserFetched(APIUser user)
         {
             if (isFromSocialPage && user.id == VRCUtils.ActiveUser.id)
             {
-                VRCUtils.OpenPopupV2("Notice:", "You are already viewing the avatar author", "Close", new Action(() => VRCUtils.ClosePopup()));
+                VRCUtils.OpenPopupV2("Notice:", "You are already viewing the avatar author", "Close", new Action(VRCUtils.ClosePopup));
                 return;
             }
 

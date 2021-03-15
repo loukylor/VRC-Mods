@@ -216,11 +216,11 @@ namespace UserInfoExtentions.Modules
 
             if (VRCUtils.ActiveUser.bio != null && VRCUtils.ActiveUser.bio.Length >= 100)
             {
-                VRCUtils.OpenPopupV1("Bio:", VRCUtils.ActiveUser.bio, "Close", new Action(() => VRCUtils.ClosePopup()));
+                VRCUtils.OpenPopupV1("Bio:", VRCUtils.ActiveUser.bio, "Close", new Action(VRCUtils.ClosePopup));
             }
             else
             {
-                VRCUtils.OpenPopupV2("Bio:", VRCUtils.ActiveUser.bio, "Close", new Action(() => VRCUtils.ClosePopup()));
+                VRCUtils.OpenPopupV2("Bio:", VRCUtils.ActiveUser.bio, "Close", new Action(VRCUtils.ClosePopup));
             }
         }
         public static void ShowBioLinksPopup()
@@ -229,18 +229,18 @@ namespace UserInfoExtentions.Modules
 
             if (VRCUtils.ActiveUser.bioLinks == null)
             {
-                VRCUtils.OpenPopupV2("Notice:", "Cannot get users links", "Close", new Action(() => VRCUtils.ClosePopup()));
+                VRCUtils.OpenPopupV2("Notice:", "Cannot get users links", "Close", new Action(VRCUtils.ClosePopup));
             }
             else
             {
                 CheckLinks(VRCUtils.ActiveUser.bioLinks);
                 if (VRCUtils.ActiveUser.bioLinks.Count == 0)
                 {
-                    VRCUtils.OpenPopupV2("Notice:", "This user has no bio links", "Close", new Action(() => VRCUtils.ClosePopup()));
+                    VRCUtils.OpenPopupV2("Notice:", "This user has no bio links", "Close", new Action(VRCUtils.ClosePopup));
                 }
                 else if (bioLinks.Count == 0)
                 {
-                    VRCUtils.OpenPopupV2("Notice:", "This user has invalid links", "Close", new Action(() => VRCUtils.ClosePopup()));
+                    VRCUtils.OpenPopupV2("Notice:", "This user has invalid links", "Close", new Action(VRCUtils.ClosePopup));
                 }
                 else
                 {
@@ -272,7 +272,7 @@ namespace UserInfoExtentions.Modules
 
             if (userLanguages == null || userLanguages.Count == 0)
             {
-                VRCUtils.OpenPopupV2("Notice:", "This user has no bio languages", "Close", new Action(() => VRCUtils.ClosePopup()));
+                VRCUtils.OpenPopupV2("Notice:", "This user has no bio languages", "Close", new Action(VRCUtils.ClosePopup));
             }
             else
             {

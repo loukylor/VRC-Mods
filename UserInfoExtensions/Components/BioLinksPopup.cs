@@ -63,7 +63,7 @@ namespace UserInfoExtentions.Components
             {
                 System.Diagnostics.Process.Start(currentLink.OriginalString);
                 Close();
-                VRCUtils.OpenPopupV2("Notice:", "Link has been opened in the default browser", "Close", new Action(() => VRCUtils.ClosePopup()));
+                VRCUtils.OpenPopupV2("Notice:", "Link has been opened in the default browser", "Close", new Action(VRCUtils.ClosePopup));
                 currentLink = null;
             }
         }

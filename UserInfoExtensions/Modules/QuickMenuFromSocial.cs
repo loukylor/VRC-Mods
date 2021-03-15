@@ -66,7 +66,7 @@ namespace UserInfoExtentions.Modules
                     return;
                 }
             }
-            VRCUtils.OpenPopupV2("Notice:", "You cannot show this user on the Quick Menu because they are not in the same instance", "Close", new Action(() => VRCUtils.ClosePopup()));
+            VRCUtils.OpenPopupV2("Notice:", "You cannot show this user on the Quick Menu because they are not in the same instance", "Close", new Action(VRCUtils.ClosePopup));
         }
     }
 }

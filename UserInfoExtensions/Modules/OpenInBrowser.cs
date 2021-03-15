@@ -34,7 +34,7 @@ namespace UserInfoExtentions.Modules
             UserInfoExtensionsMod.HideAllPopups();
 
             System.Diagnostics.Process.Start("https://vrchat.com/home/user/" + VRCUtils.ActiveUser.id);
-            VRCUtils.OpenPopupV2("Notice:", "User has been opened in the default browser", "Close", new Action(() => VRCUtils.ClosePopup()));
+            VRCUtils.OpenPopupV2("Notice:", "User has been opened in the default browser", "Close", new Action(VRCUtils.ClosePopup));
         }
     }
 }
