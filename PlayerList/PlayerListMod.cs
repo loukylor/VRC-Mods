@@ -14,7 +14,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using VRC;
 
-[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.2.2", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.2.3", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace PlayerList
@@ -336,8 +336,8 @@ namespace PlayerList
                 }
             }
 
-            foreach (KeyValuePair<string, PlayerEntry> playerEntry in playerEntries)
-                UnityEngine.Object.DestroyImmediate(playerEntry.Value.gameObject);
+            foreach (PlayerEntry playerEntry in playerEntries.Values.ToList())
+                playerEntry.Remove();
 
             playerEntries.Clear();
         }
