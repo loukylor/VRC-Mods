@@ -14,7 +14,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using VRC;
 
-[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.2.3", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.2.4", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace PlayerList
@@ -179,6 +179,9 @@ namespace PlayerList
 
             new ToggleButton(playerListMenus[0].path, new Vector3(5, -1), "Enabled on Start", "Disabled", new Action<bool>((state) => { Config.enabledOnStart.Value = state; hasConfigChanged = true; }), "Toggle if the list is toggled hidden on start", "Toggle if the list is toggled hidden on start", "EnabledOnStartToggle", Config.enabledOnStart.Value, true);
 
+            new ToggleButton(playerListMenus[0].path, new Vector3(0, 1), "Condense Text", "Regular Text", new Action<bool>((state) => { Config.condensedText.Value = !Config.condensedText.Value; RefreshPlayerEntries(); hasConfigChanged = true; }), "Toggle if text should be condensed", "Toggle if text should be condensed", "CondensedTextToggle", Config.condensedText.Value, true);
+            new ToggleButton(playerListMenus[0].path, new Vector3(0, 0), "Numbered List", "Tick List", new Action<bool>((state) => { Config.numberedList.Value = !Config.numberedList.Value; RefreshPlayerEntries(); hasConfigChanged = true; }), "Toggle if the list should be numbered or ticked", "Toggle if the list should be numbered or ticked", "NumberedTickToggle", Config.numberedList.Value, true);
+
             // TODO: Add opacity options, maybe color too, (maybe even for each stage of ping and fps??)
 
             // Add listeners
@@ -229,8 +232,6 @@ namespace PlayerList
             new SingleButton(playerListMenus[1].path, new Vector3(2, 2), "Font\nSize -", new Action(() => FontSize--), "Decrease font size of the list by 1", "DecreaseFontSizeButton", true);
             new SingleButton(playerListMenus[1].path, new Vector3(0, 1), "Reset\nFont", new Action(() => FontSize = 35), "Set font size to the default value (35)", "DefaultFontSizeButton", true);
             fontSizeLabel = new Label(playerListMenus[1].path, new Vector3(2, 1), $"Font\nSize: {FontSize}", "FontSizeLabel", resize: true);
-
-            new ToggleButton(playerListMenus[1].path, new Vector3(0, -1), "Condense Text", "Regular Text", new Action<bool>((state) => { Config.condensedText.Value = !Config.condensedText.Value; RefreshPlayerEntries(); hasConfigChanged = true; }), "Toggle if text should be condensed", "Toggle if text should be condensed", "CondensedTextToggle", Config.condensedText.Value, true);
 
             // Initialize PlayerList Customization menu
             playerListMenus.Add(new SubMenu("UserInterface/QuickMenu", "PlayerListMenuPage3"));
@@ -338,8 +339,6 @@ namespace PlayerList
 
             foreach (PlayerEntry playerEntry in playerEntries.Values.ToList())
                 playerEntry.Remove();
-
-            playerEntries.Clear();
         }
         public static void OnPlayerJoin(Player player)
         {
@@ -490,9 +489,16 @@ namespace PlayerList
         }
         public static void RefreshPlayerEntries()
         {
+            if (RoomManager.field_Internal_Static_ApiWorld_0 == null || Player.prop_Player_0 == null || Player.prop_Player_0.gameObject == null || !playerList.active) return;
+
             foreach (PlayerEntry entry in new List<EntryBase>(playerEntries.Values)) // Slow but allows me to remove things during its run
-                RefreshEntry(entry);
-            RefreshEntry(localPlayerEntry);
+                if (entry.player == null)
+                    entry.Remove();
+
+            foreach (PlayerEntry entry in playerEntries.Values)
+                entry.Refresh();
+
+            localPlayerEntry.Refresh();
 
             RefreshLayout();
         }
@@ -502,31 +508,9 @@ namespace PlayerList
             if (RoomManager.field_Internal_Static_ApiWorld_0 == null || Player.prop_Player_0 == null || Player.prop_Player_0.gameObject == null || !playerList.active) return;
 
             foreach (EntryBase entry in new List<EntryBase>(entries.Values))
-                RefreshEntry(entry);
+                entry.Refresh();
 
             RefreshLayout();
-        }
-        public static void RefreshEntry(EntryBase entry)
-        {
-            try
-            {
-                if (entry.textComponent == null || entry.gameObject == null)
-                {
-                    entries.Remove(entry.Identifier);
-
-                    if (entry is PlayerEntry playerEntry) playerEntries.Remove(playerEntry.player.field_Private_APIUser_0.id);
-                    return;
-                }
-                // Don't refresh if gameobject is hidden
-                else
-                    if (!entry.gameObject.active) return;
-
-                entry.Refresh();
-            }
-            catch (Exception ex)
-            {
-                MelonLogger.Error($"Error while processing text of entry with name of {entry.Name}:\n" + ex.ToString());
-            }
         }
         public static void SetLayerRecursive(GameObject gameObject, int layer)
         {

@@ -11,6 +11,7 @@ namespace PlayerList
 
         public static MelonPreferences_Entry<bool> enabledOnStart;
         public static MelonPreferences_Entry<bool> condensedText;
+        public static MelonPreferences_Entry<bool> numberedList;
         public static MelonPreferences_Entry<int> fontSize;
         public static MelonPreferences_Entry<int> snapToGridSize;
 
@@ -48,6 +49,7 @@ namespace PlayerList
         {
             enabledOnStart = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(enabledOnStart), true, is_hidden: true);
             condensedText = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(condensedText), false, is_hidden: true);
+            numberedList = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(numberedList), true, is_hidden: true);
             fontSize = (MelonPreferences_Entry<int>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(fontSize), 35, is_hidden: true);
             snapToGridSize = (MelonPreferences_Entry<int>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(snapToGridSize), 420, is_hidden: true);
 

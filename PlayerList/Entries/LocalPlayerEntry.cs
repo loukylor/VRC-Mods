@@ -20,6 +20,8 @@ namespace PlayerList.Entries
         }
         protected override void ProcessText(object[] parameters)
         {
+            // TODO: Figure out how to figure out how to know when someone blcosk u
+            /*
             List<PlayerEntry> playerEntries = PlayerListMod.playerEntries.Values.ToList();
             // Get blocked things
             foreach (ApiPlayerModeration moderation in ModerationManager.prop_ModerationManager_0.field_Private_List_1_ApiPlayerModeration_0)
@@ -44,11 +46,18 @@ namespace PlayerList.Entries
                     }
                 }
             }
+            */ 
 
-            if (Config.condensedText.Value)
-                AddText("-");
+            if (!Config.numberedList.Value)
+                if (Config.condensedText.Value)
+                    AddText("-");
+                else
+                    AddText(" - ");
             else
-                AddText(" - ");
+                if (Config.condensedText.Value)
+                AddText("1.".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 1));
+            else
+                AddText("1. ".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 2));
 
             // Convert to byte as that's what's sent over network so if you spoof your ping you'll see what's actually sent over the network
             if (Config.pingToggle.Value)

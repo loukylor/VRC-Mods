@@ -29,10 +29,16 @@ namespace PlayerList.Entries
         {
             if (player == null) Remove(); // Sometimes ppl will desync causing the leave event to not call
 
-            if (Config.condensedText.Value)
-                AddText("-");
+            if (!Config.numberedList.Value)
+                if (Config.condensedText.Value)
+                    AddText("-");
+                else
+                    AddText(" - ");
             else
-                AddText(" - ");
+                if (Config.condensedText.Value)
+                    AddText($"{gameObject.transform.GetSiblingIndex() - 1}.".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 1)); // Pad by weird amount because we cant include the header and disabled template in total number of gameobjects
+                else
+                    AddText($"{gameObject.transform.GetSiblingIndex() - 1}. ".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 2));
 
             if (playerNet != null)
             {
@@ -54,7 +60,7 @@ namespace PlayerList.Entries
 
                     AddColor(GetFpsColor(fps));
                     if (playerNet.field_Private_Byte_0 == 0)
-                        AddEndColor("?".PadRight(3));
+                        AddEndColor("?¿?".PadRight(3));
                     else
                         AddEndColor(fps.ToString().PadRight(3));
                     AddSpacer();
@@ -64,14 +70,14 @@ namespace PlayerList.Entries
             {
                 if (Config.pingToggle.Value)
                 {
-                    AddColoredText("#ff0000", "?".PadRight(4));
+                    AddColoredText("#ff0000", "?¿?".PadRight(4));
                     AddSpacer();
                 }
 
                 // I STG if I have to remove fps because skids start walking up to people saying poeple's fps im gonna murder someone
                 if (Config.fpsToggle.Value)
                 {
-                    AddColoredText("#ff0000", "?".PadRight(3));
+                    AddColoredText("#ff0000", "?¿?".PadRight(3));
                     AddSpacer();
                 }
 
@@ -172,6 +178,9 @@ namespace PlayerList.Entries
                     return "Good".PadRight(5);
                 case PerformanceRating.Excellent:
                     return "Great".PadRight(5);
+                case PerformanceRating.None:
+                    return "?¿?¿?".PadRight(5);
+                    // TODO: add load percentage??
                 default:
                     return rating.ToString().PadRight(5);
             }
