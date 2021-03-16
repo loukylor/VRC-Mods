@@ -1,4 +1,5 @@
-﻿using MelonLoader;
+﻿using System;
+using MelonLoader;
 using UnityEngine;
 
 namespace PlayerList
@@ -20,6 +21,12 @@ namespace PlayerList
         public static MelonPreferences_Entry<bool> platformToggle;
         public static MelonPreferences_Entry<bool> perfToggle;
         public static MelonPreferences_Entry<bool> displayNameToggle;
+        private static MelonPreferences_Entry<string> displayNameColorMode;
+        public static PlayerListMod.DisplayNameColorMode DisplayNameColorMode
+        {
+            get { return (PlayerListMod.DisplayNameColorMode)Enum.Parse(typeof(PlayerListMod.DisplayNameColorMode), displayNameColorMode.Value); }
+            set { displayNameColorMode.Value = value.ToString(); }
+        }
         public static bool HasSomethingOff
         {
             get
@@ -30,7 +37,12 @@ namespace PlayerList
             }
         }
 
-        public static MelonPreferences_Entry<int> playerListMenuButtonPosition;
+        private static MelonPreferences_Entry<string> playerListMenuButtonPosition;
+        public static PlayerListMod.PlayerListButtonPosition PlayerListMenuButtonPosition
+        {
+            get { return (PlayerListMod.PlayerListButtonPosition)Enum.Parse(typeof(PlayerListMod.PlayerListButtonPosition), playerListMenuButtonPosition.Value); }
+            set { playerListMenuButtonPosition.Value = value.ToString(); }
+        }
 
         private static MelonPreferences_Entry<float> _playerListPositionX;
         private static MelonPreferences_Entry<float> _playerListPositionY;
@@ -58,8 +70,9 @@ namespace PlayerList
             platformToggle = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(platformToggle), true, is_hidden: true);
             perfToggle = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(perfToggle), true, is_hidden: true);
             displayNameToggle = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(displayNameToggle), true, is_hidden: true);
+            displayNameColorMode = (MelonPreferences_Entry<string>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(displayNameColorMode), "TrustAndFriends", is_hidden: true);
 
-            playerListMenuButtonPosition = (MelonPreferences_Entry<int>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(playerListMenuButtonPosition), 1, is_hidden: true);
+            playerListMenuButtonPosition = (MelonPreferences_Entry<string>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(playerListMenuButtonPosition), "TopRight", is_hidden: true);
 
             _playerListPositionX = (MelonPreferences_Entry<float>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(_playerListPositionX), 7.5f, is_hidden: true);
             _playerListPositionY = (MelonPreferences_Entry<float>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(_playerListPositionY), 3.5f, is_hidden: true);

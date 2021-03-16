@@ -14,7 +14,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using VRC;
 
-[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.2.4", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.2.5", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace PlayerList
@@ -37,7 +37,7 @@ namespace PlayerList
 
         private static LocalPlayerEntry localPlayerEntry = null;
 
-        private static TileWithText snapToGridSizeLabel;
+        private static Label snapToGridSizeLabel;
         private static int _snapToGridSize;
         public static int SnapToGridSize
         {
@@ -57,7 +57,7 @@ namespace PlayerList
         private static bool shouldMove = false;
         private static bool hasConfigChanged = false;
         private static bool shouldStayHidden;
-        private static TileWithText fontSizeLabel;
+        private static Label fontSizeLabel;
         private static int _fontSize;
         public static int FontSize
         {
@@ -80,7 +80,7 @@ namespace PlayerList
             get { return _playerListMenuButtonPosition; }
             set
             {
-                if (value == (PlayerListButtonPosition)Config.playerListMenuButtonPosition.Value) return;
+                if (value == Config.PlayerListMenuButtonPosition) return;
 
                 switch (value)
                 {
@@ -105,12 +105,15 @@ namespace PlayerList
                         return;
                 }
                 _playerListMenuButtonPosition = value;
-                Config.playerListMenuButtonPosition.Value = (int)value;
+                Config.PlayerListMenuButtonPosition = value;
                 hasConfigChanged = true;
             }
         }
         public static ToggleButton menuToggleButton;
 
+        public override void OnApplicationStart()
+        {
+        }
         public override void VRChat_OnUiManagerInit()
         {
             ClassInjector.RegisterTypeInIl2Cpp<EnableDisableListener>();
@@ -156,7 +159,7 @@ namespace PlayerList
             shouldStayHidden = !Config.enabledOnStart.Value;
             _fontSize = Config.fontSize.Value;
             _snapToGridSize = Config.snapToGridSize.Value;
-            PlayerListMenuButtonPosition = (PlayerListButtonPosition)Config.playerListMenuButtonPosition.Value;
+            PlayerListMenuButtonPosition = Config.PlayerListMenuButtonPosition;
 
             EnableDisableListener playerListListener = playerList.AddComponent<EnableDisableListener>();
             playerListListener.OnEnableEvent += RefreshAllEntries;
@@ -242,8 +245,15 @@ namespace PlayerList
             new ToggleButton(playerListMenus[2].path, new Vector3(1, 1), "Enable Avatar Performance", "Disabled", new Action<bool>((state) => { Config.perfToggle.Value = state; hasConfigChanged = true; RefreshPlayerEntries(); }), "Toggle avatar performance", "Toggle avatar performance", "PerfToggle", Config.perfToggle.Value, true);
             new ToggleButton(playerListMenus[2].path, new Vector3(2, 1), "Enable DisplayName", "Disabled", new Action<bool>((state) => { Config.displayNameToggle.Value = state; hasConfigChanged = true; RefreshPlayerEntries(); }), "Why...?", "Why...?", "DisplayNameToggle", Config.displayNameToggle.Value, true);
 
+            new QuarterButton(playerListMenus[2].path, new Vector3(3, 1), new Vector2(0, 0), "TF", new Action(() => { Config.DisplayNameColorMode = DisplayNameColorMode.TrustAndFriends; RefreshPlayerEntries(); }), "Set displayname coloring to show friends and trust rank", "TrustAndFriendsButton");
+            new QuarterButton(playerListMenus[2].path, new Vector3(3, 1), new Vector2(1, 0), "T", new Action(() => { Config.DisplayNameColorMode = DisplayNameColorMode.TrustOnly; RefreshPlayerEntries(); }), "Set displayname coloring to show trust rank only", "TrustOnlyButton");
+            new QuarterButton(playerListMenus[2].path, new Vector3(3, 1), new Vector2(1, 1), "F", new Action(() => { Config.DisplayNameColorMode = DisplayNameColorMode.FriendsOnly; RefreshPlayerEntries(); }), "Set displayname coloring to show friends only", "FriendsOnlyButton");
+            new QuarterButton(playerListMenus[2].path, new Vector3(3, 1), new Vector2(0, 1), "N", new Action(() => { Config.DisplayNameColorMode = DisplayNameColorMode.None; RefreshPlayerEntries(); }), "Set displayname coloring to none", "NoneButton");
+
             // Add entries
             MelonLogger.Msg("Adding List Entries...");
+            PlayerEntry.Patch(Harmony);
+
             AddGeneralInfoEntry(EntryBase.CreateInstance<PlayerListHeaderEntry>(playerListLayout.transform.Find("Header").gameObject, includeConfig: true));
             AddGeneralInfoEntry(EntryBase.CreateInstance<RoomTimeEntry>(generalInfoLayout.transform.Find("RoomTime").gameObject, includeConfig: true));
             AddGeneralInfoEntry(EntryBase.CreateInstance<SystemTime12HrEntry>(generalInfoLayout.transform.Find("SystemTime12Hr").gameObject, includeConfig: true));
@@ -537,6 +547,13 @@ namespace PlayerList
             TopLeft,
             BottomLeft,
             BottomRight
+        }
+        public enum DisplayNameColorMode
+        {
+            TrustAndFriends,
+            TrustOnly,
+            FriendsOnly,
+            None
         }
     }
 }

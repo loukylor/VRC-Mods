@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using VRC;
 using VRC.Core;
-using VRC.Management;
 using VRCSDK2.Validation.Performance;
 
 namespace PlayerList.Entries
@@ -46,7 +43,7 @@ namespace PlayerList.Entries
                     }
                 }
             }
-            */ 
+            */
 
             if (!Config.numberedList.Value)
                 if (Config.condensedText.Value)
@@ -73,8 +70,8 @@ namespace PlayerList.Entries
 
             // I STG if I have to remove fps because skids start walking up to people saying poeple's fps im gonna murder someone
             if (Config.fpsToggle.Value)
-            {
-                int fps = (int)(1f / Time.deltaTime) < -99 ? -99 : Math.Min((int)(1f / Time.deltaTime), 999);
+            { 
+                int fps = Mathf.Clamp((int)(1f / Time.deltaTime), -99, 999); // Clamp between -99 and 999
                 AddColoredText(PlayerEntry.GetFpsColor(fps), fps.ToString().PadRight(3));
                 AddSpacer();
             }
@@ -94,7 +91,17 @@ namespace PlayerList.Entries
 
             if (Config.displayNameToggle.Value)
             {
-                AddColoredText("#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(APIUser.CurrentUser)), APIUser.CurrentUser.displayName);
+                switch (Config.DisplayNameColorMode)
+                {
+                    case PlayerListMod.DisplayNameColorMode.None:
+                    case PlayerListMod.DisplayNameColorMode.FriendsOnly:
+                        AddText(APIUser.CurrentUser.displayName);
+                        break;
+                    case PlayerListMod.DisplayNameColorMode.TrustAndFriends:
+                    case PlayerListMod.DisplayNameColorMode.TrustOnly:
+                        AddColoredText("#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(APIUser.CurrentUser)), APIUser.CurrentUser.displayName);
+                        break;
+                }
                 AddSpacer();
             }
 

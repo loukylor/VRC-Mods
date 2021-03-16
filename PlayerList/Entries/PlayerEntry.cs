@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
+using Harmony;
+using UnhollowerBaseLib.Attributes;
 using UnityEngine;
 using VRC;
+using VRC.Core;
 using VRCSDK2.Validation.Performance;
 
 namespace PlayerList.Entries
@@ -17,6 +22,13 @@ namespace PlayerList.Entries
         public bool blockedYou;
         public bool youBlocked;
 
+        public static Player currentGetPlayer;
+        public static void Patch(HarmonyInstance harmonyInstance) // All in the name of FUTUREPROOFING REEEEEEEEEEEEEEEEEEEEEE
+        {
+            MethodInfo getPlayer = typeof(PlayerManager).GetMethods()
+                .Where(mb => mb.Name.StartsWith("Method_Public_Static_Player_String_") && mb.GetCustomAttribute<CallerCountAttribute>().Count > 30).First();
+            harmonyInstance.Patch(getPlayer, new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnGetPlayer))));
+        }
         public override void Init(object[] parameters)
         {
             player = (Player)parameters[0];
@@ -56,11 +68,11 @@ namespace PlayerList.Entries
                 // I STG if I have to remove fps because skids start walking up to people saying poeple's fps im gonna murder someone
                 if (Config.fpsToggle.Value)
                 {
-                    int fps = (int)(1000f / playerNet.field_Private_Byte_0) < -99 ? -99 : Math.Min((int)(1000f / playerNet.field_Private_Byte_0), 999);
+                    int fps = Mathf.Clamp((int)(1000f / playerNet.field_Private_Byte_0), -99, 999);
 
                     AddColor(GetFpsColor(fps));
                     if (playerNet.field_Private_Byte_0 == 0)
-                        AddEndColor("?¿?".PadRight(3));
+                        AddEndColor("?¿?");
                     else
                         AddEndColor(fps.ToString().PadRight(3));
                     AddSpacer();
@@ -99,7 +111,30 @@ namespace PlayerList.Entries
 
             if (Config.displayNameToggle.Value) // Why?
             {
-                AddColoredText("#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(player.field_Private_APIUser_0)), player.field_Private_APIUser_0.displayName);
+                APIUser fakeUser;
+                switch (Config.DisplayNameColorMode)
+                {
+                    case PlayerListMod.DisplayNameColorMode.TrustAndFriends:
+                        AddColoredText("#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(player.field_Private_APIUser_0)), player.field_Private_APIUser_0.displayName);
+                        break;
+                    case PlayerListMod.DisplayNameColorMode.None:
+                        AddText(player.field_Private_APIUser_0.displayName);
+                        break;
+                    case PlayerListMod.DisplayNameColorMode.TrustOnly:
+                        // ty bono for this (https://github.com/ddakebono/)
+                        fakeUser = player.field_Private_APIUser_0.MemberwiseClone().Cast<APIUser>();
+                        fakeUser.id = "";
+
+                        currentGetPlayer = player;
+                        AddColoredText("#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(fakeUser)), player.field_Private_APIUser_0.displayName);
+                        break;
+                    case PlayerListMod.DisplayNameColorMode.FriendsOnly:
+                        if (APIUser.IsFriendsWith(player.field_Private_APIUser_0.id))
+                            AddColoredText("#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(player.field_Private_APIUser_0)), player.field_Private_APIUser_0.displayName);
+                        else
+                            AddText(player.field_Private_APIUser_0.displayName);
+                        break;
+                }
                 AddSpacer();
             }
 
@@ -107,6 +142,16 @@ namespace PlayerList.Entries
                 textComponent.text = textComponent.text.Remove(textComponent.text.Length - 1, 1);
             else
                 textComponent.text = textComponent.text.Remove(textComponent.text.Length - 3, 3);
+        }
+        public static bool OnGetPlayer(ref Player __result, string __0)
+        {
+            if (__0 == "")
+            {
+                MelonLoader.MelonLogger.Msg("Asdfasdfasdf");
+                __result = currentGetPlayer;
+                return false;
+            }
+            return true;
         }
         public void Remove()
         {
