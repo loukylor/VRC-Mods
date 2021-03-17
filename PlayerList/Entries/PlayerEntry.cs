@@ -106,7 +106,7 @@ namespace PlayerList.Entries
                 } 
                 else if (distance < 999900)
                 {
-                    AddText((distance / 10000).ToString("N0").PadRight(3) + "km");
+                    AddText((distance / 1000).ToString("N0").PadRight(3) + "km");
                 }
                 else
                 {
