@@ -45,17 +45,6 @@ namespace PlayerList.Entries
             }
             */
 
-            if (!Config.numberedList.Value)
-                if (Config.condensedText.Value)
-                    AddText("-");
-                else
-                    AddText(" - ");
-            else
-                if (Config.condensedText.Value)
-                AddText("1.".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 1));
-            else
-                AddText("1. ".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 2));
-
             // Convert to byte as that's what's sent over network so if you spoof your ping you'll see what's actually sent over the network
             if (Config.pingToggle.Value)
             { 
@@ -111,11 +100,22 @@ namespace PlayerList.Entries
                 AddSpacer();
             }
 
+            if (textComponent.text.Length > 0)
+                if (Config.condensedText.Value)
+                    textComponent.text = textComponent.text.Remove(textComponent.text.Length - 1, 1);
+                else
+                    textComponent.text = textComponent.text.Remove(textComponent.text.Length - 3, 3);
 
-            if (Config.condensedText.Value)
-                textComponent.text = textComponent.text.Remove(textComponent.text.Length - 1, 1);
+            if (!Config.numberedList.Value)
+                if (Config.condensedText.Value)
+                    AddTextToBeginning("-");
+                else
+                    AddTextToBeginning(" - ");
             else
-                textComponent.text = textComponent.text.Remove(textComponent.text.Length - 3, 3);
+                if (Config.condensedText.Value)
+                    AddTextToBeginning("1.".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 1));
+                else
+                    AddTextToBeginning("1. ".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 2));
         }
     }
 }

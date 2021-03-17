@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
 using Harmony;
-using UnhollowerBaseLib.Attributes;
 using UnityEngine;
 using VRC;
 using VRC.Core;
@@ -38,17 +35,6 @@ namespace PlayerList.Entries
         protected override void ProcessText(object[] parameters = null)
         {
             if (player == null) Remove(); // Sometimes ppl will desync causing the leave event to not call
-
-            if (!Config.numberedList.Value)
-                if (Config.condensedText.Value)
-                    AddText("-");
-                else
-                    AddText(" - ");
-            else
-                if (Config.condensedText.Value)
-                    AddText($"{gameObject.transform.GetSiblingIndex() - 1}.".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 1)); // Pad by weird amount because we cant include the header and disabled template in total number of gameobjects
-                else
-                    AddText($"{gameObject.transform.GetSiblingIndex() - 1}. ".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 2));
 
             if (playerNet != null)
             {
@@ -154,10 +140,23 @@ namespace PlayerList.Entries
                 AddSpacer();
             }
 
-            if (Config.condensedText.Value)
-                textComponent.text = textComponent.text.Remove(textComponent.text.Length - 1, 1);
+            if (textComponent.text.Length > 0)
+                if (Config.condensedText.Value)
+                    textComponent.text = textComponent.text.Remove(textComponent.text.Length - 1, 1);
+                else
+                    textComponent.text = textComponent.text.Remove(textComponent.text.Length - 3, 3);
+
+            if (!Config.numberedList.Value)
+                if (Config.condensedText.Value)
+                    AddTextToBeginning("-");
+                else
+                    AddTextToBeginning(" - ");
             else
-                textComponent.text = textComponent.text.Remove(textComponent.text.Length - 3, 3);
+                if (Config.condensedText.Value)
+                    AddTextToBeginning($"{gameObject.transform.GetSiblingIndex() - 1}.".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 1)); // Pad by weird amount because we cant include the header and disabled template in total number of gameobjects
+                else
+                    AddTextToBeginning($"{gameObject.transform.GetSiblingIndex() - 1}. ".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 2));
+
         }
         public static bool OnIsFriend(ref bool __result)
         {
