@@ -22,12 +22,10 @@ namespace PlayerList.Entries
         public bool blockedYou;
         public bool youBlocked;
 
-        public static Player currentGetPlayer;
+        public static bool spoofFriend;
         public static void Patch(HarmonyInstance harmonyInstance) // All in the name of FUTUREPROOFING REEEEEEEEEEEEEEEEEEEEEE
         {
-            MethodInfo getPlayer = typeof(PlayerManager).GetMethods()
-                .Where(mb => mb.Name.StartsWith("Method_Public_Static_Player_String_") && mb.GetCustomAttribute<CallerCountAttribute>().Count > 30).First();
-            harmonyInstance.Patch(getPlayer, new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnGetPlayer))));
+            harmonyInstance.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend))));
         }
         public override void Init(object[] parameters)
         {
@@ -108,10 +106,31 @@ namespace PlayerList.Entries
                 AddColoredText("#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, rating)), ParsePerformanceText(rating));
                 AddSpacer();
             }
+            
+            if (Config.distanceToggle.Value)
+            {
+                float distance = (player.transform.position - Player.prop_Player_0.transform.position).magnitude;
+                if (distance < 100)
+                {
+                    AddText(distance.ToString("N1").PadRight(4) + "m");
+                }
+                else if (distance < 10000)
+                {
+                    AddText((distance / 1000).ToString("N1").PadRight(3) + "km");
+                } 
+                else if (distance < 999900)
+                {
+                    AddText((distance / 10000).ToString("N0").PadRight(3) + "km");
+                }
+                else
+                {
+                    AddText((distance / 9.461e+15).ToString("N2").PadRight(3) + "ly"); // If its too large for kilometers ***just convert to light years***
+                }
+                AddSpacer();
+            }
 
             if (Config.displayNameToggle.Value) // Why?
             {
-                APIUser fakeUser;
                 switch (Config.DisplayNameColorMode)
                 {
                     case PlayerListMod.DisplayNameColorMode.TrustAndFriends:
@@ -122,11 +141,8 @@ namespace PlayerList.Entries
                         break;
                     case PlayerListMod.DisplayNameColorMode.TrustOnly:
                         // ty bono for this (https://github.com/ddakebono/)
-                        fakeUser = player.field_Private_APIUser_0.MemberwiseClone().Cast<APIUser>();
-                        fakeUser.id = "";
-
-                        currentGetPlayer = player;
-                        AddColoredText("#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(fakeUser)), player.field_Private_APIUser_0.displayName);
+                        spoofFriend = true;
+                        AddColoredText("#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(player.field_Private_APIUser_0)), player.field_Private_APIUser_0.displayName);
                         break;
                     case PlayerListMod.DisplayNameColorMode.FriendsOnly:
                         if (APIUser.IsFriendsWith(player.field_Private_APIUser_0.id))
@@ -143,12 +159,12 @@ namespace PlayerList.Entries
             else
                 textComponent.text = textComponent.text.Remove(textComponent.text.Length - 3, 3);
         }
-        public static bool OnGetPlayer(ref Player __result, string __0)
+        public static bool OnIsFriend(ref bool __result)
         {
-            if (__0 == "")
+            if (spoofFriend)
             {
-                MelonLoader.MelonLogger.Msg("Asdfasdfasdf");
-                __result = currentGetPlayer;
+                __result = false;
+                spoofFriend = false;
                 return false;
             }
             return true;

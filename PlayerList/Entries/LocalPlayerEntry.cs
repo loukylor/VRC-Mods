@@ -89,6 +89,12 @@ namespace PlayerList.Entries
                 AddSpacer();
             }
 
+            if (Config.distanceToggle.Value)
+            {
+                AddText("0.0 m");
+                AddSpacer();
+            }
+            
             if (Config.displayNameToggle.Value)
             {
                 switch (Config.DisplayNameColorMode)

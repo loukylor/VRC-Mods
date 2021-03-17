@@ -20,6 +20,7 @@ namespace PlayerList
         public static MelonPreferences_Entry<bool> fpsToggle;
         public static MelonPreferences_Entry<bool> platformToggle;
         public static MelonPreferences_Entry<bool> perfToggle;
+        public static MelonPreferences_Entry<bool> distanceToggle;
         public static MelonPreferences_Entry<bool> displayNameToggle;
         private static MelonPreferences_Entry<string> displayNameColorMode;
         public static PlayerListMod.DisplayNameColorMode DisplayNameColorMode
@@ -69,6 +70,7 @@ namespace PlayerList
             fpsToggle = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(fpsToggle), true, is_hidden: true);
             platformToggle = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(platformToggle), true, is_hidden: true);
             perfToggle = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(perfToggle), true, is_hidden: true);
+            distanceToggle = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(distanceToggle), true, is_hidden: true);
             displayNameToggle = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(displayNameToggle), true, is_hidden: true);
             displayNameColorMode = (MelonPreferences_Entry<string>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(displayNameColorMode), "TrustAndFriends", is_hidden: true);
 

@@ -84,11 +84,11 @@ namespace PlayerList
 
                 switch (value)
                 {
-                    case PlayerListButtonPosition.TopLeft:
+                    case PlayerListButtonPosition.TopRight:
                         playerListMenuButton.transform.localPosition = Converters.ConvertToUnityUnits(new Vector3(4, -1));
                         playerListMenuButton.GetComponent<RectTransform>().pivot = new Vector2(0, 0);
                         break;
-                    case PlayerListButtonPosition.TopRight:
+                    case PlayerListButtonPosition.TopLeft:
                         playerListMenuButton.transform.localPosition = Converters.ConvertToUnityUnits(new Vector3(2, -1));
                         playerListMenuButton.GetComponent<RectTransform>().pivot = new Vector2(1, 0);
                         break;
@@ -101,7 +101,7 @@ namespace PlayerList
                         playerListMenuButton.GetComponent<RectTransform>().pivot = new Vector2(0, 1);
                         break;
                     default:
-                        PlayerListMenuButtonPosition = PlayerListButtonPosition.TopLeft;
+                        PlayerListMenuButtonPosition = PlayerListButtonPosition.TopRight;
                         return;
                 }
                 _playerListMenuButtonPosition = value;
@@ -111,9 +111,6 @@ namespace PlayerList
         }
         public static ToggleButton menuToggleButton;
 
-        public override void OnApplicationStart()
-        {
-        }
         public override void VRChat_OnUiManagerInit()
         {
             ClassInjector.RegisterTypeInIl2Cpp<EnableDisableListener>();
@@ -127,6 +124,36 @@ namespace PlayerList
 
             quickMenuColliderSize = Constants.quickMenu.GetComponent<BoxCollider>().size;
 
+            LoadAssetBundle();
+
+            playerListLayout = playerList.transform.Find("PlayerList Viewport/PlayerList").GetComponent<VerticalLayoutGroup>();
+            generalInfoLayout = playerList.transform.Find("GeneralInfo Viewport/GeneralInfo").GetComponent<VerticalLayoutGroup>();
+
+            // Initialize UIManager
+            UIManager.Init();
+            UIManager.UIInit(Harmony);
+
+            // Initialize submenu for the list 
+            CreateMainSubMenu();
+
+            // TODO: Add opacity options, maybe color too, (maybe even for each stage of ping and fps??)
+
+            AddMenuListeners();
+            CreateSubMenus();
+            PlayerEntry.Patch(Harmony);
+            AddWorldInfoEntries();
+            CreateWorldInfoSubMenus();
+            AdjustSubMenus();
+
+            // Initialize on leave and join events
+            NetworkHooks.NetworkInit();
+            NetworkHooks.OnPlayerJoin += new Action<Player>((player) => OnPlayerJoin(player));
+            NetworkHooks.OnPlayerLeave += new Action<Player>((player) => OnPlayerLeave(player));
+            
+            MelonLogger.Msg("Initialized!");
+        }
+        public static void LoadAssetBundle()
+        {
             // Stolen from UIExpansionKit (https://github.com/knah/VRCMods/blob/master/UIExpansionKit) #Imnotaskidiswear
             MelonLogger.Msg("Loading List UI...");
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("PlayerList.playerlistmod.assetbundle"))
@@ -161,17 +188,12 @@ namespace PlayerList
             _snapToGridSize = Config.snapToGridSize.Value;
             PlayerListMenuButtonPosition = Config.PlayerListMenuButtonPosition;
 
+
             EnableDisableListener playerListListener = playerList.AddComponent<EnableDisableListener>();
             playerListListener.OnEnableEvent += RefreshAllEntries;
-
-            playerListLayout = playerList.transform.Find("PlayerList Viewport/PlayerList").GetComponent<VerticalLayoutGroup>();
-            generalInfoLayout = playerList.transform.Find("GeneralInfo Viewport/GeneralInfo").GetComponent<VerticalLayoutGroup>();
-
-            // Initialize UIManager
-            UIManager.Init();
-            UIManager.UIInit(Harmony);
-
-            // Initialize submenu for the list 
+        }
+        public static void CreateMainSubMenu()
+        {
             MelonLogger.Msg("Initializing Menu...");
             playerListMenus.Add(new SubMenu("UserInterface/QuickMenu", "PlayerListMenuPage1"));
 
@@ -184,9 +206,9 @@ namespace PlayerList
 
             new ToggleButton(playerListMenus[0].path, new Vector3(0, 1), "Condense Text", "Regular Text", new Action<bool>((state) => { Config.condensedText.Value = !Config.condensedText.Value; RefreshPlayerEntries(); hasConfigChanged = true; }), "Toggle if text should be condensed", "Toggle if text should be condensed", "CondensedTextToggle", Config.condensedText.Value, true);
             new ToggleButton(playerListMenus[0].path, new Vector3(0, 0), "Numbered List", "Tick List", new Action<bool>((state) => { Config.numberedList.Value = !Config.numberedList.Value; RefreshPlayerEntries(); hasConfigChanged = true; }), "Toggle if the list should be numbered or ticked", "Toggle if the list should be numbered or ticked", "NumberedTickToggle", Config.numberedList.Value, true);
-
-            // TODO: Add opacity options, maybe color too, (maybe even for each stage of ping and fps??)
-
+        }
+        public static void AddMenuListeners()
+        {
             // Add listeners
             EnableDisableListener shortcutMenuListener = Constants.shortcutMenu.AddComponent<EnableDisableListener>();
             shortcutMenuListener.OnEnableEvent += new Action(() => { playerList.SetActive(!shouldStayHidden); UIManager.CurrentMenu = Constants.shortcutMenu; });
@@ -213,7 +235,9 @@ namespace PlayerList
                 Tabs.SetActive(true);
                 newElements.SetActive(true);
             });
-
+        }
+        public static void CreateSubMenus()
+        {
             // Initialize Movement menu
             playerListMenus.Add(new SubMenu("UserInterface/QuickMenu", "PlayerListMenuPage2"));
 
@@ -243,17 +267,17 @@ namespace PlayerList
             new ToggleButton(playerListMenus[2].path, new Vector3(2, 0), "Enable Fps", "Disabled", new Action<bool>((state) => { Config.fpsToggle.Value = state; hasConfigChanged = true; RefreshPlayerEntries(); }), "Toggle player fps", "Toggle player fps", "FpsToggle", Config.fpsToggle.Value, true);
             new ToggleButton(playerListMenus[2].path, new Vector3(3, 0), "Enable Platform", "Disabled", new Action<bool>((state) => { Config.platformToggle.Value = state; hasConfigChanged = true; RefreshPlayerEntries(); }), "Toggle player Platform", "Toggle player Platform", "PlatformToggle", Config.platformToggle.Value, true);
             new ToggleButton(playerListMenus[2].path, new Vector3(1, 1), "Enable Avatar Performance", "Disabled", new Action<bool>((state) => { Config.perfToggle.Value = state; hasConfigChanged = true; RefreshPlayerEntries(); }), "Toggle avatar performance", "Toggle avatar performance", "PerfToggle", Config.perfToggle.Value, true);
-            new ToggleButton(playerListMenus[2].path, new Vector3(2, 1), "Enable DisplayName", "Disabled", new Action<bool>((state) => { Config.displayNameToggle.Value = state; hasConfigChanged = true; RefreshPlayerEntries(); }), "Why...?", "Why...?", "DisplayNameToggle", Config.displayNameToggle.Value, true);
+            new ToggleButton(playerListMenus[2].path, new Vector3(2, 1), "Enable Distance", "Disabled", new Action<bool>((state) => { Config.distanceToggle.Value = state; hasConfigChanged = true; RefreshPlayerEntries(); }), "Toggle distance to player", "Toggle distance to player", "DistanceToPlayerToggle", Config.distanceToggle.Value, true);
+            new ToggleButton(playerListMenus[2].path, new Vector3(3, 1), "Enable DisplayName", "Disabled", new Action<bool>((state) => { Config.displayNameToggle.Value = state; hasConfigChanged = true; RefreshPlayerEntries(); }), "Why...?", "Why...?", "DisplayNameToggle", Config.displayNameToggle.Value, true);
 
-            new QuarterButton(playerListMenus[2].path, new Vector3(3, 1), new Vector2(0, 0), "TF", new Action(() => { Config.DisplayNameColorMode = DisplayNameColorMode.TrustAndFriends; RefreshPlayerEntries(); hasConfigChanged = true; }), "Set displayname coloring to show friends and trust rank", "TrustAndFriendsButton");
-            new QuarterButton(playerListMenus[2].path, new Vector3(3, 1), new Vector2(1, 0), "T", new Action(() => { Config.DisplayNameColorMode = DisplayNameColorMode.TrustOnly; RefreshPlayerEntries(); hasConfigChanged = true; }), "Set displayname coloring to show trust rank only", "TrustOnlyButton");
-            new QuarterButton(playerListMenus[2].path, new Vector3(3, 1), new Vector2(1, 1), "F", new Action(() => { Config.DisplayNameColorMode = DisplayNameColorMode.FriendsOnly; RefreshPlayerEntries(); hasConfigChanged = true; }), "Set displayname coloring to show friends only", "FriendsOnlyButton");
-            new QuarterButton(playerListMenus[2].path, new Vector3(3, 1), new Vector2(0, 1), "N", new Action(() => { Config.DisplayNameColorMode = DisplayNameColorMode.None; RefreshPlayerEntries(); hasConfigChanged = true; }), "Set displayname coloring to none", "NoneButton");
-
-            // Add entries
+            new QuarterButton(playerListMenus[2].path, new Vector3(3, 2), new Vector2(0, 0), "TF", new Action(() => { Config.DisplayNameColorMode = DisplayNameColorMode.TrustAndFriends; RefreshPlayerEntries(); hasConfigChanged = true; }), "Set displayname coloring to show friends and trust rank", "TrustAndFriendsButton");
+            new QuarterButton(playerListMenus[2].path, new Vector3(3, 2), new Vector2(1, 0), "T", new Action(() => { Config.DisplayNameColorMode = DisplayNameColorMode.TrustOnly; RefreshPlayerEntries(); hasConfigChanged = true; }), "Set displayname coloring to show trust rank only", "TrustOnlyButton");
+            new QuarterButton(playerListMenus[2].path, new Vector3(3, 2), new Vector2(1, 1), "F", new Action(() => { Config.DisplayNameColorMode = DisplayNameColorMode.FriendsOnly; RefreshPlayerEntries(); hasConfigChanged = true; }), "Set displayname coloring to show friends only", "FriendsOnlyButton");
+            new QuarterButton(playerListMenus[2].path, new Vector3(3, 2), new Vector2(0, 1), "N", new Action(() => { Config.DisplayNameColorMode = DisplayNameColorMode.None; RefreshPlayerEntries(); hasConfigChanged = true; }), "Set displayname coloring to none", "NoneButton");
+        }
+        public static void AddWorldInfoEntries()
+        {
             MelonLogger.Msg("Adding List Entries...");
-            PlayerEntry.Patch(Harmony);
-
             AddGeneralInfoEntry(EntryBase.CreateInstance<PlayerListHeaderEntry>(playerListLayout.transform.Find("Header").gameObject, includeConfig: true));
             AddGeneralInfoEntry(EntryBase.CreateInstance<RoomTimeEntry>(generalInfoLayout.transform.Find("RoomTime").gameObject, includeConfig: true));
             AddGeneralInfoEntry(EntryBase.CreateInstance<SystemTime12HrEntry>(generalInfoLayout.transform.Find("SystemTime12Hr").gameObject, includeConfig: true));
@@ -264,7 +288,9 @@ namespace PlayerList
             AddGeneralInfoEntry(EntryBase.CreateInstance<WorldAuthorEntry>(generalInfoLayout.transform.Find("WorldAuthor").gameObject, includeConfig: true));
             AddGeneralInfoEntry(EntryBase.CreateInstance<InstanceMasterEntry>(generalInfoLayout.transform.Find("InstanceMaster").gameObject, includeConfig: true));
             AddGeneralInfoEntry(EntryBase.CreateInstance<InstanceCreatorEntry>(generalInfoLayout.transform.Find("InstanceCreator").gameObject, includeConfig: true));
-
+        }
+        public static void CreateWorldInfoSubMenus()
+        {
             // Create Toggle Button Submenus (done automatically to enable expandability)
             int totalMade = 0;
             for (int i = 0; i < Math.Ceiling(generalInfoEntries.Count / 9f); i++)
@@ -279,11 +305,12 @@ namespace PlayerList
 
                 playerListMenus.Add(subMenu);
             }
-
+        }
+        public static void AdjustSubMenus()
+        {
             for (int i = 0; i < playerListMenus.Count; i++)
             {
                 int k = i; // dum reference stuff
-
 
                 if (i > 0)
                 {
@@ -308,14 +335,8 @@ namespace PlayerList
                     playerListRect.localPosition = new Vector3(playerListRect.localPosition.x, playerListRect.localPosition.y, 25);
                 });
             }
-
-            // Initialize on leave and join events
-            NetworkHooks.NetworkInit();
-            NetworkHooks.OnPlayerJoin += new Action<Player>((player) => OnPlayerJoin(player));
-            NetworkHooks.OnPlayerLeave += new Action<Player>((player) => OnPlayerLeave(player));
-            
-            MelonLogger.Msg("Initialized!");
         }
+
         public override void OnUpdate()
         {
             if (timer.Elapsed.TotalSeconds > 1)
@@ -378,7 +399,8 @@ namespace PlayerList
 
         public static void MovePlayerListToEndOfMenu()
         {
-            RectTransform furthestTransform = new GameObject("temp", new UnhollowerBaseLib.Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[] { Il2CppType.Of<RectTransform>() })).GetComponent<RectTransform>(); // Create new gameobject with recttransform on it
+            GameObject temp = new GameObject("temp", new UnhollowerBaseLib.Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[] { Il2CppType.Of<RectTransform>() }));
+            RectTransform furthestTransform = temp.GetComponent<RectTransform>(); // Create new gameobject with recttransform on it
             foreach (var child in Constants.shortcutMenu.transform)
             {
                 RectTransform childRect = child.Cast<RectTransform>();
@@ -388,6 +410,7 @@ namespace PlayerList
 
             Config.PlayerListPosition = new Vector2(furthestTransform.anchoredPosition.x + (furthestTransform.rect.width / 2), playerListRect.anchoredPosition.y);
             CombineQMColliderAndPlayerListRect(useConfigValues: true);
+            UnityEngine.Object.Destroy(temp);
         }
         public static void MovePlayerList()
         {
@@ -452,6 +475,7 @@ namespace PlayerList
             float playerListTop;
             float playerListRight;
             float playerListBottom;
+
             if (!useConfigValues)
             {
                 playerListLeft = playerListRect.anchoredPosition.x - playerListRect.sizeDelta.x / 2;
