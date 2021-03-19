@@ -55,11 +55,11 @@ namespace UserInfoExtentions.Modules
                     closeMenu.Invoke(VRCUiManager.prop_VRCUiManager_0, new object[] { true, false }); //Closes Big Menu
                     openQuickMenu.Invoke(QuickMenu.prop_QuickMenu_0, new object[] { true }); //Opens Quick Menu
 
-                    if (mouseCursor.gameObject.activeSelf) mouseCursor.Method_Public_Void_VRCPlayer_0(player.field_Internal_VRCPlayer_0);
+                    if (mouseCursor.gameObject.activeSelf) mouseCursor.Method_Public_Void_VRCPlayer_PDM_0(player.field_Internal_VRCPlayer_0);
 
-                    if (rightCursor.gameObject.activeSelf) rightCursor.Method_Public_Void_VRCPlayer_0(player.field_Internal_VRCPlayer_0);
+                    if (rightCursor.gameObject.activeSelf) rightCursor.Method_Public_Void_VRCPlayer_PDM_0(player.field_Internal_VRCPlayer_0);
 
-                    if (leftCursor.gameObject.activeSelf) leftCursor.Method_Public_Void_VRCPlayer_0(player.field_Internal_VRCPlayer_0);
+                    if (leftCursor.gameObject.activeSelf) leftCursor.Method_Public_Void_VRCPlayer_PDM_0(player.field_Internal_VRCPlayer_0);
 
                     QuickMenu.prop_QuickMenu_0.Method_Public_Void_Player_0(player); //Does the rest lmao
 
