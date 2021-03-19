@@ -8,18 +8,23 @@ namespace PlayerList.Entries
     {
         public override string Name { get { return "Instance Creator"; } }
 
-        public bool hasCheckedInstance;
+        public string lastInstanceId;
         public string creatorTag;
         public string lastUserDisplayName;
         protected override void ProcessText(object[] parameters = null)
         {
             if (RoomManager.field_Internal_Static_ApiWorldInstance_0 != null)
             {
-                if (hasCheckedInstance)
+                if (RoomManager.field_Internal_Static_ApiWorldInstance_0.idWithTags == lastInstanceId)
                 {
                     ChangeEntry("instancecreator", lastUserDisplayName);
                     return;
                 }
+                else
+                {
+                    lastInstanceId = RoomManager.field_Internal_Static_ApiWorldInstance_0.idWithTags;
+                }
+
                 Il2CppSystem.Collections.Generic.List<ApiWorldInstance.InstanceTag> tags = RoomManager.field_Internal_Static_ApiWorldInstance_0.ParseTags(RoomManager.field_Internal_Static_ApiWorldInstance_0.idWithTags);
                 foreach (ApiWorldInstance.InstanceTag tag in tags)
                 {
@@ -48,12 +53,8 @@ namespace PlayerList.Entries
                         return;
                     }
                 }
-                hasCheckedInstance = true;
             }
-            else
-            {
-                hasCheckedInstance = false;
-            }
+            lastUserDisplayName = "No Instance Creator";
             ChangeEntry("instancecreator", "No Instance Creator");
             creatorTag = null;
         }
