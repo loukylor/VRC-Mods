@@ -52,7 +52,7 @@ Adds a player list to the ShortcutMenu
 
 ## Features
 Each entry to the player list is a button that will open the user in the QuickMenu on click.
-The player's name will be colored to the rank they are (OGTrustRanks compatible!), each entry also has the player's ping, fps, platform and avatar performance.
+The player's name will be colored to the rank they are (OGTrustRanks compatible!), each entry also has the player's ping, fps, platform, avatar performance and distance from you.
 You may also toggle each of these on and off, so if you don't like how the avatar performance takes up space, you can turn it off.
 
 There is also a list of info about the game and world you are in.
@@ -69,6 +69,8 @@ It lists:
 And Each of these can be individually toggled on or off.
 
 Now for more customizable things, you can change fontsize, the list's position (the QuickMenu hitbox will scale automatically), and the PlayerList button position.
+You can also change the color of the name, so instead of showing trust and friends, you could show friends only, or trust only, or just none.
+The list can also be numbered, or ticked and can be condensed so more stuff fits on one line.
 
 I also plan to add more entries, please ping or DM with ideas. I don't bite!
 Oh yea, also report any errors to me. You can make an issue or ping/DM me.
