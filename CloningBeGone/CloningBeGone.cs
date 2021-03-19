@@ -2,7 +2,7 @@
 using UnityEngine;
 using VRC.Core;
 
-[assembly: MelonInfo(typeof(CloningBeGone.CloningBeGoneMod), "CloningBeGone", "1.1.0", "loukylor (https://github.com/loukylor/CloningBeGone)")]
+[assembly: MelonInfo(typeof(CloningBeGone.CloningBeGoneMod), "CloningBeGone", "1.1.1", "loukylor (https://github.com/loukylor/CloningBeGone)")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace CloningBeGone
@@ -61,6 +61,10 @@ namespace CloningBeGone
                     break;
             }
         }
-        public static void SetCloning(bool value) => GameObject.Find("UserInterface/MenuContent/Screens/Settings/OtherOptionsPanel/AllowAvatarCopyingToggle").GetComponent<UiSettingConfig>().SetEnable(value);
+        public static void SetCloning(bool value)
+        {
+            if (Photon.Pun.PhotonNetwork.field_Public_Static_LoadBalancingClient_0.prop_Room_0 != null)
+                GameObject.Find("UserInterface/MenuContent/Screens/Settings/OtherOptionsPanel/AllowAvatarCopyingToggle").GetComponent<UiSettingConfig>().SetEnable(value);
+        }
     }
 }
