@@ -122,8 +122,6 @@ namespace PlayerList
             // Initialize input manager
             InputManager.UiInit();
 
-            quickMenuColliderSize = Constants.quickMenu.GetComponent<BoxCollider>().size;
-
             LoadAssetBundle();
 
             playerListLayout = playerList.transform.Find("PlayerList Viewport/PlayerList").GetComponent<VerticalLayoutGroup>();
@@ -168,7 +166,6 @@ namespace PlayerList
                 }
             }
             SetLayerRecursive(playerListMenuButton, 12);
-            playerListMenuButton.GetComponent<Button>().onClick.AddListener(new Action(() => { UIManager.OpenPage(playerListMenus[0].path); playerList.SetActive(!shouldStayHidden); }));
             playerListMenuButton.transform.localPosition = Converters.ConvertToUnityUnits(new Vector3(4, -1));
             playerListMenuButton.GetComponent<RectTransform>().pivot = new Vector2(0, 0);
 
@@ -179,7 +176,6 @@ namespace PlayerList
             SetLayerRecursive(playerList, 12);
             playerListRect = playerList.GetComponent<RectTransform>();
             playerListRect.anchoredPosition = Config.PlayerListPosition;
-            CombineQMColliderAndPlayerListRect();
             playerListRect.localPosition = new Vector3(playerListRect.localPosition.x, playerListRect.localPosition.y, 25); // Do this or else it looks off for whatever reason
             playerList.SetActive(false);
 
@@ -206,6 +202,8 @@ namespace PlayerList
 
             new ToggleButton(playerListMenus[0].path, new Vector3(0, 1), "Condense Text", "Regular Text", new Action<bool>((state) => { Config.condensedText.Value = !Config.condensedText.Value; RefreshPlayerEntries(); hasConfigChanged = true; }), "Toggle if text should be condensed", "Toggle if text should be condensed", "CondensedTextToggle", Config.condensedText.Value, true);
             new ToggleButton(playerListMenus[0].path, new Vector3(0, 0), "Numbered List", "Tick List", new Action<bool>((state) => { Config.numberedList.Value = !Config.numberedList.Value; RefreshPlayerEntries(); hasConfigChanged = true; }), "Toggle if the list should be numbered or ticked", "Toggle if the list should be numbered or ticked", "NumberedTickToggle", Config.numberedList.Value, true);
+
+            playerListMenuButton.GetComponent<Button>().onClick.AddListener(new Action(() => { UIManager.OpenPage(playerListMenus[0].path); playerList.SetActive(!shouldStayHidden); }));
         }
         public static void AddMenuListeners()
         {
@@ -349,31 +347,40 @@ namespace PlayerList
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
 
-            if (buildIndex == -1 && !hasChangedTabs)
+
+            if (buildIndex == -1)
             {
-                void ChangeOnClickOfTabMenuButtons(Transform parent)
+                if (quickMenuColliderSize != null)
                 {
-                    foreach (var child in parent)
-                    {
-                        try
-                        {
-                            Transform childTransform = child.Cast<Transform>();
-                            if (childTransform.name == "HomeTab") continue; // Ignore home tab or else it go brrrr
-
-                            ChangeOnClickOfTabMenuButtons(childTransform);
-
-                            childTransform.GetComponent<Button>().onClick.AddListener(new Action(() =>
-                            {
-                                foreach (SubMenu subMenu in playerListMenus)
-                                    subMenu.gameObject.SetActive(false);
-                            }));
-                        }
-                        catch { }
-                    }
+                    quickMenuColliderSize = Constants.quickMenu.GetComponent<BoxCollider>().size;
+                    CombineQMColliderAndPlayerListRect();
                 }
-                hasChangedTabs = true;
 
-                ChangeOnClickOfTabMenuButtons(GameObject.Find("UserInterface/QuickMenu/QuickModeTabs").transform);
+                if (!hasChangedTabs)
+                {
+                    void ChangeOnClickOfTabMenuButtons(Transform parent)
+                    {
+                        foreach (var child in parent)
+                        {
+                            try
+                            {
+                                Transform childTransform = child.Cast<Transform>();
+                                if (childTransform.name == "HomeTab") continue; // Ignore home tab or else it go brrrr
+
+                                ChangeOnClickOfTabMenuButtons(childTransform);
+
+                                childTransform.GetComponent<Button>().onClick.AddListener(new Action(() =>
+                                {
+                                    foreach (SubMenu subMenu in playerListMenus)
+                                        subMenu.gameObject.SetActive(false);
+                                }));
+                            }
+                            catch { }
+                        }
+                    }
+                    hasChangedTabs = true;
+                    ChangeOnClickOfTabMenuButtons(GameObject.Find("UserInterface/QuickMenu/QuickModeTabs").transform);
+                }
             }
 
             foreach (PlayerEntry playerEntry in playerEntries.Values.ToList())
