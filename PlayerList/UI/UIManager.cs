@@ -71,21 +71,12 @@ namespace PlayerList.UI
             foreach (PropertyInfo prop in possibleProps)
                 if (prop.GetValue(QuickMenu.prop_QuickMenu_0) != null) currentMenuField = prop;
 
-            // Close QM so it doesn't float in front of your face
-            try
-            {
-                openQuickMenu.Invoke(QuickMenu.prop_QuickMenu_0, new object[] { false });
-            }
-            catch { }
-            try
-            {
-                closeQuickMenu.Invoke(QuickMenu.prop_QuickMenu_0, new object[] { false });
-            }
-            catch { } // Ignore error cuz it still closes the menu
+            CurrentMenu.SetActive(false);
 
             // Set to null as to not change values unexpectedly 
             foreach (PropertyInfo prop in possibleProps)
                 prop.SetValue(QuickMenu.prop_QuickMenu_0, null);
+            QuickMenu.prop_QuickMenu_0.field_Private_Int32_0 = -1;
 
             harmonyInstance.Patch(openQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuOpen))));
             harmonyInstance.Patch(closeQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuClose))));

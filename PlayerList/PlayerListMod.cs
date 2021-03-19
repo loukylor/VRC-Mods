@@ -348,24 +348,32 @@ namespace PlayerList
         }
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
+
             if (buildIndex == -1 && !hasChangedTabs)
             {
-                hasChangedTabs = true;
-                foreach (var child in GameObject.Find("UserInterface/QuickMenu/QuickModeTabs").transform)
+                void ChangeOnClickOfTabMenuButtons(Transform parent)
                 {
-                    try
+                    foreach (var child in parent)
                     {
-                        Transform childTransform = child.Cast<Transform>();
-                        if (childTransform.name == "HomeTab") continue; // Ignore home tab or else it go brrrr
-
-                        childTransform.GetComponent<Button>().onClick.AddListener(new Action(() =>
+                        try
                         {
-                            foreach (SubMenu subMenu in playerListMenus)
-                                subMenu.gameObject.SetActive(false);
-                        }));
+                            Transform childTransform = child.Cast<Transform>();
+                            if (childTransform.name == "HomeTab") continue; // Ignore home tab or else it go brrrr
+
+                            ChangeOnClickOfTabMenuButtons(childTransform);
+
+                            childTransform.GetComponent<Button>().onClick.AddListener(new Action(() =>
+                            {
+                                foreach (SubMenu subMenu in playerListMenus)
+                                    subMenu.gameObject.SetActive(false);
+                            }));
+                        }
+                        catch { }
                     }
-                    catch { }
                 }
+                hasChangedTabs = true;
+
+                ChangeOnClickOfTabMenuButtons(GameObject.Find("UserInterface/QuickMenu/QuickModeTabs").transform);
             }
 
             foreach (PlayerEntry playerEntry in playerEntries.Values.ToList())

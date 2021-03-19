@@ -1,5 +1,4 @@
-﻿using PlayerList.Utilities;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace PlayerList.UI
 {
