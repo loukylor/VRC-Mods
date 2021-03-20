@@ -15,7 +15,6 @@ namespace PlayerList.Utilities
         {
             shortcutMenu = GameObject.Find("UserInterface/QuickMenu/ShortcutMenu");
             quickMenu = QuickMenu.prop_QuickMenu_0.gameObject;
-            quickMenuColliderSize = quickMenu.GetComponent<BoxCollider>().size;
         }
     }
 }
