@@ -19,7 +19,9 @@ namespace PlayerList.Entries
         public bool blockedYou;
         public bool youBlocked;
 
-        public static bool spoofFriend;
+        private static bool spoofFriend;
+        public static int highestPhotonIdLength = 0;
+
         public static void Patch(HarmonyInstance harmonyInstance) // All in the name of FUTUREPROOFING REEEEEEEEEEEEEEEEEEEEEE
         {
             harmonyInstance.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend))));
@@ -115,6 +117,12 @@ namespace PlayerList.Entries
                 AddSpacer();
             }
 
+            if (Config.photonIdToggle.Value)
+            {
+                AddText(player.field_Internal_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0.ToString().PadRight(highestPhotonIdLength));
+                AddSpacer();
+            }
+
             if (Config.displayNameToggle.Value) // Why?
             {
                 switch (Config.DisplayNameColorMode)
@@ -170,8 +178,8 @@ namespace PlayerList.Entries
         }
         public void Remove()
         {
-            PlayerListMod.playerEntries.Remove(userID);
-            PlayerListMod.entries.Remove(Identifier);
+            EntryManager.playerEntries.Remove(userID);
+            EntryManager.entries.Remove(Identifier);
             UnityEngine.Object.DestroyImmediate(gameObject);
             return;
         }

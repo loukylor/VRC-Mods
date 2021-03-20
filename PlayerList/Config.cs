@@ -21,6 +21,7 @@ namespace PlayerList
         public static MelonPreferences_Entry<bool> platformToggle;
         public static MelonPreferences_Entry<bool> perfToggle;
         public static MelonPreferences_Entry<bool> distanceToggle;
+        public static MelonPreferences_Entry<bool> photonIdToggle;
         public static MelonPreferences_Entry<bool> displayNameToggle;
         private static MelonPreferences_Entry<string> displayNameColorMode;
         public static PlayerListMod.DisplayNameColorMode DisplayNameColorMode
@@ -39,7 +40,7 @@ namespace PlayerList
         }
 
         private static MelonPreferences_Entry<string> playerListMenuButtonPosition;
-        public static PlayerListMod.PlayerListButtonPosition PlayerListMenuButtonPosition
+        public static PlayerListMod.PlayerListButtonPosition MenuButtonPosition
         {
             get { return (PlayerListMod.PlayerListButtonPosition)Enum.Parse(typeof(PlayerListMod.PlayerListButtonPosition), playerListMenuButtonPosition.Value); }
             set { playerListMenuButtonPosition.Value = value.ToString(); }
@@ -71,6 +72,7 @@ namespace PlayerList
             platformToggle = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(platformToggle), true, is_hidden: true);
             perfToggle = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(perfToggle), true, is_hidden: true);
             distanceToggle = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(distanceToggle), true, is_hidden: true);
+            photonIdToggle = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(photonIdToggle), false, is_hidden: true);
             displayNameToggle = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(displayNameToggle), true, is_hidden: true);
             displayNameColorMode = (MelonPreferences_Entry<string>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(displayNameColorMode), "TrustAndFriends", is_hidden: true);
 

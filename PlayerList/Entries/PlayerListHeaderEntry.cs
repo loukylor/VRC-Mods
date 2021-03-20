@@ -4,6 +4,6 @@
     {
         public override string Name { get { return "PlayerList Header"; } }
 
-        protected override void ProcessText(object[] parameters = null) => ChangeEntry("playercount", PlayerListMod.playerEntries.Count + 1);
+        protected override void ProcessText(object[] parameters = null) => ChangeEntry("playercount", EntryManager.playerEntries.Count + 1);
     }
 }

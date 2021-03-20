@@ -39,6 +39,10 @@ namespace PlayerList.Entries
         {
         }
 
+        public virtual void OnSceneWasLoaded()
+        {
+        }
+
         public static T CreateInstance<T>(GameObject gameObject, object[] parameters = null, bool includeConfig = false) where T : EntryBase, new()
         {
             EntryBase entry = new T();

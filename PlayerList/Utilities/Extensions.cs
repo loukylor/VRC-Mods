@@ -14,5 +14,11 @@ namespace PlayerList.Utilities
             }
             return path;
         }
+        public static void SetLayerRecursive(this GameObject gameObject, int layer)
+        {
+            gameObject.layer = layer;
+            foreach (var child in gameObject.transform)
+                SetLayerRecursive(child.Cast<Transform>().gameObject, layer);
+        }
     }
 }

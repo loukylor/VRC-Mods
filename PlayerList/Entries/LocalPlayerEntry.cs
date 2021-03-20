@@ -44,6 +44,13 @@ namespace PlayerList.Entries
                 }
             }
             */
+            // Get highest photonId once per update
+            int highestId = 0;
+            foreach (int photonId in PlayerManager.prop_PlayerManager_0.field_Private_Dictionary_2_Int32_Player_0.Keys)
+                if (photonId > highestId)
+                    highestId = photonId;
+
+            PlayerEntry.highestPhotonIdLength = highestId.ToString().Length;
 
             // Convert to byte as that's what's sent over network so if you spoof your ping you'll see what's actually sent over the network
             if (Config.pingToggle.Value)
@@ -83,7 +90,13 @@ namespace PlayerList.Entries
                 AddText("0.0 m");
                 AddSpacer();
             }
-            
+
+            if (Config.photonIdToggle.Value)
+            {
+                AddText(Player.prop_Player_0.field_Internal_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0.ToString().PadRight(PlayerEntry.highestPhotonIdLength));
+                AddSpacer();
+            }
+
             if (Config.displayNameToggle.Value)
             {
                 switch (Config.DisplayNameColorMode)
