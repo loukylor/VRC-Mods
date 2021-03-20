@@ -50,7 +50,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="move &quot;C:\Users\emem0\Source\Repos\nullClient\UserInfoExtensions\bin\Debug\net472\UserInfoExtentions.dll&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\VRChat\Mods&quot;" />
+    <Exec Command="move &quot;C:\Users\emem0\Source\Repos\VRC-Mods\UserInfoExtensions\bin\Debug\net472\UserInfoExtentions.dll&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\VRChat\Mods&quot;" />
   </Target>
 
 </Project>
