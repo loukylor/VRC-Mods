@@ -23,8 +23,6 @@ namespace PlayerList
         public static GameObject menuButton;
         public static RectTransform playerListRect;
 
-        private static Vector2 quickMenuColliderSize;
-
         private static readonly Stopwatch timer = Stopwatch.StartNew();
 
         public static Label fontSizeLabel;
@@ -169,9 +167,9 @@ namespace PlayerList
         {
             if (buildIndex == -1)
             {
-                if (quickMenuColliderSize != null)
+                if (Constants.quickMenuColliderSize != null)
                 {
-                    quickMenuColliderSize = Constants.quickMenu.GetComponent<BoxCollider>().size;
+                    Constants.quickMenuColliderSize = Constants.quickMenu.GetComponent<BoxCollider>().size;
                     ListPositionManager.CombineQMColliderAndPlayerListRect();
                 }
 
