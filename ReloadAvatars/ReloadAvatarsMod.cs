@@ -38,8 +38,8 @@ namespace ReloadAvatars
         }
         public override void OnPreferencesSaved()
         {
-            reloadAvatarButton.SetActive(MelonPreferences.GetEntryValue<bool>("ReloadAvatars", "ReloadAvatar"));
-            reloadAllAvatarsButton.SetActive(MelonPreferences.GetEntryValue<bool>("ReloadAvatars", "ReloadAllAvatars"));
+            reloadAvatarButton?.SetActive(MelonPreferences.GetEntryValue<bool>("ReloadAvatars", "ReloadAvatar"));
+            reloadAllAvatarsButton?.SetActive(MelonPreferences.GetEntryValue<bool>("ReloadAvatars", "ReloadAllAvatars"));
         }
     }
 }

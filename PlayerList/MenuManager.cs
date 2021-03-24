@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MelonLoader;
 using PlayerList.Components;
 using PlayerList.Entries;
@@ -113,10 +111,10 @@ namespace PlayerList
 
             new SingleButton(playerListMenus[1].path, new Vector3(3, 1), "Move to Right of QuickMenu", new Action(ListPositionManager.MovePlayerListToEndOfMenu), "Move PlayerList to right side of menu, this can also serve as a reset position button", "LockPlayerListToRightButton", true);
 
-            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(0, 0), "1", new Action(() => PlayerListMod.MenuButtonPosition = PlayerListMod.PlayerListButtonPosition.TopRight), "Move PlayerList menu button to the top right", "1PlayerListMenuButton");
-            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(1, 0), "2", new Action(() => PlayerListMod.MenuButtonPosition = PlayerListMod.PlayerListButtonPosition.TopLeft), "Move PlayerList menu button to the top left", "2PlayerListMenuButton");
-            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(1, 1), "3", new Action(() => PlayerListMod.MenuButtonPosition = PlayerListMod.PlayerListButtonPosition.BottomLeft), "Move PlayerList menu button to the bottom left", "3PlayerListMenuButton");
-            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(0, 1), "4", new Action(() => PlayerListMod.MenuButtonPosition = PlayerListMod.PlayerListButtonPosition.BottomRight), "Move PlayerList menu button to the bottom right", "4PlayerListMenuButton");
+            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(0, 0), "1", new Action(() => PlayerListMod.MenuButtonPosition = PlayerListMod.MenuButtonPositionEnum.TopRight), "Move PlayerList menu button to the top right", "1PlayerListMenuButton");
+            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(1, 0), "2", new Action(() => PlayerListMod.MenuButtonPosition = PlayerListMod.MenuButtonPositionEnum.TopLeft), "Move PlayerList menu button to the top left", "2PlayerListMenuButton");
+            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(1, 1), "3", new Action(() => PlayerListMod.MenuButtonPosition = PlayerListMod.MenuButtonPositionEnum.BottomLeft), "Move PlayerList menu button to the bottom left", "3PlayerListMenuButton");
+            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(0, 1), "4", new Action(() => PlayerListMod.MenuButtonPosition = PlayerListMod.MenuButtonPositionEnum.BottomRight), "Move PlayerList menu button to the bottom right", "4PlayerListMenuButton");
 
             new SingleButton(playerListMenus[1].path, new Vector3(1, 0), "Snap Grid\nSize +", new Action(() => ListPositionManager.SnapToGridSize += 10), "Increase the size of the snap to grid by 10", "IncreaseSnapGridSize", true);
             new SingleButton(playerListMenus[1].path, new Vector3(1, 2), "Snap Grid\nSize -", new Action(() => ListPositionManager.SnapToGridSize -= 10), "Decrease the size of the snap to grid by 10", "DecreaseSnapGridSize", true);

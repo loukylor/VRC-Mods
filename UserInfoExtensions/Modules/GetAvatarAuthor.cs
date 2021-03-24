@@ -50,8 +50,8 @@ namespace UserInfoExtentions.Modules
         }
         public static void OnPreferencesSaved()
         {
-            authorFromSocialMenuButtonGameObject.SetActive(AuthorFromSocialMenuButton.Value);
-            authorFromAvatarMenuButtonGameObject.SetActive(AuthorFromAvatarMenuButton.Value);
+            authorFromSocialMenuButtonGameObject?.SetActive(AuthorFromSocialMenuButton.Value);
+            authorFromAvatarMenuButtonGameObject?.SetActive(AuthorFromAvatarMenuButton.Value);
         }
         public static void OnUserInfoOpen()
         {

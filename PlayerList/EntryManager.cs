@@ -34,13 +34,13 @@ namespace PlayerList
             {
                 if (localPlayerEntry != null) return;
 
-                localPlayerEntry = EntryBase.CreateInstance<LocalPlayerEntry>(UnityEngine.Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform));
+                localPlayerEntry = EntryBase.CreateInstance<LocalPlayerEntry>(Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform));
                 AddEntry(localPlayerEntry);
                 localPlayerEntry.gameObject.SetActive(true);
                 return;
             }
 
-            AddPlayerEntry(EntryBase.CreateInstance<PlayerEntry>(UnityEngine.Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform), new object[] { player }));
+            AddPlayerEntry(EntryBase.CreateInstance<PlayerEntry>(Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform), new object[] { player }));
         }
         public static void OnPlayerLeave(Player player)
         {

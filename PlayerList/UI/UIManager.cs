@@ -34,7 +34,7 @@ namespace PlayerList.UI
         private static Type QuickMenuContextualDisplayEnum;
         private static MethodBase QuickMenuContexualDisplayMethod;
 
-        public static void Init()
+        public static void Init(HarmonyInstance harmonyInstance)
         {
             closeQuickMenu = typeof(QuickMenu).GetMethods()
                 .Where(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM") && Xref.CheckUsed(mb, "Method_Public_Void_Int32_Boolean_")).First();
@@ -49,9 +49,14 @@ namespace PlayerList.UI
                 .Where(type => type.Name.StartsWith("Enum")).First();
 
             QuickMenuContexualDisplayMethod = typeof(QuickMenuContextualDisplay).GetMethod($"Method_Public_Void_{QuickMenuContextualDisplayEnum.Name}_0");
+
+            harmonyInstance.Patch(openQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuOpen))));
+            harmonyInstance.Patch(closeQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuClose))));
         }
-        public static void UIInit(HarmonyInstance harmonyInstance)
+        public static void OnSceneWasLoaded()
         {
+            if (currentMenuField != null) return;
+
             // Check which fields return null
             List<PropertyInfo> possibleProps = new List<PropertyInfo>();
             foreach (PropertyInfo prop in typeof(QuickMenu).GetProperties().Where(pi => pi.Name.StartsWith("field_Private_GameObject_")))
@@ -63,7 +68,7 @@ namespace PlayerList.UI
             // Open QuickMenu to set current menu
             try
             {
-                setMenuIndex.Invoke(QuickMenu.prop_QuickMenu_0, new object[] { 2 });
+                setMenuIndex.Invoke(QuickMenu.prop_QuickMenu_0, new object[] { 8 });
             }
             catch { } // Ignore error cuz it still sets the menu
 
@@ -77,9 +82,6 @@ namespace PlayerList.UI
             foreach (PropertyInfo prop in possibleProps)
                 prop.SetValue(QuickMenu.prop_QuickMenu_0, null);
             QuickMenu.prop_QuickMenu_0.field_Private_Int32_0 = -1;
-
-            harmonyInstance.Patch(openQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuOpen))));
-            harmonyInstance.Patch(closeQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuClose))));
         }
         public static void OnQuickMenuOpen() => OnQuickMenuOpenEvent?.Invoke();
         public static void OnQuickMenuClose() => OnQuickMenuCloseEvent?.Invoke();

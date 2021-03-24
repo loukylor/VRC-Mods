@@ -26,7 +26,7 @@ namespace UserInfoExtentions.Modules
         }
         public static void OnPreferencesSaved()
         {
-            openUserInBrowserButtonGameObject.SetActive(OpenUserInBrowserButton.Value);
+            openUserInBrowserButtonGameObject?.SetActive(OpenUserInBrowserButton.Value);
         }
 
         public static void OpenUserInBrowser()

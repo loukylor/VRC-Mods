@@ -41,37 +41,35 @@ namespace PlayerList
             }
         }
 
-        private static PlayerListButtonPosition _playerListMenuButtonPosition;
-        public static PlayerListButtonPosition MenuButtonPosition
+        private static MenuButtonPositionEnum _menuButtonPosition;
+        public static MenuButtonPositionEnum MenuButtonPosition
         {
-            get { return _playerListMenuButtonPosition; }
+            get { return _menuButtonPosition; }
             set
             {
-                if (value == Config.MenuButtonPosition) return;
-
                 switch (value)
                 {
-                    case PlayerListButtonPosition.TopRight:
+                    case MenuButtonPositionEnum.TopRight:
                         menuButton.transform.localPosition = Converters.ConvertToUnityUnits(new Vector3(4, -1));
                         menuButton.GetComponent<RectTransform>().pivot = new Vector2(0, 0);
                         break;
-                    case PlayerListButtonPosition.TopLeft:
+                    case MenuButtonPositionEnum.TopLeft:
                         menuButton.transform.localPosition = Converters.ConvertToUnityUnits(new Vector3(2, -1));
                         menuButton.GetComponent<RectTransform>().pivot = new Vector2(1, 0);
                         break;
-                    case PlayerListButtonPosition.BottomLeft:
+                    case MenuButtonPositionEnum.BottomLeft:
                         menuButton.transform.localPosition = Converters.ConvertToUnityUnits(new Vector3(2, -1));
                         menuButton.GetComponent<RectTransform>().pivot = new Vector2(1, 1);
                         break;
-                    case PlayerListButtonPosition.BottomRight:
+                    case MenuButtonPositionEnum.BottomRight:
                         menuButton.transform.localPosition = Converters.ConvertToUnityUnits(new Vector3(4, -1));
                         menuButton.GetComponent<RectTransform>().pivot = new Vector2(0, 1);
                         break;
                     default:
-                        MenuButtonPosition = PlayerListButtonPosition.TopRight;
+                        MenuButtonPosition = MenuButtonPositionEnum.TopRight;
                         return;
                 }
-                _playerListMenuButtonPosition = value;
+                _menuButtonPosition = value;
                 Config.MenuButtonPosition = value;
                 EntryManager.shouldSaveConfig = true;
             }
@@ -82,18 +80,13 @@ namespace PlayerList
             ClassInjector.RegisterTypeInIl2Cpp<EnableDisableListener>();
             Config.RegisterSettings();
 
-
-            // Initialize input manager
-            InputManager.UiInit();
-
             // Initialize Constants util
             Constants.UIInit();
 
             LoadAssetBundle();
 
             // Initialize UIManager
-            UIManager.Init();
-            UIManager.UIInit(Harmony);
+            UIManager.Init(Harmony);
 
             // Initialize submenu for the list 
             MenuManager.CreateMainSubMenu();
@@ -175,6 +168,7 @@ namespace PlayerList
 
                 MenuManager.OnSceneWasLoaded();
                 EntryManager.OnSceneWasLoaded();
+                UIManager.OnSceneWasLoaded();
             }
         }
         public static void OnPlayerJoin(Player player)
@@ -186,7 +180,7 @@ namespace PlayerList
             EntryManager.OnPlayerLeave(player);
         }
 
-        public enum PlayerListButtonPosition
+        public enum MenuButtonPositionEnum
         {
             TopRight,
             TopLeft,

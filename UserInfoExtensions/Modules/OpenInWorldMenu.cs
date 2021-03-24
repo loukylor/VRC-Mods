@@ -29,7 +29,7 @@ namespace UserInfoExtentions.Modules
         }
         public static void OnPreferencesSaved()
         {
-            openInWorldMenuButtonGameObject.SetActive(OpenInWorldMenuButton.Value);
+            openInWorldMenuButtonGameObject?.SetActive(OpenInWorldMenuButton.Value);
         }
 
         public static void OpenUserWorldInWorldMenu()
@@ -45,7 +45,7 @@ namespace UserInfoExtentions.Modules
             {
                 location = APIUser.CurrentUser.location;
             }
-            if (VRCUtils.userInfo.field_Private_ApiWorld_1 != null && !(string.IsNullOrEmpty(location) || location == "private"))
+            if (VRCUtils.userInfo.field_Private_ApiWorld_1 != null && !(string.IsNullOrEmpty(location) || location == "private" || location == "offline"))
             {
                 string processedLocation = VRCUtils.ActiveUser.location.Split(new char[] { ':' }, 2)[1];
                 int count;

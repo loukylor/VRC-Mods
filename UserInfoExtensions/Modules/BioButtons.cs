@@ -188,9 +188,9 @@ namespace UserInfoExtentions.Modules
         }
         public static void OnPreferencesSaved()
         {
-            bioButtonGameObject.SetActive(BioButton.Value);
-            bioLinksButtonGameObject.SetActive(BioLinksButton.Value);
-            bioLanguagesButtonGameObject.SetActive(BioLanguagesButton.Value); 
+            bioButtonGameObject?.SetActive(BioButton.Value);
+            bioLinksButtonGameObject?.SetActive(BioLinksButton.Value);
+            bioLanguagesButtonGameObject?.SetActive(BioLanguagesButton.Value); 
         }
         public static void OnUserInfoOpen()
         {

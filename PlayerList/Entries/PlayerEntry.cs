@@ -197,12 +197,7 @@ namespace PlayerList.Entries
         
         public static void OpenPlayerInQuickMenu(Player player)
         {
-            if (InputManager.mouseCursor.gameObject.activeSelf) InputManager.mouseCursor.Method_Public_Void_VRCPlayer_PDM_0(player.field_Internal_VRCPlayer_0);
-
-            if (InputManager.rightCursor.gameObject.activeSelf) InputManager.rightCursor.Method_Public_Void_VRCPlayer_PDM_0(player.field_Internal_VRCPlayer_0);
-
-            if (InputManager.leftCursor.gameObject.activeSelf) InputManager.leftCursor.Method_Public_Void_VRCPlayer_PDM_0(player.field_Internal_VRCPlayer_0);
-
+            InputManager.SelectPlayer(player.field_Internal_VRCPlayer_0);
             QuickMenuContextualDisplay.Method_Public_Static_Void_VRCPlayer_0(player.field_Internal_VRCPlayer_0);
         }
 
