@@ -63,7 +63,7 @@ You may also toggle each of these on and off, so if you don't like how the avata
 There is also a list of info about the game and world you are in.
 It lists:
 - Time since joining the instance (Room Time)
-- System time in 12hr format and 24hr format (this will be configurable in the future, I just got lazy)
+- System time in 12hr format and 24hr format 
 - Game build number (Game Version)
 - Position in world (Coordinate Position)
 - World Name
