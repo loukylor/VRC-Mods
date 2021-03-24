@@ -4,7 +4,7 @@ using Harmony;
 using MelonLoader;
 using UnhollowerBaseLib.Attributes;
 
-[assembly: MelonInfo(typeof(ClickFix.ClickFixMod), "ClickFix", "1.0.0", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(ClickFix.ClickFixMod), "ClickFix", "1.0.1", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace ClickFix
