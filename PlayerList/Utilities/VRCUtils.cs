@@ -13,9 +13,7 @@ namespace PlayerList.Utilities
         // Completely stolen from Psychloor's PlayerRotator (https://github.com/Psychloor/PlayerRotater)
         public static IEnumerator CheckWorld(ApiWorld world)
         {
-            MelonLogger.Msg(world.id);
             string worldId = world.id;
-            MelonLogger.Msg(world.id);
             // Check if black/whitelisted from EmmVRC - thanks Emilia and the rest of EmmVRC Staff
             WWW www = new WWW($"https://thetrueyoshifan.com/RiskyFuncsCheck.php?worldid={worldId}", null, new Dictionary<string, string>());
             while (!www.isDone)

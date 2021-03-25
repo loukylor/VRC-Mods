@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using VRC;
 
-[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.2.8", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.2.9", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace PlayerList
