@@ -60,6 +60,8 @@ Each entry to the player list is a button that will open the user in the QuickMe
 The player's name will be colored to the rank they are (OGTrustRanks compatible!), each entry also has the player's ping, fps, platform, avatar performance and distance from you.
 You may also toggle each of these on and off, so if you don't like how the avatar performance takes up space, you can turn it off.
 
+Note: distance from you will be disabled in worlds that do not allow risky functions.
+
 There is also a list of info about the game and world you are in.
 It lists:
 - Time since joining the instance (Room Time)
@@ -83,7 +85,8 @@ Oh yea, also report any errors to me. You can make an issue or ping/DM me.
 ## Credits
 - [KortyBoi](https://github.com/KortyBoi) as he let me use the layout from his player list, and helped me with getting some of the information.
 - [knah](https://github.com/knah) as I use [Join Notifier's](https://github.com/knah/VRCMods) join/leave system.
-- [DubyaDude](https://github.com/DubyaDude) as I used his [RubyButtonAPI](https://github.com/DubyaDude/RubyButtonAPI) as reference for my button API.
+- [DubyaDude](https://github.com/DubyaDude) as I used [RubyButtonAPI](https://github.com/DubyaDude/RubyButtonAPI) as reference for my button API.
+- [Psychloor](https://github.com/Psychloor) as I used his code for the risky functions check.
 
 ## Picture of List
 ![Picture of List](https://i.imgur.com/Tt6ZYqB.png)
