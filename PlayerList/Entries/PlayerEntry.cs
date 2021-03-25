@@ -1,5 +1,7 @@
 ﻿using System;
 using Harmony;
+using MelonLoader;
+using PlayerList.Utilities;
 using UnityEngine;
 using VRC;
 using VRC.Core;
@@ -11,6 +13,8 @@ namespace PlayerList.Entries
     {
         // - <color={pingcolor}>{ping}ms</color> | <color={fpscolor}>{fps}</color> | {platform} | <color={perfcolor}>{perf}</color> | {relationship} | <color={rankcolor}>{displayname}</color>
         public override string Name { get { return "Player"; } }
+
+        public static bool worldAllowed = false;
 
         public Player player;
         public string userID;
@@ -25,6 +29,7 @@ namespace PlayerList.Entries
         public static void Patch(HarmonyInstance harmonyInstance) // All in the name of FUTUREPROOFING REEEEEEEEEEEEEEEEEEEEEE
         {
             harmonyInstance.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend))));
+            harmonyInstance.Patch(typeof(RoomManager).GetMethod("Method_Public_Static_Boolean_ApiWorld_ApiWorldInstance_String_Int32_0"), null, new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnInstanceChange))));
         }
         public override void Init(object[] parameters)
         {
@@ -97,22 +102,29 @@ namespace PlayerList.Entries
             
             if (Config.distanceToggle.Value)
             {
-                float distance = (player.transform.position - Player.prop_Player_0.transform.position).magnitude;
-                if (distance < 100)
+                if (worldAllowed)
                 {
-                    AddText(distance.ToString("N1").PadRight(4) + "m");
-                }
-                else if (distance < 10000)
-                {
-                    AddText((distance / 1000).ToString("N1").PadRight(3) + "km");
-                } 
-                else if (distance < 999900)
-                {
-                    AddText((distance / 1000).ToString("N0").PadRight(3) + "km");
+                    float distance = (player.transform.position - Player.prop_Player_0.transform.position).magnitude;
+                    if (distance < 100)
+                    {
+                        AddText(distance.ToString("N1").PadRight(4) + "m");
+                    }
+                    else if (distance < 10000)
+                    {
+                        AddText((distance / 1000).ToString("N1").PadRight(3) + "km");
+                    }
+                    else if (distance < 999900)
+                    {
+                        AddText((distance / 1000).ToString("N0").PadRight(3) + "km");
+                    }
+                    else
+                    {
+                        AddText((distance / 9.461e+15).ToString("N2").PadRight(3) + "ly"); // If its too large for kilometers ***just convert to light years***
+                    }
                 }
                 else
                 {
-                    AddText((distance / 9.461e+15).ToString("N2").PadRight(3) + "ly"); // If its too large for kilometers ***just convert to light years***
+                    AddText("0.0 m");
                 }
                 AddSpacer();
             }
@@ -175,6 +187,13 @@ namespace PlayerList.Entries
                 return false;
             }
             return true;
+        }
+        public static void OnInstanceChange(ApiWorld __0)
+        {
+            MelonLogger.Msg("Checking if world is allowed to show distance...");
+            worldAllowed = false;
+            if (__0 != null)
+                MelonCoroutines.Start(VRCUtils.CheckWorld(__0));
         }
         public void Remove()
         {

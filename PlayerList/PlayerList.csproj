@@ -21,6 +21,9 @@
 		<Reference Include="Il2Cppmscorlib">
 			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\Il2Cppmscorlib.dll</HintPath>
 		</Reference>
+		<Reference Include="Il2CppSystem">
+		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\Il2CppSystem.dll</HintPath>
+		</Reference>
 		<Reference Include="Il2CppSystem.Core">
 			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\Il2CppSystem.Core.dll</HintPath>
 		</Reference>
@@ -50,6 +53,9 @@
 		</Reference>
 		<Reference Include="UnityEngine.UI">
 			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.UI.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UnityWebRequestWWWModule">
+		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
 		</Reference>
 		<Reference Include="VRCCore-Standalone">
 			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\VRCCore-Standalone.dll</HintPath>
