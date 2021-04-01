@@ -20,7 +20,6 @@ More detailed instructions and more mods can be found in the [VRChat Modding Gro
 
 # Mod List
 - [AskToPortal](#asktoportal)
-- [ClickFix](#clickfix)
 - [CloningBeGone](#cloningbegone)
 - [PlayerList](#playerlist)
 - [ReloadAvatars](#reloadavatars)
@@ -40,10 +39,6 @@ AskToPortal is NOT Portal Confirmation by 404. AskToPortal is simply a replaceme
 
 ## Picture of user prompt:
 ![Image of user prompt](https://i.imgur.com/uvUeUmL.png)
-
-# ClickFix
-Fixes the issue where you cant click on people when you have less than 20fps.
-That's... that's it.
 
 # CloningBeGone
 Turns off cloning when you join an instance.
