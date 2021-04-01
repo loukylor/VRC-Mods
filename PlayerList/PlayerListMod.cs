@@ -41,6 +41,8 @@ namespace PlayerList
             }
         }
 
+        public static PlayerListMod Instance { get; private set; }
+
         private static MenuButtonPositionEnum _menuButtonPosition;
         public static MenuButtonPositionEnum MenuButtonPosition
         {
@@ -75,6 +77,10 @@ namespace PlayerList
             }
         }
 
+        public override void OnApplicationStart()
+        {
+            Instance = this;
+        }
         public override void VRChat_OnUiManagerInit()
         {
             ClassInjector.RegisterTypeInIl2Cpp<EnableDisableListener>();
@@ -86,7 +92,7 @@ namespace PlayerList
             LoadAssetBundle();
 
             // Initialize UIManager
-            UIManager.Init(Harmony);
+            UIManager.Init();
 
             // Initialize submenu for the list 
             MenuManager.CreateMainSubMenu();
@@ -166,7 +172,6 @@ namespace PlayerList
                     ListPositionManager.CombineQMColliderAndPlayerListRect();
                 }
 
-                MenuManager.OnSceneWasLoaded();
                 EntryManager.OnSceneWasLoaded();
                 UIManager.OnSceneWasLoaded();
             }

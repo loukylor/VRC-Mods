@@ -46,7 +46,7 @@ namespace PlayerList
         {
             if (!playerEntries.ContainsKey(player.field_Private_APIUser_0.id)) return;
 
-            UnityEngine.Object.DestroyImmediate(playerEntries[player.field_Private_APIUser_0.id].gameObject);
+            Object.DestroyImmediate(playerEntries[player.field_Private_APIUser_0.id].gameObject);
             entries.Remove(playerEntries[player.field_Private_APIUser_0.id].Identifier);
             playerEntries.Remove(player.field_Private_APIUser_0.id);
             RefreshLayout();

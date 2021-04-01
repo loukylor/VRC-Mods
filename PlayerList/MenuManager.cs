@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Harmony;
 using MelonLoader;
 using PlayerList.Components;
 using PlayerList.Entries;
@@ -14,39 +15,9 @@ namespace PlayerList
     class MenuManager
     {
         public static List<SubMenu> playerListMenus = new List<SubMenu>();
-        private static bool hasChangedTabs = false;
         public static ToggleButton menuToggleButton;
 
         public static bool shouldStayHidden;
-
-        public static void OnSceneWasLoaded()
-        {
-            if (!hasChangedTabs)
-            {
-                void ChangeOnClickOfTabMenuButtons(Transform parent)
-                {
-                    foreach (var child in parent)
-                    {
-                        try
-                        {
-                            Transform childTransform = child.Cast<Transform>();
-                            if (childTransform.name == "HomeTab") continue; // Ignore home tab or else it go brrrr
-
-                            ChangeOnClickOfTabMenuButtons(childTransform);
-
-                            childTransform.GetComponent<Button>().onClick.AddListener(new Action(() =>
-                            {
-                                foreach (SubMenu subMenu in playerListMenus)
-                                    subMenu.gameObject.SetActive(false);
-                            }));
-                        }
-                        catch { }
-                    }
-                }
-                hasChangedTabs = true;
-                ChangeOnClickOfTabMenuButtons(GameObject.Find("UserInterface/QuickMenu/QuickModeTabs").transform);
-            }
-        }
 
         public static void ToggleMenu()
         {
