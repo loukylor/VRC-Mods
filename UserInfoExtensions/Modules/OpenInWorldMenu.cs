@@ -10,14 +10,14 @@ using VRC.UI;
 
 namespace UserInfoExtentions.Modules
 {
-    public class OpenInWorldMenu
+    public class OpenInWorldMenu : ModuleBase
     {
         public static MelonPreferences_Entry<bool> OpenInWorldMenuButton;
 
         public static GameObject openInWorldMenuButtonGameObject;
 
         public static MethodInfo setUpWorldInfo;
-        public static void Init()
+        public override void Init()
         {
             OpenInWorldMenuButton = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(OpenInWorldMenuButton), false, "Show\"Open User World in World Menu\" button");
 
@@ -27,7 +27,7 @@ namespace UserInfoExtentions.Modules
             setUpWorldInfo = typeof(PageWorldInfo).GetMethods()
                 .Where(mb => mb.Name.StartsWith("Method_Public_Void_ApiWorld_ApiWorldInstance_Boolean_Boolean_") && !mb.Name.Contains("_PDM_") && Xref.CheckMethod(mb, "NEW INSTANCE")).First();
         }
-        public static void OnPreferencesSaved()
+        public override void OnPreferencesSaved()
         {
             openInWorldMenuButtonGameObject?.SetActive(OpenInWorldMenuButton.Value);
         }

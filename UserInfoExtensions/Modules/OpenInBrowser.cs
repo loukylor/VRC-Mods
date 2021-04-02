@@ -6,12 +6,12 @@ using UserInfoExtentions.Utilities;
 
 namespace UserInfoExtentions.Modules
 {
-    public class OpenInBrowser
+    public class OpenInBrowser : ModuleBase
     {
         public static MelonPreferences_Entry<bool> OpenUserInBrowserButton;
         public static GameObject openUserInBrowserButtonGameObject;
 
-        public static void Init()
+        public override void Init()
         {
             OpenUserInBrowserButton = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(OpenUserInBrowserButton), false, "Show \"Open User in Browser\" button");
 
@@ -24,7 +24,7 @@ namespace UserInfoExtentions.Modules
             UserInfoExtensionsMod.menu.AddSpacer();
             UserInfoExtensionsMod.menu.AddSpacer();
         }
-        public static void OnPreferencesSaved()
+        public override void OnPreferencesSaved()
         {
             openUserInBrowserButtonGameObject?.SetActive(OpenUserInBrowserButton.Value);
         }

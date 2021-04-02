@@ -111,6 +111,11 @@ Adding individually toggleable buttons that allow you to:
 
 The buttons can always be accessed in a popup attached to the User Details Page.
 
+Within the popup, there are also thing you can see, like the user's:
+ - username (what the person logs in with)
+ - platform (Quest or PC)
+ - last login (literal login, not starting the game) 
+
 ## Requirements
  - [UIExpansionKit](https://github.com/knah/VRCMods/)
 

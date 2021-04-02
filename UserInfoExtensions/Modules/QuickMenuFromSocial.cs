@@ -9,16 +9,17 @@ using VRC;
 
 namespace UserInfoExtentions.Modules
 {
-    public class QuickMenuFromSocial
+    public class QuickMenuFromSocial : ModuleBase
     {
         public static MelonPreferences_Entry<bool> QuickMenuFromSocialButton;
 
         public static GameObject quickMenuFromSocialButtonGameObject;
 
-        public static MethodBase closeMenu;
-        public static MethodBase openQuickMenu;
+        public static MethodInfo closeMenu;
+        public static MethodInfo openQuickMenu;
+        public static MethodInfo clickMethod;
 
-        public static void Init()
+        public override void Init()
         {
             QuickMenuFromSocialButton = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(QuickMenuFromSocialButton), false, "Show \"To Quick Menu\" button");
             UserInfoExtensionsMod.userDetailsMenu.AddSimpleButton("To Quick Menu", ToQuickMenu, new Action<GameObject>((gameObject) => { quickMenuFromSocialButtonGameObject = gameObject; gameObject.SetActive(QuickMenuFromSocialButton.Value); }));
@@ -28,8 +29,10 @@ namespace UserInfoExtentions.Modules
                             .Where(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_Boolean_") && !mb.Name.Contains("_PDM_")).OrderBy(mb => ((UnhollowerBaseLib.Attributes.CallerCountAttribute)Attribute.GetCustomAttribute(mb, typeof(UnhollowerBaseLib.Attributes.CallerCountAttribute))).Count).Last();
             openQuickMenu = typeof(QuickMenu).GetMethods()
                             .Where(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && mb.GetParameters().Any(pi => pi.HasDefaultValue == false)).First();
+            clickMethod = typeof(VRCUiCursor).GetMethods()
+                .First(mi => mi.Name.StartsWith("Method_Public_Void_VRCPlayer_") && mi.GetParameters().Any(pi => pi.ParameterType == typeof(VRCPlayer)));
         }
-        public static void OnPreferencesSaved()
+        public override void OnPreferencesSaved()
         {
             quickMenuFromSocialButtonGameObject?.SetActive(QuickMenuFromSocialButton.Value);
         }
@@ -45,7 +48,7 @@ namespace UserInfoExtentions.Modules
                     closeMenu.Invoke(VRCUiManager.prop_VRCUiManager_0, new object[] { true, false }); //Closes Big Menu
                     openQuickMenu.Invoke(QuickMenu.prop_QuickMenu_0, new object[] { true }); //Opens Quick Menu
 
-                    if (VRCUiCursorManager.Method_Public_Static_VRCUiCursor_0().gameObject.activeSelf) VRCUiCursorManager.Method_Public_Static_VRCUiCursor_0().Method_Public_Void_VRCPlayer_PDM_0(player.field_Internal_VRCPlayer_0);
+                    if (VRCUiCursorManager.Method_Public_Static_VRCUiCursor_0().gameObject.activeSelf) clickMethod.Invoke(VRCUiCursorManager.Method_Public_Static_VRCUiCursor_0(), new object[] { player.field_Internal_VRCPlayer_0 });
 
                     QuickMenu.prop_QuickMenu_0.Method_Public_Void_Player_0(player); //Does the rest lmao
 

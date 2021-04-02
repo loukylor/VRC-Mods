@@ -43,15 +43,22 @@ namespace UserInfoExtentions.Components
         [method: HideFromIl2Cpp]
         public async void DownloadTexture(int index)
         {
-            linkTexts[index].text = BioButtons.bioLinks[index].OriginalString.Length >= 43 ? BioButtons.bioLinks[index].OriginalString.Substring(0, 43) : BioButtons.bioLinks[index].OriginalString;
-            WebRequest iconRequest = WebRequest.Create($"http://www.google.com/s2/favicons?domain_url={BioButtons.bioLinks[index].Host}&sz=64");
+            MemoryStream stream;
+            try
+            {
+                linkTexts[index].text = BioButtons.bioLinks[index].OriginalString.Length >= 43 ? BioButtons.bioLinks[index].OriginalString.Substring(0, 43) : BioButtons.bioLinks[index].OriginalString;
+                WebRequest iconRequest = WebRequest.Create($"http://www.google.com/s2/favicons?domain_url={BioButtons.bioLinks[index].Host}&sz=64");
 
-            WebResponse response = await iconRequest.GetResponseAsync().NoAwait();
+                WebResponse response = await iconRequest.GetResponseAsync().NoAwait();
 
-            MemoryStream stream = new MemoryStream();
-            response.GetResponseStream().CopyTo(stream);
+                stream = new MemoryStream();
+                response.GetResponseStream().CopyTo(stream);
+            }
+            finally
+            {
+                await AsyncUtils.YieldToMainThread();
+            }
 
-            await AsyncUtils.YieldToMainThread();
             Texture2D tex = new Texture2D(2, 2);
             ImageConversion.LoadImage(tex, stream.ToArray());
             icons[index].texture = tex;

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Reflection;
+using UnhollowerRuntimeLib.XrefScans;
 
 namespace UserInfoExtentions.Utilities
 {
@@ -10,8 +11,8 @@ namespace UserInfoExtentions.Utilities
         {
             try
             {
-                return UnhollowerRuntimeLib.XrefScans.XrefScanner.XrefScan(methodBase)
-                    .Where(instance => instance.Type == UnhollowerRuntimeLib.XrefScans.XrefType.Global && instance.ReadAsObject().ToString().Contains(match)).Any();
+                return XrefScanner.XrefScan(methodBase)
+                    .Where(instance => instance.Type == XrefType.Global && instance.ReadAsObject().ToString() == match).Any();
             }
             catch { }
             return false;
@@ -20,7 +21,7 @@ namespace UserInfoExtentions.Utilities
         {
             try
             {
-                return UnhollowerRuntimeLib.XrefScans.XrefScanner.UsedBy(methodBase)
+                return XrefScanner.UsedBy(methodBase)
                     .Where(instance => instance.TryResolve() != null && instance.TryResolve().Name.Contains(methodName)).Any();
             }
             catch { }

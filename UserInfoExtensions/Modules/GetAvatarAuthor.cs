@@ -15,7 +15,7 @@ using VRC.UI;
 
 namespace UserInfoExtentions.Modules
 {
-    public class GetAvatarAuthor
+    public class GetAvatarAuthor : ModuleBase
     {
         public static MelonPreferences_Entry<bool> AuthorFromSocialMenuButton;
         public static MelonPreferences_Entry<bool> AuthorFromAvatarMenuButton;
@@ -32,7 +32,7 @@ namespace UserInfoExtentions.Modules
         public static Type genericType;
         public static PropertyInfo screenStackProp;
 
-        public static void Init()
+        public override void Init()
         {
             AuthorFromSocialMenuButton = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(AuthorFromSocialMenuButton), false, "Show \"Avatar Author\" button in Social Menu");
             AuthorFromAvatarMenuButton = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(AuthorFromAvatarMenuButton), true, "Show \"Avatar Author\" button in Avatar Menu");
@@ -43,17 +43,17 @@ namespace UserInfoExtentions.Modules
 
             screenStackProp = typeof(VRCUiManager).GetProperties().Where(pi => pi.Name.Contains("field_Internal_List_1_") && !pi.Name.Contains("String")).First();
         }
-        public static void UiInit()
+        public override void UiInit()
         {
             GameObject gameObject = GameObject.Find("UserInterface/MenuContent/Screens/Avatar");
             avatarPage = gameObject.GetComponent<PageAvatar>();
         }
-        public static void OnPreferencesSaved()
+        public override void OnPreferencesSaved()
         {
             authorFromSocialMenuButtonGameObject?.SetActive(AuthorFromSocialMenuButton.Value);
             authorFromAvatarMenuButtonGameObject?.SetActive(AuthorFromAvatarMenuButton.Value);
         }
-        public static void OnUserInfoOpen()
+        public override void OnUserInfoOpen()
         {
             try
             {
@@ -110,6 +110,7 @@ namespace UserInfoExtentions.Modules
             }
             catch
             {
+                await AsyncUtils.YieldToMainThread();
                 VRCUtils.OpenPopupV2("Error!", "Something went wrong and the author could not be retreived. Please try again", "Close", new Action(VRCUtils.ClosePopup));
                 return;
             }

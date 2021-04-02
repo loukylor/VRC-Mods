@@ -10,7 +10,7 @@ using VRC.UI;
 
 namespace UserInfoExtentions.Modules
 {
-    public class BioButtons
+    public class BioButtons : ModuleBase
     {
         public static GameObject bioButtonGameObject;
         public static GameObject bioLinksButtonGameObject;
@@ -56,7 +56,7 @@ namespace UserInfoExtentions.Modules
             { "kvk", "[ kvk ] Korean Sign Language" },
         };
 
-        public static void Init()
+        public override void Init()
         {
             BioButton = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(BioButton), false, "Show \"Bio\" button");
             BioLinksButton = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(BioLinksButton), false, "Show \"Bio Links\" button");
@@ -73,7 +73,7 @@ namespace UserInfoExtentions.Modules
             UserInfoExtensionsMod.menu.AddSimpleButton("Bio Links", ShowBioLinksPopup);
             UserInfoExtensionsMod.menu.AddSimpleButton("Bio Languages", ShowBioLanguagesPopup);
         }
-        public static void UiInit() //This is a shit show but it works so shshshhhshh
+        public override void UiInit() //This is a shit show but it works so shshshhhshh
         {
             ClassInjector.RegisterTypeInIl2Cpp<BioLinksPopup>();
             GameObject popupGameObject = GameObject.Find("UserInterface/MenuContent/Popups/UpdateStatusPopup");
@@ -186,13 +186,13 @@ namespace UserInfoExtentions.Modules
 
             bioLanguagesPopup.gameObject.name = "BioLanguagesPopup";
         }
-        public static void OnPreferencesSaved()
+        public override void OnPreferencesSaved()
         {
             bioButtonGameObject?.SetActive(BioButton.Value);
             bioLinksButtonGameObject?.SetActive(BioLinksButton.Value);
             bioLanguagesButtonGameObject?.SetActive(BioLanguagesButton.Value); 
         }
-        public static void OnUserInfoOpen()
+        public override void OnUserInfoOpen()
         {
             userLanguages.Clear();
             foreach (string tag in VRCUtils.ActiveUser.tags) //Cant use where here because Il2Cpp List and regular List
@@ -200,21 +200,12 @@ namespace UserInfoExtentions.Modules
                 if (tag.StartsWith("language_")) userLanguages.Add(languageLookup[tag.Substring(9)]);
             }
         }
-        /*
-        public static void OnPageOpen(VRCUiPage __0)
-        {
-            if (__0 == null) return;
-
-            // This field (which is very important) is literally changed at random during runtime, it changes to random numbers to an invalid string so i have to set it before the page opens   
-            if (__0.TryCast<BioLanguagesPopup>() != null) __0.field_Public_String_0 = "LINKS_POPUP";
-            if (__0.TryCast<BioLinksPopup>() != null) __0.field_Public_String_0 = "BIO_LINKS";
-        }*/
 
         public static void GetBio()
         {
             UserInfoExtensionsMod.HideAllPopups();
 
-            if (VRCUtils.ActiveUser.bio != null && VRCUtils.ActiveUser.bio.Length >= 100)
+            if (VRCUtils.ActiveUser.bio != null && VRCUtils.ActiveUser.bio.Length >= 300)
             {
                 VRCUtils.OpenPopupV1("Bio:", VRCUtils.ActiveUser.bio, "Close", new Action(VRCUtils.ClosePopup));
             }
@@ -229,7 +220,7 @@ namespace UserInfoExtentions.Modules
 
             if (VRCUtils.ActiveUser.bioLinks == null)
             {
-                VRCUtils.OpenPopupV2("Notice:", "Cannot get users links", "Close", new Action(VRCUtils.ClosePopup));
+                VRCUtils.OpenPopupV2("Notice:", "Cannot get user's links", "Close", new Action(VRCUtils.ClosePopup));
             }
             else
             {
@@ -244,7 +235,7 @@ namespace UserInfoExtentions.Modules
                 }
                 else
                 {
-                    VRCUiManager.prop_VRCUiManager_0.ShowScreenButton("UserInterface/MenuContent/Popups/BioLinksPopup");
+                    VRCUiManager.prop_VRCUiManager_0.Method_Public_Void_String_Boolean_0("UserInterface/MenuContent/Popups/BioLinksPopup");
                 }
             }
         }
@@ -276,7 +267,7 @@ namespace UserInfoExtentions.Modules
             }
             else
             {
-                VRCUiManager.prop_VRCUiManager_0.ShowScreenButton("UserInterface/MenuContent/Popups/BioLanguagesPopup");
+                VRCUiManager.prop_VRCUiManager_0.Method_Public_Void_String_Boolean_0("UserInterface/MenuContent/Popups/BioLanguagesPopup");
             }
         }
     }

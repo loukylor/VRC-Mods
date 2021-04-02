@@ -11,7 +11,6 @@ namespace UserInfoExtentions.Utilities
     {
         private static MethodInfo popupV2;
         private static MethodInfo popupV1;
-        private static MethodInfo closePopup;
 
         public static MenuController menuController;
 
@@ -25,11 +24,10 @@ namespace UserInfoExtentions.Utilities
         public static void Init()
         {
             popupV2 = typeof(VRCUiPopupManager).GetMethods()
-                .Where(mb => mb.Name.StartsWith("Method_Public_Void_String_String_String_Action_Action_1_VRCUiPopup_") && !mb.Name.Contains("PDM") && Xref.CheckMethod(mb, "UserInterface/MenuContent/Popups/StandardPopupV2")).First();
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_String_String_String_Action_Action_1_VRCUiPopup_") && !mb.Name.Contains("PDM") && Xref.CheckMethod(mb, "UserInterface/MenuContent/Popups/StandardPopupV2"));
+                        var possibleMethods = typeof(VRCUiPopupManager).GetMethods().Where(mb => mb.Name.StartsWith("Method_Public_Void_String_String_String_Action_Action_1_VRCUiPopup_") && !mb.Name.Contains("PDM"));
             popupV1 = typeof(VRCUiPopupManager).GetMethods()
-                .Where(mb => mb.Name.StartsWith("Method_Public_Void_String_String_String_Action_Action_1_VRCUiPopup_") && !mb.Name.Contains("PDM") && Xref.CheckMethod(mb, "UserInterface/MenuContent/Popups/StandardPopup") && !Xref.CheckMethod(mb, "UserInterface/MenuContent/Popups/StandardPopupV2")).First();
-            closePopup = typeof(VRCUiPopupManager).GetMethods()
-                .Where(mb => mb.Name.StartsWith("Method_Public_Void_String_") && mb.Name.Length <= 28 && !mb.Name.Contains("PDM") && Xref.CheckUsed(mb, "Close")).First();
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_String_String_String_Action_Action_1_VRCUiPopup_") && !mb.Name.Contains("PDM") && Xref.CheckMethod(mb, "UserInterface/MenuContent/Popups/StandardPopup"));
         }
 
         public static void UiInit()
@@ -39,32 +37,27 @@ namespace UserInfoExtentions.Utilities
             userInfo = GameObject.Find("UserInterface/MenuContent/Screens/UserInfo").GetComponent<PageUserInfo>();
         }
 
-        public static void TryExecuteMethod(MethodInfo method, object instance = null, object[] parameters = null)
+        public static void OpenPopupV2(string title, string text, string buttonText, Action onButtonClick)
         {
-            try
-            {
-                method.Invoke(instance, parameters);
-            }
-            catch (Exception ex)
-            {
-                MelonLoader.MelonLogger.Error($"Error while trying to run method \"{method.Name}\" in module \"{method.DeclaringType}:\"\n" + ex.ToString());
-            }
-        }
-
-        public static async void OpenPopupV2(string title, string text, string buttonText, Action onButtonClick)
-        {
-            await AsyncUtils.YieldToMainThread();
             popupV2.Invoke(VRCUiPopupManager.prop_VRCUiPopupManager_0, new object[5] { title, text, buttonText, (Il2CppSystem.Action)onButtonClick, null });
         }
-        public static async void OpenPopupV1(string title, string text, string buttonText, Action onButtonClick)
+        public static void OpenPopupV1(string title, string text, string buttonText, Action onButtonClick)
         {
-            await AsyncUtils.YieldToMainThread();
             popupV1.Invoke(VRCUiPopupManager.prop_VRCUiPopupManager_0, new object[5] { title, text, buttonText, (Il2CppSystem.Action)onButtonClick, null });
         }
-        public static async void ClosePopup()
+        public static void ClosePopup()
         {
-            await AsyncUtils.YieldToMainThread();
-            closePopup.Invoke(VRCUiPopupManager.prop_VRCUiPopupManager_0, new object[] { "POPUP" });
+            VRCUiPopup popup = VRCUiManager.prop_VRCUiManager_0.field_Internal_VRCUiPopup_0;
+            if (popup == null) // If null try grabbing from the screen stack
+            {
+                foreach (VRCUiPage vrcUIPage in VRCUiManager.prop_VRCUiManager_0.field_Internal_Dictionary_2_String_VRCUiPage_0.Values)
+                    popup = vrcUIPage.TryCast<VRCUiPopup>();
+
+                if (popup == null)
+                    return;
+            }
+
+            popup.Close();
         }
     }
 }
