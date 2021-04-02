@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Threading.Tasks;
 using MelonLoader;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -87,6 +88,7 @@ namespace UserInfoExtentions.Modules
             if (avatarLink == null)
             {
                 VRCUtils.OpenPopupV2("Error!", "Something went wrong and the avatar author could not be retreived. Please try again", "Close", new Action(VRCUtils.ClosePopup));
+                return;
             }
 
             MelonCoroutines.Start(StartTimer());
@@ -95,7 +97,7 @@ namespace UserInfoExtentions.Modules
 
             try
             {
-                WebResponse response = await request.GetResponseAsync().NoAwait();
+                WebResponse response = await request.GetResponseAsync();
                 isFromSocialPage = true;
 
                 StreamReader streamReader = new StreamReader(response.GetResponseStream());
@@ -108,10 +110,10 @@ namespace UserInfoExtentions.Modules
                 response.Close();
                 streamReader.Close();
             }
-            catch
+            catch (WebException)
             {
                 await AsyncUtils.YieldToMainThread();
-                VRCUtils.OpenPopupV2("Error!", "Something went wrong and the author could not be retreived. Please try again", "Close", new Action(VRCUtils.ClosePopup));
+                VRCUtils.OpenPopupV2("Error!", "Something went wrong and the avatar author could not be retreived. Please try again", "Close", new Action(VRCUtils.ClosePopup));
                 return;
             }
         }
