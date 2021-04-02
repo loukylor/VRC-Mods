@@ -49,7 +49,7 @@ namespace UserInfoExtentions.Components
                 linkTexts[index].text = BioButtons.bioLinks[index].OriginalString.Length >= 43 ? BioButtons.bioLinks[index].OriginalString.Substring(0, 43) : BioButtons.bioLinks[index].OriginalString;
                 WebRequest iconRequest = WebRequest.Create($"http://www.google.com/s2/favicons?domain_url={BioButtons.bioLinks[index].Host}&sz=64");
 
-                WebResponse response = await iconRequest.GetResponseAsync().NoAwait();
+                WebResponse response = await iconRequest.GetResponseAsync();
 
                 stream = new MemoryStream();
                 response.GetResponseStream().CopyTo(stream);
