@@ -3,7 +3,6 @@ using System.Linq;
 using System.Reflection;
 using MelonLoader;
 using UIExpansionKit.API;
-using UnhollowerRuntimeLib.XrefScans;
 using UnityEngine;
 
 [assembly: MelonInfo(typeof(ReloadAvatars.ReloadAvatarsMod), "ReloadAvatars", "1.0.2", "loukylor", "https://github.com/loukylor/VRC-Mods")]
