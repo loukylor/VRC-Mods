@@ -33,5 +33,9 @@
 	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\VRCCore-Standalone.dll</HintPath>
 	  </Reference>
 	</ItemGroup>
+	
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Exec Command="move &quot;bin\Debug\net472\ReloadAvatars.dll&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\VRChat\Mods&quot;" />
+	</Target>
 
 </Project>

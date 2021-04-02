@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 using MelonLoader;
 using UIExpansionKit.API;
+using UnhollowerRuntimeLib.XrefScans;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(ReloadAvatars.ReloadAvatarsMod), "ReloadAvatars", "1.0.1", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(ReloadAvatars.ReloadAvatarsMod), "ReloadAvatars", "1.0.2", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace ReloadAvatars
@@ -13,33 +16,47 @@ namespace ReloadAvatars
         public static GameObject reloadAvatarButton;
         public static GameObject reloadAllAvatarsButton;
 
+        public static MelonPreferences_Entry<bool> reloadAvatarPref;
+        public static MelonPreferences_Entry<bool> reloadAllAvatarsPref;
+
         public override void OnApplicationStart()
         {
             MelonPreferences.CreateCategory("ReloadAvatars", "ReloadAvatars Settings");
-            MelonPreferences.CreateEntry("ReloadAvatars", "ReloadAvatar", true, "Enable/Disable Reload Avatar Button");
-            MelonPreferences.CreateEntry("ReloadAvatars", "ReloadAllAvatars", true, "Enable/Disable Reload All Avatars Button");
+            reloadAvatarPref = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("ReloadAvatars", "ReloadAvatar", true, "Enable/Disable Reload Avatar Button");
+            reloadAllAvatarsPref = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("ReloadAvatars", "ReloadAllAvatars", true, "Enable/Disable Reload All Avatars Button");
+
+            MethodInfo reloadAvatarMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.Name.StartsWith("Method_Private_Void_Boolean_") && mi.Name.Length < 31 && mi.GetParameters().Any(pi => pi.IsOptional));
+            MethodInfo reloadAllAvatarsMethod = typeof(VRCPlayer).GetMethods().Where(mi => mi.Name.StartsWith("Method_Public_Void_Boolean_") && mi.Name.Length < 30 && mi.GetParameters().Any(pi => pi.IsOptional)).First(); // Both methods seem to do the same thing
 
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.UserQuickMenu).AddSimpleButton("Reload Avatar", new Action(() =>
             {
                 try
                 {
-                    VRCPlayer.Method_Public_Static_Void_APIUser_0(QuickMenu.prop_QuickMenu_0.prop_APIUser_0);
+                    reloadAvatarMethod.Invoke(QuickMenu.prop_QuickMenu_0.field_Private_Player_0.field_Internal_VRCPlayer_0, new object[] { true });
                 }
-                catch { } // Ignore
-            }), new Action<GameObject>((gameObject) => { reloadAvatarButton = gameObject; reloadAvatarButton.SetActive(MelonPreferences.GetEntryValue<bool>("ReloadAvatars", "ReloadAvatar")); }));
+                catch (Exception ex)
+                {
+                    MelonLogger.Error("Error while reloading single avatar:\n" + ex.ToString());
+                } // Ignore
+            }), new Action<GameObject>((gameObject) => { reloadAvatarButton = gameObject; reloadAvatarButton.SetActive(reloadAllAvatarsPref.Value); }));
+
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.QuickMenu).AddSimpleButton("Reload All Avatars", new Action(() =>
             {
                 try
                 {
-                    VRCPlayer.field_Internal_Static_VRCPlayer_0.Method_Public_Void_Boolean_0();
+                    reloadAllAvatarsMethod.Invoke(VRCPlayer.field_Internal_Static_VRCPlayer_0, new object[] { true });
                 }
-                catch { } // Ignore
-            }), new Action<GameObject>((gameObject) => { reloadAllAvatarsButton = gameObject; reloadAllAvatarsButton.SetActive(MelonPreferences.GetEntryValue<bool>("ReloadAvatars", "ReloadAllAvatars")); }));
+                catch (Exception ex)
+                {
+                    MelonLogger.Error("Error while reloading all avatars:\n" + ex.ToString());
+                } // Ignore
+            }), new Action<GameObject>((gameObject) => { reloadAllAvatarsButton = gameObject; reloadAllAvatarsButton.SetActive(reloadAvatarPref.Value); }));
+            MelonLogger.Msg("Initialized!");
         }
         public override void OnPreferencesSaved()
         {
-            reloadAvatarButton?.SetActive(MelonPreferences.GetEntryValue<bool>("ReloadAvatars", "ReloadAvatar"));
-            reloadAllAvatarsButton?.SetActive(MelonPreferences.GetEntryValue<bool>("ReloadAvatars", "ReloadAllAvatars"));
+            reloadAvatarButton?.SetActive(reloadAvatarPref.Value);
+            reloadAllAvatarsButton?.SetActive(reloadAllAvatarsPref.Value);
         }
     }
 }
