@@ -48,9 +48,6 @@
 		<Reference Include="UnityEngine.PhysicsModule">
 			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.PhysicsModule.dll</HintPath>
 		</Reference>
-		<Reference Include="UnityEngine.TextRenderingModule">
-			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
-		</Reference>
 		<Reference Include="UnityEngine.UI">
 			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.UI.dll</HintPath>
 		</Reference>
@@ -66,7 +63,7 @@
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="move &quot;C:\Users\emem0\Source\Repos\VRC-Mods\PlayerList\bin\Debug\net472\PlayerList.dll&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\VRChat\Mods&quot;" />
+		<Exec Command="move &quot;bin\Debug\net472\PlayerList.dll&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\VRChat\Mods&quot;" />
 	</Target>
 
 </Project>

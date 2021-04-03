@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Harmony;
 using MelonLoader;
 using PlayerList.Components;
 using PlayerList.Entries;
