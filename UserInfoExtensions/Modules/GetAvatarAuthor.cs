@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Threading.Tasks;
 using MelonLoader;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -93,10 +92,11 @@ namespace UserInfoExtentions.Modules
 
             MelonCoroutines.Start(StartTimer());
 
-            WebRequest request = WebRequest.Create(avatarLink.OriginalString);
+            HttpWebRequest request = WebRequest.CreateHttp(avatarLink.OriginalString);
 
             try
             {
+                request.UserAgent = "Mozilla/5.0";
                 WebResponse response = await request.GetResponseAsync();
                 isFromSocialPage = true;
 
