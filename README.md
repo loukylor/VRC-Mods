@@ -21,6 +21,7 @@ More detailed instructions and more mods can be found in the [VRChat Modding Gro
 # Mod List
 - [AskToPortal](#asktoportal)
 - [CloningBeGone](#cloningbegone)
+- [InstanceHistory](#instancehistory)
 - [PlayerList](#playerlist)
 - [ReloadAvatars](#reloadavatars)
 - [UserInfoExtensions](#userinfoextensions)
@@ -46,6 +47,16 @@ Turns off cloning when you join an instance.
 ## Features
 You can configure whether you want cloning to be on or off, based off instance type.
 So, you can say, have cloning on in Invite+ worlds and off in all the other instance types.
+
+# InstanceHistory
+A basic instance history mod
+
+## Features
+It's very basic as of now, but I plan on adding support for importing the configs of different instance history mods
+I also would like to make this very customizable, so support for both regular buttons and UIX buttons and the ability to move the regular button around.
+
+## Credits
+- [DubyaDude](https://github.com/DubyaDude) as I used [RubyButtonAPI](https://github.com/DubyaDude/RubyButtonAPI) as reference for my button API.
 
 # PlayerList
 Adds a player list to the ShortcutMenu
