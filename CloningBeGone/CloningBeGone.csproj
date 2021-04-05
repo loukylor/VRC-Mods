@@ -33,4 +33,8 @@
     </Reference>
   </ItemGroup>
 
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="move &quot;C:\Users\emem0\Source\Repos\VRC-Mods\CloningBeGone\bin\Debug\net472\CloningBeGone.dll&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\VRChat\Mods&quot;" />
+	</Target>
+	
 </Project>
