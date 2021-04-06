@@ -98,6 +98,7 @@ namespace PlayerList
             MenuManager.CreateMainSubMenu();
 
             // TODO: Add opacity options, maybe color too, (maybe even for each stage of ping and fps??)
+            // TODO: Add option to sort playerlist
 
             MenuManager.AddMenuListeners();
             MenuManager.CreateSubMenus();

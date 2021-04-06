@@ -123,7 +123,7 @@ namespace PlayerList.UI
                 return;
             }
 
-            CurrentMenu.SetActive(false);
+            CurrentMenu?.SetActive(false);
 
             if (page.Split('/').Last() == "ShortcutMenu")
             { 
@@ -135,7 +135,7 @@ namespace PlayerList.UI
                 CurrentMenu = pageGameObject;
             }
 
-            CurrentTabMenu.SetActive(false);
+            CurrentTabMenu?.SetActive(false);
             if (setCurrentTab)
                 CurrentTabMenu = pageGameObject;
 
