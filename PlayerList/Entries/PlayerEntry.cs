@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using Harmony;
 using MelonLoader;
 using PlayerList.Utilities;
+using UnhollowerBaseLib;
 using UnityEngine;
 using VRC;
 using VRC.Core;
@@ -16,169 +20,132 @@ namespace PlayerList.Entries
 
         public static bool worldAllowed = false;
 
+        public int playerInstanceId;
+
         public Player player;
         public string userID;
-        public PlayerNet playerNet;
+        protected string playerColor = "#";
+        protected string platform;
 
-        public bool blockedYou;
-        public bool youBlocked;
+        public static string separator = " | ";
+        public static string leftPart = " - ";
+
+        public static bool reCacheColor;
 
         private static bool spoofFriend;
-        public static int highestPhotonIdLength = 0;
+        protected static int highestPhotonIdLength = 0;
 
-        public static void Patch(HarmonyInstance harmonyInstance) // All in the name of FUTUREPROOFING REEEEEEEEEEEEEEEEEEEEEE
+        public PerformanceRating lastPerf;
+
+        public delegate void UpdateEntryDelegate(PlayerNet playerNet, PlayerEntry entry, ref string tempString);
+        public static UpdateEntryDelegate updateDelegate;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate IntPtr OnPlayerNetDecode(IntPtr instancePointer, IntPtr objectsPointer, int objectIndex, float sendTime, IntPtr nativeMethodPointer);
+        private static OnPlayerNetDecode originalDecodeDelegate;
+        public static void EntryInit()
         {
-            harmonyInstance.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend))));
-            harmonyInstance.Patch(typeof(RoomManager).GetMethod("Method_Public_Static_Boolean_ApiWorld_ApiWorldInstance_String_Int32_0"), null, new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnInstanceChange))));
+            PlayerListMod.Instance.Harmony.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend))));
+
+            // Definitely not stolen code from our lord and savior knah (https://github.com/knah/VRCMods/blob/master/AdvancedSafety/AdvancedSafetyMod.cs) because im not a skid
+            foreach (MethodInfo method in typeof(PlayerNet).GetMethods().Where(mi => mi.Name.StartsWith("Method_Public_Virtual_Final_New_Void_ValueTypePublicSealed2157InObIn1144Vo71VoUnique_Int32_Single_3")))
+            {
+                unsafe
+                {
+                    var originalMethodPointer = *(IntPtr*)(IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(method).GetValue(null);
+
+                    originalDecodeDelegate = null;
+
+                    OnPlayerNetDecode replacement = (instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer) => OnPlayerNetDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
+
+                    MelonUtils.NativeHookAttach((IntPtr)(&originalMethodPointer), Marshal.GetFunctionPointerForDelegate(replacement));
+
+                    originalDecodeDelegate = Marshal.GetDelegateForFunctionPointer<OnPlayerNetDecode>(originalMethodPointer);
+                }
+            }
         }
         public override void Init(object[] parameters)
         {
             player = (Player)parameters[0];
+            playerInstanceId = player.GetInstanceID();
             userID = player.field_Private_APIUser_0.id;
-            playerNet = player.GetComponent<PlayerNet>();
+            platform = platform = GetPlatform(player).PadRight(2);
 
             gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new Action(() => OpenPlayerInQuickMenu(player)));
+
+            textComponent.text = "Loading...";
+
+            OnConfigChanged();
         }
-        protected override void ProcessText(object[] parameters = null)
+        public override void OnConfigChanged()
         {
-            if (player == null) Remove(); // Sometimes ppl will desync causing the leave event to not call
-
-            if (playerNet != null)
-            {
-                if (Config.pingToggle.Value)
-                {
-                    short ping = playerNet.prop_Int16_0;
-                    AddColor(GetPingColor(ping));
-                    if (ping < 9999 && ping > -999)
-                        AddEndColor(ping.ToString().PadRight(4) + "ms");
-                    else
-                        AddEndColor(((double)(ping / 1000)).ToString("N1").PadRight(5) + "s");
-                    AddSpacer();
-                }
-
-                // I STG if I have to remove fps because skids start walking up to people saying poeple's fps im gonna murder someone
-                if (Config.fpsToggle.Value)
-                {
-                    int fps = Mathf.Clamp((int)(1000f / playerNet.field_Private_Byte_0), -99, 999);
-
-                    AddColor(GetFpsColor(fps));
-                    if (playerNet.field_Private_Byte_0 == 0)
-                        AddEndColor("?¿?");
-                    else
-                        AddEndColor(fps.ToString().PadRight(3));
-                    AddSpacer();
-                }
-            }
-            else
-            {
-                if (Config.pingToggle.Value)
-                {
-                    AddColoredText("#ff0000", "?¿?".PadRight(4));
-                    AddSpacer();
-                }
-
-                // I STG if I have to remove fps because skids start walking up to people saying poeple's fps im gonna murder someone
-                if (Config.fpsToggle.Value)
-                {
-                    AddColoredText("#ff0000", "?¿?".PadRight(3));
-                    AddSpacer();
-                }
-
-                playerNet = player.GetComponent<PlayerNet>();
-            }
-
+            updateDelegate = null;
+            if (Config.pingToggle.Value)
+                updateDelegate += AddPing;
+            if (Config.fpsToggle.Value)
+                updateDelegate += AddFps;
             if (Config.platformToggle.Value)
-            {
-                AddText(ParsePlatform(player).PadRight(2));
-                AddSpacer();
-            }
-
+                updateDelegate += AddPlatform;
             if (Config.perfToggle.Value)
-            {
-                PerformanceRating rating = player.field_Internal_VRCPlayer_0.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall]; // Get from cache so it doesnt calculate perf all at once
-                AddColoredText("#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, rating)), ParsePerformanceText(rating));
-                AddSpacer();
-            }
-            
+                updateDelegate += AddPerf;
             if (Config.distanceToggle.Value)
-            {
-                if (worldAllowed)
-                {
-                    float distance = (player.transform.position - Player.prop_Player_0.transform.position).magnitude;
-                    if (distance < 100)
-                    {
-                        AddText(distance.ToString("N1").PadRight(4) + "m");
-                    }
-                    else if (distance < 10000)
-                    {
-                        AddText((distance / 1000).ToString("N1").PadRight(3) + "km");
-                    }
-                    else if (distance < 999900)
-                    {
-                        AddText((distance / 1000).ToString("N0").PadRight(3) + "km");
-                    }
-                    else
-                    {
-                        AddText((distance / 9.461e+15).ToString("N2").PadRight(3) + "ly"); // If its too large for kilometers ***just convert to light years***
-                    }
-                }
-                else
-                {
-                    AddText("0.0 m");
-                }
-                AddSpacer();
-            }
-
+                updateDelegate += AddDistance;
             if (Config.photonIdToggle.Value)
-            {
-                AddText(player.field_Internal_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0.ToString().PadRight(highestPhotonIdLength));
-                AddSpacer();
-            }
+                updateDelegate += AddPhotonId;
+            if (Config.displayNameToggle.Value)
+                updateDelegate += AddDisplayName;
 
-            if (Config.displayNameToggle.Value) // Why?
-            {
-                switch (Config.DisplayNameColorMode)
-                {
-                    case PlayerListMod.DisplayNameColorMode.TrustAndFriends:
-                        AddColoredText("#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(player.field_Private_APIUser_0)), player.field_Private_APIUser_0.displayName);
-                        break;
-                    case PlayerListMod.DisplayNameColorMode.None:
-                        AddText(player.field_Private_APIUser_0.displayName);
-                        break;
-                    case PlayerListMod.DisplayNameColorMode.TrustOnly:
-                        // ty bono for this (https://github.com/ddakebono/)
-                        spoofFriend = true;
-                        AddColoredText("#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(player.field_Private_APIUser_0)), player.field_Private_APIUser_0.displayName);
-                        break;
-                    case PlayerListMod.DisplayNameColorMode.FriendsOnly:
-                        if (APIUser.IsFriendsWith(player.field_Private_APIUser_0.id))
-                            AddColoredText("#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(player.field_Private_APIUser_0)), player.field_Private_APIUser_0.displayName);
-                        else
-                            AddText(player.field_Private_APIUser_0.displayName);
-                        break;
-                }
-                AddSpacer();
-            }
-
-            if (textComponent.text.Length > 0)
-                if (Config.condensedText.Value)
-                    textComponent.text = textComponent.text.Remove(textComponent.text.Length - 1, 1);
-                else
-                    textComponent.text = textComponent.text.Remove(textComponent.text.Length - 3, 3);
-
-            if (!Config.numberedList.Value)
-                if (Config.condensedText.Value)
-                    AddTextToBeginning("-");
-                else
-                    AddTextToBeginning(" - ");
+            if (Config.condensedText.Value)
+                separator = "|";
             else
-                if (Config.condensedText.Value)
-                    AddTextToBeginning($"{gameObject.transform.GetSiblingIndex() - 1}.".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 1)); // Pad by weird amount because we cant include the header and disabled template in total number of gameobjects
-                else
-                    AddTextToBeginning($"{gameObject.transform.GetSiblingIndex() - 1}. ".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 2));
+                separator = " | ";
 
+            EntryManager.RefreshPlayerEntries();
         }
-        public static bool OnIsFriend(ref bool __result)
+        private static IntPtr OnPlayerNetDecodeDelegate(IntPtr instancePointer, IntPtr objectsPointer, int objectIndex, float sendTime, IntPtr nativeMethodPointer)
+        {
+            if (instancePointer == IntPtr.Zero)
+                return originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
+
+            PlayerNet playerNet = new PlayerNet(instancePointer).TryCast<PlayerNet>();
+            if (playerNet == null)
+                return originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
+
+            IntPtr result = originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
+            if (result == IntPtr.Zero)
+                return result;
+
+            try
+            {
+                UpdateEntry(playerNet);
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error("Something went horribly wrong:\n" + ex.ToString());
+            }
+
+            return result;
+        }
+        public static void UpdateEntry(PlayerNet playerNet, PlayerEntry entry = null)
+        {
+            if (!MenuManager.playerList.active)
+                return;
+
+            if (entry == null)
+            {
+                EntryManager.playerEntries.TryGetValue(playerNet.field_Internal_VRCPlayer_0.field_Private_Player_0.GetInstanceID(), out entry);
+                if (entry == null)
+                    return;
+            }
+
+            string tempString = "";
+
+            updateDelegate?.Invoke(playerNet, entry, ref tempString);
+
+            tempString = entry.AddLeftPart(tempString);
+            entry.textComponent.text = tempString;
+        }
+        private static bool OnIsFriend(ref bool __result)
         {
             if (spoofFriend)
             {
@@ -188,39 +155,133 @@ namespace PlayerList.Entries
             }
             return true;
         }
-        public static void OnInstanceChange(ApiWorld __0)
+        public override void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
         {
             MelonLogger.Msg("Checking if world is allowed to show distance...");
             worldAllowed = false;
-            if (__0 != null)
-                MelonCoroutines.Start(VRCUtils.CheckWorld(__0));
+            if (world != null)
+                MelonCoroutines.Start(VRCUtils.CheckWorld(world));
         }
+
+        private static void AddPing(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
+        {
+            short ping = playerNet.prop_Int16_0;
+
+            tempString += "<color=" + GetPingColor(ping) + ">";
+            if (ping < 9999 && ping > -999)
+                tempString += ping.ToString().PadRight(4) + "ms</color>";
+            else
+                tempString += ((double)(ping / 1000)).ToString("N1").PadRight(5) + "s</color>";
+            tempString += separator;
+        }
+        private static void AddFps(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
+        {
+            int fps = MelonUtils.Clamp((int)(1000f / playerNet.field_Private_Byte_0), -99, 999);
+
+            tempString += "<color=" + GetFpsColor(fps) + ">";
+            if (playerNet.field_Private_Byte_0 == 0)
+                tempString += "?¿?</color>";
+            else
+                tempString += fps.ToString().PadRight(3) + "</color>";
+            tempString += separator;
+        }
+        private static void AddPlatform(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
+        {
+            tempString += entry.platform + separator;
+        }
+        private static void AddPerf(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
+        {
+            PerformanceRating rating = entry.player.field_Internal_VRCPlayer_0.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall]; // Get from cache so it doesnt calculate perf all at once
+            if (rating != entry.lastPerf)
+                EntryManager.shouldSort = true;
+            entry.lastPerf = rating;
+            tempString += "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, rating)) + ">" + ParsePerformanceText(rating) + "</color>" + separator;
+        }
+        private static void AddDistance(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
+        {
+            if (worldAllowed)
+            {
+                float distance = (entry.player.transform.position - Player.prop_Player_0.transform.position).magnitude;
+                if (distance < 100)
+                {
+                    tempString += distance.ToString("N1").PadRight(4) + "m";
+                }
+                else if (distance < 10000)
+                {
+                    tempString += (distance / 1000).ToString("N1").PadRight(3) + "km";
+                }
+                else if (distance < 999900)
+                {
+                    tempString += (distance / 1000).ToString("N0").PadRight(3) + "km";
+                }
+                else
+                {
+                    tempString += (distance / 9.461e+15).ToString("N2").PadRight(3) + "ly"; // If its too large for kilometers ***just convert to light years***
+                }
+            }
+            else
+            {
+                tempString += "0.0 m";
+            }
+            tempString += separator;
+        }
+        private static void AddPhotonId(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
+        {
+            tempString += entry.player.field_Internal_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0.ToString().PadRight(highestPhotonIdLength) + separator;
+        }
+        private static void AddDisplayName(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
+        {
+            if (reCacheColor || entry.playerColor == "#")
+            {
+                entry.playerColor = "";
+                switch (Config.DisplayNameColorMode)
+                {
+                    case DisplayNameColorMode.TrustAndFriends:
+                        entry.playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(entry.player.field_Private_APIUser_0));
+                        break;
+                    case DisplayNameColorMode.None:
+                        break;
+                    case DisplayNameColorMode.TrustOnly:
+                        // ty bono for this (https://github.com/ddakebono/)
+                        spoofFriend = true;
+                        entry.playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(entry.player.field_Private_APIUser_0));
+                        break;
+                    case DisplayNameColorMode.FriendsOnly:
+                        if (APIUser.IsFriendsWith(entry.player.field_Private_APIUser_0.id))
+                            entry.playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(entry.player.field_Private_APIUser_0));
+                        break;
+                }
+                reCacheColor = false;
+            }
+            tempString += "<color=" + entry.playerColor + ">" + entry.player.field_Private_APIUser_0.displayName + "</color>" + separator;
+        }
+
         public void Remove()
         {
-            EntryManager.playerEntries.Remove(userID);
+            EntryManager.playerEntries.Remove(playerInstanceId);
             EntryManager.entries.Remove(Identifier);
             UnityEngine.Object.DestroyImmediate(gameObject);
             return;
         }
 
-        public static string ParsePlatform(Player player)
+        protected static string GetPlatform(Player player)
         {
             if (player.field_Private_APIUser_0.last_platform == "standalonewindows")
-                if (player.field_Private_VRCPlayerApi_0.IsUserInVR())
+                if (player.prop_VRCPlayerApi_0.IsUserInVR())
                     return "VR".PadRight(2);
                 else
                     return "PC".PadRight(2);
             else
                 return "Q".PadRight(2);
         }
-        
-        public static void OpenPlayerInQuickMenu(Player player)
+
+        protected static void OpenPlayerInQuickMenu(Player player)
         {
             InputManager.SelectPlayer(player.field_Internal_VRCPlayer_0);
             QuickMenuContextualDisplay.Method_Public_Static_Void_VRCPlayer_0(player.field_Internal_VRCPlayer_0);
         }
 
-        public static string GetPingColor(int ping)
+        protected static string GetPingColor(int ping)
         {
             if (ping <= 75)
                 return "#00ff00";
@@ -233,7 +294,7 @@ namespace PlayerList.Entries
             else
                 return "#ff0000";
         }
-        public static string GetFpsColor(int fps)
+        protected static string GetFpsColor(int fps)
         {
             if (fps >= 60)
                 return "#00ff00";
@@ -246,12 +307,12 @@ namespace PlayerList.Entries
             else
                 return "#ff0000";
         }
-        public static string ParsePerformanceText(PerformanceRating rating)
+        protected static string ParsePerformanceText(PerformanceRating rating)
         {
             switch (rating)
             {
                 case PerformanceRating.VeryPoor:
-                    return "Awful".PadRight(5);
+                    return "Awful";
                 case PerformanceRating.Poor:
                     return "Poor".PadRight(5);
                 case PerformanceRating.Medium:
@@ -259,13 +320,42 @@ namespace PlayerList.Entries
                 case PerformanceRating.Good:
                     return "Good".PadRight(5);
                 case PerformanceRating.Excellent:
-                    return "Great".PadRight(5);
+                    return "Great";
                 case PerformanceRating.None:
-                    return "?¿?¿?".PadRight(5);
+                    return "?¿?¿?";
                     // TODO: add load percentage??
                 default:
                     return rating.ToString().PadRight(5);
             }
+        }
+        protected string AddLeftPart(string tempString)
+        {
+            if (tempString.Length > 0)
+                if (Config.condensedText.Value)
+                    tempString = tempString.Remove(tempString.Length - 1, 1);
+                else
+                    tempString = tempString.Remove(tempString.Length - 3, 3);
+
+            if (!Config.numberedList.Value)
+                if (Config.condensedText.Value)
+                    tempString = "-" + tempString;
+                else
+                    tempString = " - " + tempString;
+            else
+                if (Config.condensedText.Value)
+                    tempString = $"{gameObject.transform.GetSiblingIndex() - 1}.".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 1) + tempString; // Pad by weird amount because we cant include the header and disabled template in total number of gameobjects
+                else
+                    tempString = $"{gameObject.transform.GetSiblingIndex() - 1}. ".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 2) + tempString;
+
+            return tempString;
+        }
+
+        public enum DisplayNameColorMode
+        {
+            TrustAndFriends,
+            TrustOnly,
+            FriendsOnly,
+            None
         }
     }
 }

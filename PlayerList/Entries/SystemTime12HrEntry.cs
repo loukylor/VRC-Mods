@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 
 namespace PlayerList.Entries
 {
@@ -7,6 +6,17 @@ namespace PlayerList.Entries
     {
         public override string Name { get { return "System Time 12Hr"; } }
 
-        protected override void ProcessText(object[] parameters = null) => ChangeEntry("systemtime12hr", DateTime.Now.ToString(@"hh\:mm\:ss tt", CultureInfo.InvariantCulture));
+        public string lastTime;
+
+        protected override void ProcessText(object[] parameters = null)
+        {
+            string timeString = DateTime.Now.ToString(@"hh\:mm\:ss tt");
+            if (lastTime == timeString)
+                return;
+
+            lastTime = timeString;
+            ResetEntry();
+            ChangeEntry("systemtime12hr", timeString);
+        }
     }
 }

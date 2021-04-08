@@ -1,11 +1,15 @@
 ﻿using System;
 using MelonLoader;
+using PlayerList.Entries;
 using UnityEngine;
 
 namespace PlayerList
 {
-    class Config
+    static class Config
     {
+        public static event Action OnConfigChangedEvent;
+        private static bool hasConfigChanged;
+
         // TODO: Make is so the vector 2 acutlaly uses the custom mapper when it gets fixed
         public static readonly string categoryIdentifier = "PlayerList Config";
         public static MelonPreferences_Category category = MelonPreferences.CreateCategory(categoryIdentifier);
@@ -24,25 +28,21 @@ namespace PlayerList
         public static MelonPreferences_Entry<bool> photonIdToggle;
         public static MelonPreferences_Entry<bool> displayNameToggle;
         private static MelonPreferences_Entry<string> displayNameColorMode;
-        public static PlayerListMod.DisplayNameColorMode DisplayNameColorMode
+
+        public static PlayerEntry.DisplayNameColorMode DisplayNameColorMode
         {
-            get { return (PlayerListMod.DisplayNameColorMode)Enum.Parse(typeof(PlayerListMod.DisplayNameColorMode), displayNameColorMode.Value); }
+            get { return (PlayerEntry.DisplayNameColorMode)Enum.Parse(typeof(PlayerEntry.DisplayNameColorMode), displayNameColorMode.Value); }
             set { displayNameColorMode.Value = value.ToString(); }
         }
-        public static bool HasSomethingOff
-        {
-            get
-            {
-                if (!pingToggle.Value || !fpsToggle.Value || !platformToggle.Value || !perfToggle.Value || !displayNameToggle.Value)
-                    return true;
-                return false;
-            }
-        }
+
+        public static MelonPreferences_Entry<bool> excludeSelfFromSort;
+        public static MelonPreferences_Entry<bool> sortFriendsFirst;
+        private static MelonPreferences_Entry<string> currentSortType;
 
         private static MelonPreferences_Entry<string> menuButtonPosition;
-        public static PlayerListMod.MenuButtonPositionEnum MenuButtonPosition
+        public static MenuManager.MenuButtonPositionEnum MenuButtonPosition
         {
-            get { return (PlayerListMod.MenuButtonPositionEnum)Enum.Parse(typeof(PlayerListMod.MenuButtonPositionEnum), menuButtonPosition.Value); }
+            get { return (MenuManager.MenuButtonPositionEnum)Enum.Parse(typeof(MenuManager.MenuButtonPositionEnum), menuButtonPosition.Value); }
             set { menuButtonPosition.Value = value.ToString(); }
         }
 
@@ -61,6 +61,7 @@ namespace PlayerList
 
         public static void RegisterSettings()
         {
+            // Converting to the generic then mine is required f
             enabledOnStart = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(enabledOnStart), true, is_hidden: true);
             condensedText = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(condensedText), false, is_hidden: true);
             numberedList = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(numberedList), true, is_hidden: true);
@@ -80,7 +81,27 @@ namespace PlayerList
 
             _playerListPositionX = (MelonPreferences_Entry<float>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(_playerListPositionX), 7.5f, is_hidden: true);
             _playerListPositionY = (MelonPreferences_Entry<float>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(_playerListPositionY), 3.5f, is_hidden: true);
-            // playerListPosition = (MelonPreferences_Entry<Vector2>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(playerListPosition), (Vector2)Utilities.Converters.ConvertToUnityUnits(new Vector3(7.5f, 3.5f)), is_hidden: true);
+
+            foreach (MelonPreferences_Entry entry in category.Entries)
+                entry.OnValueChangedUntyped += OnConfigChanged;
+        }
+
+        public static void OnConfigChanged()
+        {
+            OnConfigChangedEvent?.Invoke();
+            hasConfigChanged = true;
+        }
+        public static void SaveEntries()
+        {
+            if (RoomManager.field_Internal_Static_ApiWorldInstance_0 == null) return;
+
+            if (hasConfigChanged)
+            {
+                MelonPreferences.Save();
+                hasConfigChanged = false;
+            }
+
+            ListPositionManager.shouldMove = false;
         }
     }
 }

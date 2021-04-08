@@ -1,9 +1,14 @@
-﻿namespace PlayerList.Entries
+﻿using VRC.Core;
+
+namespace PlayerList.Entries
 {
     class WorldAuthorEntry : EntryBase
     {
         public override string Name { get { return "World Author"; } }
 
-        protected override void ProcessText(object[] parameters = null) => ChangeEntry("worldauthor", RoomManager.field_Internal_Static_ApiWorld_0.authorName);
+        public override void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
+        {
+            ChangeEntry("worldauthor", world.authorName);
+        }
     }
 }

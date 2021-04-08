@@ -1,6 +1,8 @@
 ﻿using System;
-using VRC;
+using System.Collections;
 using VRC.Core;
+using UnityEngine;
+using MelonLoader;
 
 namespace PlayerList.Entries
 {
@@ -8,53 +10,40 @@ namespace PlayerList.Entries
     {
         public override string Name { get { return "Instance Creator"; } }
 
-        public bool hasCheckedInstance;
-        public string lastUserDisplayName;
-        protected override void ProcessText(object[] parameters = null)
+        public override void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
         {
-            if (RoomManager.field_Internal_Static_ApiWorldInstance_0 != null)
-            {
-                if (hasCheckedInstance)
-                {
-                    ChangeEntry("instancecreator", lastUserDisplayName);
-                    return;
-                }
-
-                Il2CppSystem.Collections.Generic.List<ApiWorldInstance.InstanceTag> tags = RoomManager.field_Internal_Static_ApiWorldInstance_0.ParseTags(RoomManager.field_Internal_Static_ApiWorldInstance_0.idWithTags);
-                foreach (ApiWorldInstance.InstanceTag tag in tags)
-                {
-                    if (tag.name == "private" || tag.name == "friend" || tag.name == "hidden")
-                    {
-                        foreach (Player player in PlayerManager.prop_PlayerManager_0.field_Private_List_1_Player_0)
-                        {
-                            if (player.field_Private_APIUser_0.id == tag.data)
-                            {
-                                ChangeEntry("instancecreator", player.field_Private_APIUser_0.displayName);
-                                lastUserDisplayName = player.field_Private_APIUser_0.displayName;
-                                hasCheckedInstance = true;
-                                return;
-                            }
-                        }
-
-                        APIUser.FetchUser(tag.data, new Action<APIUser>(OnIdReceived), null);
-                        ChangeEntry("instancecreator", "Loading...");
-                        hasCheckedInstance = true;
-                        return;
-                    }
-                }
-            }
-            lastUserDisplayName = "No Instance Creator";
-            ChangeEntry("instancecreator", "No Instance Creator");
-            hasCheckedInstance = true;
+            MelonCoroutines.Start(GetInstanceCreator(instance));
         }
-        public override void OnSceneWasLoaded()
+        public IEnumerator GetInstanceCreator(ApiWorldInstance instance)
         {
-            hasCheckedInstance = false;
+            ResetEntry();
+
+            string creator = instance.GetInstanceCreator();
+
+            if (creator != null)
+            { 
+                if (creator == APIUser.CurrentUser.id)
+                {
+                    ChangeEntry("instancecreator", APIUser.CurrentUser.displayName);
+                    yield break;
+                }
+
+                yield return new WaitForSeconds(4);
+
+                APIUser.FetchUser(creator, new Action<APIUser>(OnIdReceived), null);
+                ChangeEntry("instancecreator", "Loading...");
+                yield break;
+            }
+            else
+            {
+                ResetEntry();
+                ChangeEntry("instancecreator", "No Instance Creator");
+            }
         }
         public void OnIdReceived(APIUser user)
         {
-            MelonLoader.MelonLogger.Msg("user fetched");
-            lastUserDisplayName = user.displayName;
+            MelonLoader.MelonLogger.Msg("awefjas;lekf");
+            ChangeEntry("instancecreator", user.displayName);
         }
     }
 }

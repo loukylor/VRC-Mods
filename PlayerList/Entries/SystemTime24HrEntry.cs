@@ -6,6 +6,17 @@ namespace PlayerList.Entries
     {
         public override string Name { get { return "System Time 24Hr"; } }
 
-        protected override void ProcessText(object[] parameters = null) => ChangeEntry("systemtime24hr", DateTime.Now.ToString(@"HH\:mm\:ss"));
+        public string lastTime;
+
+        protected override void ProcessText(object[] parameters = null)
+        {
+            string timeString = DateTime.Now.ToString(@"HH\:mm\:ss");
+            if (lastTime == timeString)
+                return;
+
+            lastTime = timeString;
+            ResetEntry();
+            ChangeEntry("systemtime24hr", timeString);
+        }
     }
 }

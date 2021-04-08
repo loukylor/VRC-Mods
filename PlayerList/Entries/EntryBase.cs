@@ -1,6 +1,7 @@
 ﻿using MelonLoader;
 using UnityEngine;
 using UnityEngine.UI;
+using VRC.Core;
 
 namespace PlayerList.Entries
 {
@@ -31,7 +32,9 @@ namespace PlayerList.Entries
 
         public void Refresh(object[] parameters = null)
         {
-            textComponent.text = OriginalText;
+            if (!gameObject.active)
+                return;
+
             ProcessText(parameters);
         }
 
@@ -43,13 +46,22 @@ namespace PlayerList.Entries
         {
         }
 
+        public virtual void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
+        {
+        }
+
+        public virtual void OnConfigChanged()
+        {
+        }
+
         public static T CreateInstance<T>(GameObject gameObject, object[] parameters = null, bool includeConfig = false) where T : EntryBase, new()
         {
-            EntryBase entry = new T();
-
-            entry._identifier = gameObject.GetInstanceID();
-            entry.gameObject = gameObject;
-            entry.textComponent = gameObject.GetComponent<Text>();
+            EntryBase entry = new T
+            {
+                _identifier = gameObject.GetInstanceID(),
+                gameObject = gameObject,
+                textComponent = gameObject.GetComponent<Text>()
+            };
             entry._originalText = entry.textComponent.text;
             if (includeConfig)
             { 
@@ -60,25 +72,8 @@ namespace PlayerList.Entries
 
             return (T)entry;
         }
-        public void AddTextToBeginning(string value) => textComponent.text = NullText(value) + textComponent.text;
-        public void AddText(string value) => textComponent.text += NullText(value);
-        public void AddText(object value) => textComponent.text += NullText(value.ToString());
-        public void AddColor(string color) => textComponent.text += "<color=" + color + ">";
-        public void AddEndColor(string beforeText = null) => textComponent.text += NullText(beforeText) + "</color>";
-        public void AddColoredText(string color, string coloredText, string afterText = null) => textComponent.text += "<color=" + color + ">" + coloredText + "</color>" + NullText(afterText);
-        public void AddSpacer()
-        {
-            if (Config.condensedText.Value)
-                textComponent.text += "|";
-            else
-                textComponent.text += " | ";
-        }
-        private string NullText(string text)
-        {
-            return text ?? "";
-        }
-        public void ChangeEntry(string identifier, string value) => textComponent.text = textComponent.text.Replace($"{{{identifier}}}", value);
-        public void ChangeEntry(string identifier, object value) => textComponent.text = textComponent.text.Replace($"{{{identifier}}}", value.ToString());
-
+        protected void ChangeEntry(string identifier, string value) => textComponent.text = textComponent.text.Replace($"{{{identifier}}}", value);
+        protected void ChangeEntry(string identifier, object value) => textComponent.text = textComponent.text.Replace($"{{{identifier}}}", value.ToString());
+        protected void ResetEntry() => textComponent.text = _originalText;
     }
 }
