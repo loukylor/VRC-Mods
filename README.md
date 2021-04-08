@@ -90,7 +90,7 @@ Oh yea, also report any errors to me. You can make an issue or ping/DM me.
 
 ## Credits
 - [KortyBoi](https://github.com/KortyBoi) as he let me use the layout from his player list, and helped me with getting some of the information.
-- [knah](https://github.com/knah) as I use [Join Notifier's](https://github.com/knah/VRCMods) join/leave system.
+- [knah](https://github.com/knah) as I use [Join Notifier's](https://github.com/knah/VRCMods) join/leave system also I used [Advanced Safety's](https://github.com/knah/VRCMods) native patch.
 - [DubyaDude](https://github.com/DubyaDude) as I used [RubyButtonAPI](https://github.com/DubyaDude/RubyButtonAPI) as reference for my button API.
 - [Psychloor](https://github.com/Psychloor) as I used his code for the risky functions check.
 

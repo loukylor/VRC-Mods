@@ -6,7 +6,7 @@ using PlayerList.Utilities;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "2.0.0", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.3.0", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace PlayerList
