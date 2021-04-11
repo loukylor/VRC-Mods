@@ -13,9 +13,11 @@ And in fact, only one of my mods could trigger any anticheat in any way (UserInf
 **But**, no matter how small, there is always a chance. 
 
 # Installation 
-1. Simply follow the instructions on the [MelonLoader wiki](https://melonwiki.xyz/#/) on installing MelonLoader (MelonLoader is the mod loader which will allow my mods to run). 
+1. Simply follow the instructions on the [MelonLoader wiki](https://melonwiki.xyz/#/) on installing MelonLoader **0.3.0** (MelonLoader is the mod loader which will allow my mods to run). 
+1a. Make sure you've installed version 0.3.0, as 0.2.7.4 will not function with VRChat.
 2. Then download the mod(s) you would like to install from the [releases](https://github.com/loukylor/VRC-Mods/releases) section of this repository.
-3. And finally, drag and drop the downloaded mod(s) into the newly created `Mods` folder in the `VRChat` folder.
+3. Allow the game to run once (this will set up a bunch of things MelonLoader uses)
+4. And finally, drag and drop the downloaded mod(s) into the newly created `Mods` folder in the `VRChat` folder and restart the game.
 More detailed instructions and more mods can be found in the [VRChat Modding Group Discord](https://discord.gg/rCqKSvR).
 
 # Mod List
@@ -35,9 +37,6 @@ If the mod detects a portal dropper, it will give you the option of blacklisting
 
 You can also toggle the mod on and off and auto accept portals from friends, yourself, and one's placed in the world itself (by the creator).
 
-## Disclaimer
-AskToPortal is NOT Portal Confirmation by 404. AskToPortal is simply a replacement for Portal Confirmation as 404 was banned from the VRChat Modding Group and AskToPortal will NOT work in conjunction with Portal Confirmation.
-
 ## Picture of user prompt:
 ![Image of user prompt](https://i.imgur.com/uvUeUmL.png)
 
@@ -45,8 +44,8 @@ AskToPortal is NOT Portal Confirmation by 404. AskToPortal is simply a replaceme
 Turns off cloning when you join an instance.
 
 ## Features
-You can configure whether you want cloning to be on or off, based off instance type.
-So, you can say, have cloning on in Invite+ worlds and off in all the other instance types.
+You can configure whether you want cloning to be on or off based off instance type.
+So for example, you can have cloning on in Invite+ worlds and off in all the other instance types.
 
 # InstanceHistory
 A basic instance history mod
@@ -85,6 +84,8 @@ Now for more customizable things, you can change fontsize, the list's position (
 You can also change the color of the name, so instead of showing trust and friends, you could show friends only, or trust only, or just none.
 The list can also be numbered, or ticked and can be condensed so more stuff fits on one line.
 
+The list may also be turned off on startup, and can always be toggled on using `left ctrl + f1`
+
 I also plan to add more entries, please ping or DM with ideas. I don't bite!
 Oh yea, also report any errors to me. You can make an issue or ping/DM me.
 
@@ -93,6 +94,7 @@ Oh yea, also report any errors to me. You can make an issue or ping/DM me.
 - [knah](https://github.com/knah) as I use [Join Notifier's](https://github.com/knah/VRCMods) join/leave system also I used [Advanced Safety's](https://github.com/knah/VRCMods) native patch.
 - [DubyaDude](https://github.com/DubyaDude) as I used [RubyButtonAPI](https://github.com/DubyaDude/RubyButtonAPI) as reference for my button API.
 - [Psychloor](https://github.com/Psychloor) as I used his code for the risky functions check.
+- Frostbyte for being a big meanie and telling me how to optimize things
 
 ## Picture of List
 ![Picture of List](https://i.imgur.com/Tt6ZYqB.png)
@@ -101,7 +103,7 @@ Oh yea, also report any errors to me. You can make an issue or ping/DM me.
 Adds buttons to reload a single user's avatar or all users' avatar.
 
 ## Features
-The buttons can each be turned on and off (without a restart :3, yes this is coming to UserInfoExtensions soon)
+The buttons can each be toggled on and off using UIX
 
 ## Requirements
  - [UIExpansionKit](https://github.com/knah/VRCMods/)
@@ -110,7 +112,7 @@ The buttons can each be turned on and off (without a restart :3, yes this is com
 A mod that adds buttons to the to make VRChat more convenient
 
 ## Features
-Adding individually toggleable buttons that allow you to:
+It adds individually toggleable buttons that allow you to:
  - Select a user in the Quick Menu from the Social Menu page.
  - Find the avatar's author from the Social Menu and Avatar Menu pages.
  - Selects the world instance of the selected user in the World Menu (if you can join their world).
@@ -122,7 +124,7 @@ Adding individually toggleable buttons that allow you to:
 
 The buttons can always be accessed in a popup attached to the User Details Page.
 
-Within the popup, there are also thing you can see, like the user's:
+Within the popup, you can see the user's:
  - username (what the person logs in with)
  - platform (Quest or PC)
  - last login (literal login, not starting the game) 
