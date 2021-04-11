@@ -28,10 +28,11 @@ namespace PlayerList.Entries
                     yield break;
                 }
 
+                ChangeEntry("instancecreator", "Loading...");
+
                 yield return new WaitForSeconds(4);
 
                 APIUser.FetchUser(creator, new Action<APIUser>(OnIdReceived), null);
-                ChangeEntry("instancecreator", "Loading...");
                 yield break;
             }
             else
