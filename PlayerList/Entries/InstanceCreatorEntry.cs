@@ -42,7 +42,7 @@ namespace PlayerList.Entries
         }
         public void OnIdReceived(APIUser user)
         {
-            MelonLoader.MelonLogger.Msg("awefjas;lekf");
+            ResetEntry();
             ChangeEntry("instancecreator", user.displayName);
         }
     }

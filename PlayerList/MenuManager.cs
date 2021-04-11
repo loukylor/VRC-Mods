@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using MelonLoader;
 using PlayerList.Components;
+using PlayerList.Config;
 using PlayerList.Entries;
 using PlayerList.UI;
 using PlayerList.Utilities;
@@ -30,11 +31,11 @@ namespace PlayerList
 
         public static void Init()
         {
-            Config.OnConfigChangedEvent += OnConfigChanged;
+            PlayerListConfig.OnConfigChangedEvent += OnConfigChanged;
         }
         public static void OnConfigChanged()
         {
-            switch (Config.MenuButtonPosition)
+            switch (PlayerListConfig.MenuButtonPosition)
             {
                 case MenuButtonPositionEnum.TopLeft:
                     menuButton.transform.localPosition = Converters.ConvertToUnityUnits(new Vector3(2, -1));
@@ -88,11 +89,11 @@ namespace PlayerList
 
             playerList.SetLayerRecursive(12);
             playerListRect = playerList.GetComponent<RectTransform>();
-            playerListRect.anchoredPosition = Config.PlayerListPosition;
+            playerListRect.anchoredPosition = PlayerListConfig.PlayerListPosition;
             playerListRect.localPosition = new Vector3(playerListRect.localPosition.x, playerListRect.localPosition.y, 25); // Do this or else it looks off for whatever reason
             playerList.SetActive(false);
 
-            shouldStayHidden = !Config.enabledOnStart.Value;
+            shouldStayHidden = !PlayerListConfig.enabledOnStart.Value;
 
             Constants.playerListLayout = playerList.transform.Find("PlayerList Viewport/PlayerList").GetComponent<VerticalLayoutGroup>();
             Constants.generalInfoLayout = playerList.transform.Find("GeneralInfo Viewport/GeneralInfo").GetComponent<VerticalLayoutGroup>();
@@ -110,10 +111,10 @@ namespace PlayerList
 
             menuToggleButton = new ToggleButton(playerListMenus[0].path, new Vector3(5, 0), "Enabled", "Disabled", new Action<bool>((state) => ToggleMenu()), "Toggle the menu. Can also be toggled using Left Ctrl + F1", "Toggle the menu. Can also be toggled using Left Ctrl + F1", "ToggleMenuToggle", !shouldStayHidden);
 
-            new ToggleButton(playerListMenus[0].path, new Vector3(5, -1), "Enabled on Start", "Disabled", new Action<bool>((state) => Config.enabledOnStart.Value = state), "Toggle if the list is toggled hidden on start", "Toggle if the list is toggled hidden on start", "EnabledOnStartToggle", Config.enabledOnStart.Value, true);
+            new ToggleButton(playerListMenus[0].path, new Vector3(5, -1), "Enabled on Start", "Disabled", new Action<bool>((state) => PlayerListConfig.enabledOnStart.Value = state), "Toggle if the list is toggled hidden on start", "Toggle if the list is toggled hidden on start", "EnabledOnStartToggle", PlayerListConfig.enabledOnStart.Value, true);
 
-            new ToggleButton(playerListMenus[0].path, new Vector3(0, 1), "Condense Text", "Regular Text", new Action<bool>((state) => Config.condensedText.Value = !Config.condensedText.Value), "Toggle if text should be condensed", "Toggle if text should be condensed", "CondensedTextToggle", Config.condensedText.Value, true);
-            new ToggleButton(playerListMenus[0].path, new Vector3(0, 0), "Numbered List", "Tick List", new Action<bool>((state) => Config.numberedList.Value = !Config.numberedList.Value), "Toggle if the list should be numbered or ticked", "Toggle if the list should be numbered or ticked", "NumberedTickToggle", Config.numberedList.Value, true);
+            new ToggleButton(playerListMenus[0].path, new Vector3(0, 1), "Condense Text", "Regular Text", new Action<bool>((state) => PlayerListConfig.condensedText.Value = !PlayerListConfig.condensedText.Value), "Toggle if text should be condensed", "Toggle if text should be condensed", "CondensedTextToggle", PlayerListConfig.condensedText.Value, true);
+            new ToggleButton(playerListMenus[0].path, new Vector3(0, 0), "Numbered List", "Tick List", new Action<bool>((state) => PlayerListConfig.numberedList.Value = !PlayerListConfig.numberedList.Value), "Toggle if the list should be numbered or ticked", "Toggle if the list should be numbered or ticked", "NumberedTickToggle", PlayerListConfig.numberedList.Value, true);
 
             menuButton.GetComponent<Button>().onClick.AddListener(new Action(() => { UIManager.OpenPage(playerListMenus[0].path); playerList.SetActive(!shouldStayHidden); }));
         }
@@ -127,7 +128,7 @@ namespace PlayerList
             GameObject newElements = GameObject.Find("UserInterface/QuickMenu/QuickMenu_NewElements");
             GameObject Tabs = GameObject.Find("UserInterface/QuickMenu/QuickModeTabs");
 
-            UIManager.OnQuickMenuCloseEvent += new Action(Config.SaveEntries);
+            UIManager.OnQuickMenuCloseEvent += new Action(PlayerListConfig.SaveEntries);
 
             EnableDisableListener playerListMenuListener = playerListMenus[0].gameObject.AddComponent<EnableDisableListener>();
             playerListMenuListener.OnEnableEvent += new Action(() =>
@@ -140,7 +141,7 @@ namespace PlayerList
             playerListMenuListener.OnDisableEvent += new Action(() =>
             {
                 playerList.SetActive(false);
-                playerListRect.anchoredPosition = Config.PlayerListPosition;
+                playerListRect.anchoredPosition = PlayerListConfig.PlayerListPosition;
                 playerListRect.localPosition = new Vector3(playerListRect.localPosition.x, playerListRect.localPosition.y, 25);
                 Tabs.SetActive(true);
                 newElements.SetActive(true);
@@ -155,21 +156,21 @@ namespace PlayerList
 
             new SingleButton(playerListMenus[1].path, new Vector3(3, 1), "Move to Right of QuickMenu", new Action(ListPositionManager.MovePlayerListToEndOfMenu), "Move PlayerList to right side of menu, this can also serve as a reset position button", "LockPlayerListToRightButton", true);
 
-            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(0, 0), "1", new Action(() => Config.MenuButtonPosition = MenuButtonPositionEnum.TopRight), "Move PlayerList menu button to the top right", "1PlayerListMenuButton");
-            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(1, 0), "2", new Action(() => Config.MenuButtonPosition = MenuButtonPositionEnum.TopLeft), "Move PlayerList menu button to the top left", "2PlayerListMenuButton");
-            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(1, 1), "3", new Action(() => Config.MenuButtonPosition = MenuButtonPositionEnum.BottomLeft), "Move PlayerList menu button to the bottom left", "3PlayerListMenuButton");
-            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(0, 1), "4", new Action(() => Config.MenuButtonPosition = MenuButtonPositionEnum.BottomRight), "Move PlayerList menu button to the bottom right", "4PlayerListMenuButton");
+            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(0, 0), "1", new Action(() => PlayerListConfig.MenuButtonPosition = MenuButtonPositionEnum.TopRight), "Move PlayerList menu button to the top right", "1PlayerListMenuButton");
+            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(1, 0), "2", new Action(() => PlayerListConfig.MenuButtonPosition = MenuButtonPositionEnum.TopLeft), "Move PlayerList menu button to the top left", "2PlayerListMenuButton");
+            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(1, 1), "3", new Action(() => PlayerListConfig.MenuButtonPosition = MenuButtonPositionEnum.BottomLeft), "Move PlayerList menu button to the bottom left", "3PlayerListMenuButton");
+            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(0, 1), "4", new Action(() => PlayerListConfig.MenuButtonPosition = MenuButtonPositionEnum.BottomRight), "Move PlayerList menu button to the bottom right", "4PlayerListMenuButton");
 
-            new SingleButton(playerListMenus[1].path, new Vector3(1, 0), "Snap Grid\nSize +", new Action(() => Config.snapToGridSize.Value += 10), "Increase the size of the snap to grid by 10", "IncreaseSnapGridSize", true);
-            new SingleButton(playerListMenus[1].path, new Vector3(1, 2), "Snap Grid\nSize -", new Action(() => Config.snapToGridSize.Value -= 10), "Decrease the size of the snap to grid by 10", "DecreaseSnapGridSize", true);
-            new SingleButton(playerListMenus[1].path, new Vector3(0, 0), "Reset Snap\nGrid Size", new Action(() => Config.snapToGridSize.Value = 420), "Set snap to grid to the default value (420)", "DefaultSnapGridSize", true);
-            ListPositionManager.snapToGridSizeLabel = new Label(playerListMenus[1].path, new Vector3(1, 1), $"Snap Grid\nSize: {Config.snapToGridSize.Value}", "SnapToGridSizeLabel", resize: true);
+            new SingleButton(playerListMenus[1].path, new Vector3(1, 0), "Snap Grid\nSize +", new Action(() => PlayerListConfig.snapToGridSize.Value += 10), "Increase the size of the snap to grid by 10", "IncreaseSnapGridSize", true);
+            new SingleButton(playerListMenus[1].path, new Vector3(1, 2), "Snap Grid\nSize -", new Action(() => PlayerListConfig.snapToGridSize.Value -= 10), "Decrease the size of the snap to grid by 10", "DecreaseSnapGridSize", true);
+            new SingleButton(playerListMenus[1].path, new Vector3(0, 0), "Reset Snap\nGrid Size", new Action(() => PlayerListConfig.snapToGridSize.Value = 420), "Set snap to grid to the default value (420)", "DefaultSnapGridSize", true);
+            ListPositionManager.snapToGridSizeLabel = new Label(playerListMenus[1].path, new Vector3(1, 1), $"Snap Grid\nSize: {PlayerListConfig.snapToGridSize.Value}", "SnapToGridSizeLabel", resize: true);
 
-            new SingleButton(playerListMenus[1].path, new Vector3(2, 0), "Font\nSize +", new Action(() => Config.fontSize.Value++), "Increase font size of the list by 1", "IncreaseFontSizeButton", true);
-            new SingleButton(playerListMenus[1].path, new Vector3(2, 2), "Font\nSize -", new Action(() => Config.fontSize.Value--), "Decrease font size of the list by 1", "DecreaseFontSizeButton", true);
-            new SingleButton(playerListMenus[1].path, new Vector3(0, 1), "Reset\nFont", new Action(() => Config.fontSize.Value = 35), "Set font size to the default value (35)", "DefaultFontSizeButton", true);
+            new SingleButton(playerListMenus[1].path, new Vector3(2, 0), "Font\nSize +", new Action(() => PlayerListConfig.fontSize.Value++), "Increase font size of the list by 1", "IncreaseFontSizeButton", true);
+            new SingleButton(playerListMenus[1].path, new Vector3(2, 2), "Font\nSize -", new Action(() => PlayerListConfig.fontSize.Value--), "Decrease font size of the list by 1", "DecreaseFontSizeButton", true);
+            new SingleButton(playerListMenus[1].path, new Vector3(0, 1), "Reset\nFont", new Action(() => PlayerListConfig.fontSize.Value = 35), "Set font size to the default value (35)", "DefaultFontSizeButton", true);
             fontSizeLabel = new Label(playerListMenus[1].path, new Vector3(2, 1), "", "FontSizeLabel", resize: true);
-            EntryManager.SetFontSize(Config.fontSize.Value);
+            EntryManager.SetFontSize(PlayerListConfig.fontSize.Value);
 
             playerListMenus.Add(new SubMenu("UserInterface/QuickMenu", "PlayerListMenuPage3"));
 
@@ -177,17 +178,17 @@ namespace PlayerList
             // Initialize PlayerList Customization menu
             playerListMenus.Add(new SubMenu("UserInterface/QuickMenu", "PlayerListMenuPage4"));
 
-            new ToggleButton(playerListMenus[3].path, new Vector3(1, 0), "Enable Ping", "Disabled", new Action<bool>((state) => Config.pingToggle.Value = state), "Toggle player ping", "Toggle player ping", "PingToggle", Config.pingToggle.Value, true);
-            new ToggleButton(playerListMenus[3].path, new Vector3(2, 0), "Enable Fps", "Disabled", new Action<bool>((state) => Config.fpsToggle.Value = state), "Toggle player fps", "Toggle player fps", "FpsToggle", Config.fpsToggle.Value, true);
-            new ToggleButton(playerListMenus[3].path, new Vector3(3, 0), "Enable Platform", "Disabled", new Action<bool>((state) => Config.platformToggle.Value = state), "Toggle player Platform", "Toggle player Platform", "PlatformToggle", Config.platformToggle.Value, true);
-            new ToggleButton(playerListMenus[3].path, new Vector3(1, 1), "Enable Avatar Performance", "Disabled", new Action<bool>((state) => Config.perfToggle.Value = state), "Toggle avatar performance", "Toggle avatar performance", "PerfToggle", Config.perfToggle.Value, true);
-            new ToggleButton(playerListMenus[3].path, new Vector3(2, 1), "Enable Distance", "Disabled", new Action<bool>((state) => Config.distanceToggle.Value = state), "Toggle distance to player", "Toggle distance to player", "DistanceToPlayerToggle", Config.distanceToggle.Value, true);
-            new ToggleButton(playerListMenus[3].path, new Vector3(3, 1), "Enable DisplayName", "Disabled", new Action<bool>((state) => Config.displayNameToggle.Value = state), "Why...?", "Why...?", "DisplayNameToggle", Config.displayNameToggle.Value, true);
+            new ToggleButton(playerListMenus[3].path, new Vector3(1, 0), "Enable Ping", "Disabled", new Action<bool>((state) => PlayerListConfig.pingToggle.Value = state), "Toggle player ping", "Toggle player ping", "PingToggle", PlayerListConfig.pingToggle.Value, true);
+            new ToggleButton(playerListMenus[3].path, new Vector3(2, 0), "Enable Fps", "Disabled", new Action<bool>((state) => PlayerListConfig.fpsToggle.Value = state), "Toggle player fps", "Toggle player fps", "FpsToggle", PlayerListConfig.fpsToggle.Value, true);
+            new ToggleButton(playerListMenus[3].path, new Vector3(3, 0), "Enable Platform", "Disabled", new Action<bool>((state) => PlayerListConfig.platformToggle.Value = state), "Toggle player Platform", "Toggle player Platform", "PlatformToggle", PlayerListConfig.platformToggle.Value, true);
+            new ToggleButton(playerListMenus[3].path, new Vector3(1, 1), "Enable Avatar Performance", "Disabled", new Action<bool>((state) => PlayerListConfig.perfToggle.Value = state), "Toggle avatar performance", "Toggle avatar performance", "PerfToggle", PlayerListConfig.perfToggle.Value, true);
+            new ToggleButton(playerListMenus[3].path, new Vector3(2, 1), "Enable Distance", "Disabled", new Action<bool>((state) => PlayerListConfig.distanceToggle.Value = state), "Toggle distance to player", "Toggle distance to player", "DistanceToPlayerToggle", PlayerListConfig.distanceToggle.Value, true);
+            new ToggleButton(playerListMenus[3].path, new Vector3(3, 1), "Enable DisplayName", "Disabled", new Action<bool>((state) => PlayerListConfig.displayNameToggle.Value = state), "Why...?", "Why...?", "DisplayNameToggle", PlayerListConfig.displayNameToggle.Value, true);
 
-            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(0, 0), "TF", new Action(() => Config.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.TrustAndFriends), "Set displayname coloring to show friends and trust rank", "TrustAndFriendsButton");
-            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(1, 0), "T", new Action(() => Config.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.TrustOnly), "Set displayname coloring to show trust rank only", "TrustOnlyButton");
-            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(1, 1), "F", new Action(() => Config.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.FriendsOnly), "Set displayname coloring to show friends only", "FriendsOnlyButton");
-            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(0, 1), "N", new Action(() => Config.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.None), "Set displayname coloring to none", "NoneButton");
+            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(0, 0), "TF", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.TrustAndFriends), "Set displayname coloring to show friends and trust rank", "TrustAndFriendsButton");
+            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(1, 0), "T", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.TrustOnly), "Set displayname coloring to show trust rank only", "TrustOnlyButton");
+            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(1, 1), "F", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.FriendsOnly), "Set displayname coloring to show friends only", "FriendsOnlyButton");
+            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(0, 1), "N", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.None), "Set displayname coloring to none", "NoneButton");
         }
 
         public static void CreateGeneralInfoSubMenus()
@@ -216,7 +217,7 @@ namespace PlayerList
                 if (i > 0)
                 {
                     new SingleButton(playerListMenus[i].path, "UserInterface/QuickMenu/EmojiMenu/PageUp", new Vector3(4, 0), $"Page {i}", new Action(() => UIManager.OpenPage($"UserInterface/QuickMenu/PlayerListMenuPage{k}")), $"Go back to page {i}", "BackPageButton");
-                    new SingleButton(playerListMenus[i].path, new Vector3(4, 1), $"Save", new Action(Config.SaveEntries), $"Saves all settings if you have made changes, this is also done automatically when you close the menu", "SaveEntriesButton");
+                    new SingleButton(playerListMenus[i].path, new Vector3(4, 1), $"Save", new Action(PlayerListConfig.SaveEntries), $"Saves all settings if you have made changes, this is also done automatically when you close the menu", "SaveEntriesButton");
                 }
                 if (i + 1 < playerListMenus.Count)
                     new SingleButton(playerListMenus[i].path, "UserInterface/QuickMenu/EmojiMenu/PageDown", new Vector3(4, 2), $"Page {i + 2}", new Action(() => UIManager.OpenPage($"UserInterface/QuickMenu/PlayerListMenuPage{k + 2}")), $"Go to page {i + 2}", "ForwardPageButton");
@@ -232,7 +233,7 @@ namespace PlayerList
                 subMenuListener.OnDisableEvent += new Action(() =>
                 {
                     playerList.SetActive(false);
-                    playerListRect.anchoredPosition = Config.PlayerListPosition;
+                    playerListRect.anchoredPosition = PlayerListConfig.PlayerListPosition;
                     playerListRect.localPosition = new Vector3(playerListRect.localPosition.x, playerListRect.localPosition.y, 25);
                 });
             }

@@ -1,4 +1,5 @@
 ﻿using MelonLoader;
+using PlayerList.Config;
 using UnityEngine;
 using UnityEngine.UI;
 using VRC.Core;
@@ -65,7 +66,7 @@ namespace PlayerList.Entries
             entry._originalText = entry.textComponent.text;
             if (includeConfig)
             { 
-                entry.prefEntry = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(Config.categoryIdentifier, entry.Name.Replace(" ", ""), true, is_hidden: true);
+                entry.prefEntry = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(PlayerListConfig.categoryIdentifier, entry.Name.Replace(" ", ""), true, is_hidden: true);
                 entry.gameObject.SetActive(entry.prefEntry.Value);
             }
             entry.Init(parameters);

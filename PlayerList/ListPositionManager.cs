@@ -1,5 +1,6 @@
 ﻿using System;
 using MelonLoader;
+using PlayerList.Config;
 using PlayerList.UI;
 using PlayerList.Utilities;
 using UnhollowerRuntimeLib;
@@ -15,14 +16,14 @@ namespace PlayerList
 
         public static void Init()
         {
-            Config.snapToGridSize.OnValueChanged += OnSnapToGridSizeChanged;
+            PlayerListConfig.snapToGridSize.OnValueChanged += OnSnapToGridSizeChanged;
         }
         public static void OnSnapToGridSizeChanged(int oldValue, int newValue)
         {
             if (oldValue == newValue)
                 return;
 
-            snapToGridSizeLabel.textComponent.text = $"Snap Grid\nSize: {Config.snapToGridSize}";
+            snapToGridSizeLabel.textComponent.text = $"Snap Grid\nSize: {PlayerListConfig.snapToGridSize}";
         }
 
         public static void MovePlayerListToEndOfMenu()
@@ -36,17 +37,17 @@ namespace PlayerList
                     furthestTransform = childRect;
             }
 
-            Config.PlayerListPosition = new Vector2(furthestTransform.anchoredPosition.x + (furthestTransform.rect.width / 2), MenuManager.playerListRect.anchoredPosition.y);
+            PlayerListConfig.PlayerListPosition = new Vector2(furthestTransform.anchoredPosition.x + (furthestTransform.rect.width / 2), MenuManager.playerListRect.anchoredPosition.y);
             CombineQMColliderAndPlayerListRect(useConfigValues: true);
             UnityEngine.Object.Destroy(temp);
         }
         public static void MovePlayerList()
         {
-            MenuManager.playerListRect.anchoredPosition = Config.PlayerListPosition; // So old position var works properly
+            MenuManager.playerListRect.anchoredPosition = PlayerListConfig.PlayerListPosition; // So old position var works properly
             shouldMove = true;
             MelonCoroutines.Start(WaitForPress(MenuManager.playerList, new Action<GameObject>((gameObject) =>
             {
-                Config.PlayerListPosition = MenuManager.playerListRect.anchoredPosition;
+                PlayerListConfig.PlayerListPosition = MenuManager.playerListRect.anchoredPosition;
                 gameObject.SetActive(!MenuManager.shouldStayHidden);
                 UIManager.OpenPage(MenuManager.playerListMenus[1].path);
                 MenuManager.playerListRect.localPosition = new Vector3(MenuManager.playerListRect.localPosition.x, MenuManager.playerListRect.localPosition.y, 25);
@@ -64,7 +65,7 @@ namespace PlayerList
                 CombineQMColliderAndPlayerListRect();
                 movingGameObjectRect.transform.position = InputManager.HitPosition;
                 movingGameObjectRect.transform.localPosition = new Vector3(movingGameObjectRect.transform.localPosition.x, movingGameObjectRect.transform.localPosition.y, oldPosition.z);
-                movingGameObjectRect.anchoredPosition = Converters.RoundAmount(movingGameObjectRect.anchoredPosition, Config.snapToGridSize.Value);
+                movingGameObjectRect.anchoredPosition = Converters.RoundAmount(movingGameObjectRect.anchoredPosition, PlayerListConfig.snapToGridSize.Value);
 
                 yield return null;
             }
@@ -74,7 +75,7 @@ namespace PlayerList
                 CombineQMColliderAndPlayerListRect();
                 movingGameObjectRect.transform.position = InputManager.HitPosition;
                 movingGameObjectRect.transform.localPosition = new Vector3(movingGameObjectRect.transform.localPosition.x, movingGameObjectRect.transform.localPosition.y, oldPosition.z);
-                movingGameObjectRect.anchoredPosition = Converters.RoundAmount(movingGameObjectRect.anchoredPosition, Config.snapToGridSize.Value);
+                movingGameObjectRect.anchoredPosition = Converters.RoundAmount(movingGameObjectRect.anchoredPosition, PlayerListConfig.snapToGridSize.Value);
 
                 yield return null;
             }
@@ -112,10 +113,10 @@ namespace PlayerList
             }
             else
             {
-                playerListLeft = Config.PlayerListPosition.x - MenuManager.playerListRect.sizeDelta.x / 2;
-                playerListTop = Config.PlayerListPosition.y + (MenuManager.playerListRect.sizeDelta.y / 2);
-                playerListRight = Config.PlayerListPosition.x + MenuManager.playerListRect.sizeDelta.x / 2;
-                playerListBottom = Config.PlayerListPosition.y - (MenuManager.playerListRect.sizeDelta.y / 2);
+                playerListLeft = PlayerListConfig.PlayerListPosition.x - MenuManager.playerListRect.sizeDelta.x / 2;
+                playerListTop = PlayerListConfig.PlayerListPosition.y + (MenuManager.playerListRect.sizeDelta.y / 2);
+                playerListRight = PlayerListConfig.PlayerListPosition.x + MenuManager.playerListRect.sizeDelta.x / 2;
+                playerListBottom = PlayerListConfig.PlayerListPosition.y - (MenuManager.playerListRect.sizeDelta.y / 2);
             }
 
             collider.size = new Vector2(Math.Abs(Math.Max(Math.Abs(Math.Min(colliderLeft, playerListLeft)), Math.Abs(Math.Max(colliderRight, playerListRight)))) * 2, Math.Abs(Math.Max(Math.Abs(Math.Min(colliderBottom, playerListBottom)), Math.Abs(Math.Max(colliderTop, playerListTop)))) * 2);

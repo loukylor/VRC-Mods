@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using MelonLoader;
+using PlayerList.Config;
 using PlayerList.Entries;
 using PlayerList.Utilities;
 using UnityEngine;
@@ -51,8 +52,8 @@ namespace PlayerList
 
         public static void Init()
         {
-            Config.fontSize.OnValueChanged += OnFontSizeChange;
-            Config.OnConfigChangedEvent += OnConfigChanged;
+            PlayerListConfig.fontSize.OnValueChanged += OnFontSizeChange;
+            PlayerListConfig.OnConfigChangedEvent += OnConfigChanged;
             NetworkHooks.OnPlayerJoin += OnPlayerJoin;
             NetworkHooks.OnPlayerLeave += OnPlayerLeave;
             NetworkHooks.OnInstanceChange += OnInstanceChange;
@@ -130,7 +131,7 @@ namespace PlayerList
         }
         public static void AddEntry(EntryBase entry)
         {
-            entry.textComponent.fontSize = Config.fontSize.Value;
+            entry.textComponent.fontSize = PlayerListConfig.fontSize.Value;
             entries.Add(entry.Identifier, entry);
             RefreshLayout();
         }

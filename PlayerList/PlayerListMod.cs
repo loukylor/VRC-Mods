@@ -1,4 +1,5 @@
 ﻿using MelonLoader;
+using PlayerList.Config;
 using PlayerList.Components;
 using PlayerList.Entries;
 using PlayerList.UI;
@@ -19,7 +20,7 @@ namespace PlayerList
         {
             Instance = this;
             ClassInjector.RegisterTypeInIl2Cpp<EnableDisableListener>();
-            Config.RegisterSettings();
+            PlayerListConfig.RegisterSettings();
             UIManager.Init();
             EntryManager.Init();
             MenuManager.Init();
@@ -49,7 +50,7 @@ namespace PlayerList
             // Initialize on leave and join events
             NetworkHooks.NetworkInit();
 
-            Config.OnConfigChanged();
+            PlayerListConfig.OnConfigChanged();
             
             MelonLogger.Msg("Initialized!");
         }

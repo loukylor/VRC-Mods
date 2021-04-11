@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using Harmony;
+using PlayerList.Config;
 using PlayerList.Utilities;
 using UnityEngine;
 using VRC;
@@ -48,19 +49,19 @@ namespace PlayerList.Entries
         public override void OnConfigChanged()
         {
             updateDelegate = null;
-            if (Config.pingToggle.Value)
+            if (PlayerListConfig.pingToggle.Value)
                 updateDelegate += AddPing;
-            if (Config.fpsToggle.Value)
+            if (PlayerListConfig.fpsToggle.Value)
                 updateDelegate += AddFps;
-            if (Config.platformToggle.Value)
+            if (PlayerListConfig.platformToggle.Value)
                 updateDelegate += AddPlatform;
-            if (Config.perfToggle.Value)
+            if (PlayerListConfig.perfToggle.Value)
                 updateDelegate += AddPerf;
-            if (Config.distanceToggle.Value)
+            if (PlayerListConfig.distanceToggle.Value)
                 updateDelegate += AddDistance;
-            if (Config.photonIdToggle.Value)
+            if (PlayerListConfig.photonIdToggle.Value)
                 updateDelegate += AddPhotonId;
-            if (Config.displayNameToggle.Value)
+            if (PlayerListConfig.displayNameToggle.Value)
                 updateDelegate += AddDisplayName;
 
             GetPlayerColor();
@@ -150,7 +151,7 @@ namespace PlayerList.Entries
         private void GetPlayerColor()
         {
             playerColor = "";
-            switch (Config.DisplayNameColorMode)
+            switch (PlayerListConfig.DisplayNameColorMode)
             {
                 case DisplayNameColorMode.None:
                 case DisplayNameColorMode.FriendsOnly:

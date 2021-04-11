@@ -8,6 +8,7 @@ namespace PlayerList.Entries
 
         public override void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
         {
+            ResetEntry();
             ChangeEntry("worldauthor", world.authorName);
         }
     }

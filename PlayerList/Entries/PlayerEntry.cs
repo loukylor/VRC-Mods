@@ -1,10 +1,11 @@
-﻿using Harmony;
-using MelonLoader;
-using PlayerList.Utilities;
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Harmony;
+using MelonLoader;
+using PlayerList.Config;
+using PlayerList.Utilities;
 using UnhollowerBaseLib;
 using UnityEngine;
 using VRC;
@@ -49,7 +50,7 @@ namespace PlayerList.Entries
 
         public static void EntryInit()
         {
-            Config.OnConfigChangedEvent += OnStaticConfigChanged;
+            PlayerListConfig.OnConfigChangedEvent += OnStaticConfigChanged;
             PlayerListMod.Instance.Harmony.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend), BindingFlags.NonPublic | BindingFlags.Static)));
 
             // Definitely not stolen code from our lord and savior knah (https://github.com/knah/VRCMods/blob/master/AdvancedSafety/AdvancedSafetyMod.cs) because im not a skid
@@ -100,22 +101,22 @@ namespace PlayerList.Entries
         public static void OnStaticConfigChanged()
         {
             updateDelegate = null;
-            if (Config.pingToggle.Value)
+            if (PlayerListConfig.pingToggle.Value)
                 updateDelegate += AddPing;
-            if (Config.fpsToggle.Value)
+            if (PlayerListConfig.fpsToggle.Value)
                 updateDelegate += AddFps;
-            if (Config.platformToggle.Value)
+            if (PlayerListConfig.platformToggle.Value)
                 updateDelegate += AddPlatform;
-            if (Config.perfToggle.Value)
+            if (PlayerListConfig.perfToggle.Value)
                 updateDelegate += AddPerf;
-            if (Config.distanceToggle.Value)
+            if (PlayerListConfig.distanceToggle.Value)
                 updateDelegate += AddDistance;
-            if (Config.photonIdToggle.Value)
+            if (PlayerListConfig.photonIdToggle.Value)
                 updateDelegate += AddPhotonId;
-            if (Config.displayNameToggle.Value)
+            if (PlayerListConfig.displayNameToggle.Value)
                 updateDelegate += AddDisplayName;
 
-            if (Config.condensedText.Value)
+            if (PlayerListConfig.condensedText.Value)
                 separator = "|";
             else
                 separator = " | ";
@@ -291,7 +292,7 @@ namespace PlayerList.Entries
         private void GetPlayerColor()
         {
             playerColor = "";
-            switch (Config.DisplayNameColorMode)
+            switch (PlayerListConfig.DisplayNameColorMode)
             {
                 case DisplayNameColorMode.TrustAndFriends:
                     playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(player.field_Private_APIUser_0));
@@ -377,18 +378,18 @@ namespace PlayerList.Entries
         protected string AddLeftPart(string tempString)
         {
             if (tempString.Length > 0)
-                if (Config.condensedText.Value)
+                if (PlayerListConfig.condensedText.Value)
                     tempString = tempString.Remove(tempString.Length - 1, 1);
                 else
                     tempString = tempString.Remove(tempString.Length - 3, 3);
 
-            if (!Config.numberedList.Value)
-                if (Config.condensedText.Value)
+            if (!PlayerListConfig.numberedList.Value)
+                if (PlayerListConfig.condensedText.Value)
                     tempString = "-" + tempString;
                 else
                     tempString = " - " + tempString;
             else
-                if (Config.condensedText.Value)
+                if (PlayerListConfig.condensedText.Value)
                     tempString = $"{gameObject.transform.GetSiblingIndex() - 1}.".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 1) + tempString; // Pad by weird amount because we cant include the header and disabled template in total number of gameobjects
                 else
                     tempString = $"{gameObject.transform.GetSiblingIndex() - 1}. ".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 2) + tempString;
