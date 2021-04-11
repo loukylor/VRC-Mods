@@ -178,17 +178,17 @@ namespace PlayerList
             // Initialize PlayerList Customization menu
             playerListMenus.Add(new SubMenu("UserInterface/QuickMenu", "PlayerListMenuPage4"));
 
-            new ToggleButton(playerListMenus[3].path, new Vector3(1, 0), "Enable Ping", "Disabled", new Action<bool>((state) => PlayerListConfig.pingToggle.Value = state), "Toggle player ping", "Toggle player ping", "PingToggle", PlayerListConfig.pingToggle.Value, true);
-            new ToggleButton(playerListMenus[3].path, new Vector3(2, 0), "Enable Fps", "Disabled", new Action<bool>((state) => PlayerListConfig.fpsToggle.Value = state), "Toggle player fps", "Toggle player fps", "FpsToggle", PlayerListConfig.fpsToggle.Value, true);
-            new ToggleButton(playerListMenus[3].path, new Vector3(3, 0), "Enable Platform", "Disabled", new Action<bool>((state) => PlayerListConfig.platformToggle.Value = state), "Toggle player Platform", "Toggle player Platform", "PlatformToggle", PlayerListConfig.platformToggle.Value, true);
-            new ToggleButton(playerListMenus[3].path, new Vector3(1, 1), "Enable Avatar Performance", "Disabled", new Action<bool>((state) => PlayerListConfig.perfToggle.Value = state), "Toggle avatar performance", "Toggle avatar performance", "PerfToggle", PlayerListConfig.perfToggle.Value, true);
-            new ToggleButton(playerListMenus[3].path, new Vector3(2, 1), "Enable Distance", "Disabled", new Action<bool>((state) => PlayerListConfig.distanceToggle.Value = state), "Toggle distance to player", "Toggle distance to player", "DistanceToPlayerToggle", PlayerListConfig.distanceToggle.Value, true);
-            new ToggleButton(playerListMenus[3].path, new Vector3(3, 1), "Enable DisplayName", "Disabled", new Action<bool>((state) => PlayerListConfig.displayNameToggle.Value = state), "Why...?", "Why...?", "DisplayNameToggle", PlayerListConfig.displayNameToggle.Value, true);
+            new ToggleButton(playerListMenus[2].path, new Vector3(1, 0), "Enable Ping", "Disabled", new Action<bool>((state) => PlayerListConfig.pingToggle.Value = state), "Toggle player ping", "Toggle player ping", "PingToggle", PlayerListConfig.pingToggle.Value, true);
+            new ToggleButton(playerListMenus[2].path, new Vector3(2, 0), "Enable Fps", "Disabled", new Action<bool>((state) => PlayerListConfig.fpsToggle.Value = state), "Toggle player fps", "Toggle player fps", "FpsToggle", PlayerListConfig.fpsToggle.Value, true);
+            new ToggleButton(playerListMenus[2].path, new Vector3(3, 0), "Enable Platform", "Disabled", new Action<bool>((state) => PlayerListConfig.platformToggle.Value = state), "Toggle player Platform", "Toggle player Platform", "PlatformToggle", PlayerListConfig.platformToggle.Value, true);
+            new ToggleButton(playerListMenus[2].path, new Vector3(1, 1), "Enable Avatar Performance", "Disabled", new Action<bool>((state) => PlayerListConfig.perfToggle.Value = state), "Toggle avatar performance", "Toggle avatar performance", "PerfToggle", PlayerListConfig.perfToggle.Value, true);
+            new ToggleButton(playerListMenus[2].path, new Vector3(2, 1), "Enable Distance", "Disabled", new Action<bool>((state) => PlayerListConfig.distanceToggle.Value = state), "Toggle distance to player", "Toggle distance to player", "DistanceToPlayerToggle", PlayerListConfig.distanceToggle.Value, true);
+            new ToggleButton(playerListMenus[2].path, new Vector3(3, 1), "Enable DisplayName", "Disabled", new Action<bool>((state) => PlayerListConfig.displayNameToggle.Value = state), "Why...?", "Why...?", "DisplayNameToggle", PlayerListConfig.displayNameToggle.Value, true);
 
-            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(0, 0), "TF", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.TrustAndFriends), "Set displayname coloring to show friends and trust rank", "TrustAndFriendsButton");
-            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(1, 0), "T", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.TrustOnly), "Set displayname coloring to show trust rank only", "TrustOnlyButton");
-            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(1, 1), "F", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.FriendsOnly), "Set displayname coloring to show friends only", "FriendsOnlyButton");
-            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(0, 1), "N", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.None), "Set displayname coloring to none", "NoneButton");
+            new QuarterButton(playerListMenus[2].path, new Vector3(3, 2), new Vector2(0, 0), "TF", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.TrustAndFriends), "Set displayname coloring to show friends and trust rank", "TrustAndFriendsButton");
+            new QuarterButton(playerListMenus[2].path, new Vector3(3, 2), new Vector2(1, 0), "T", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.TrustOnly), "Set displayname coloring to show trust rank only", "TrustOnlyButton");
+            new QuarterButton(playerListMenus[2].path, new Vector3(3, 2), new Vector2(1, 1), "F", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.FriendsOnly), "Set displayname coloring to show friends only", "FriendsOnlyButton");
+            new QuarterButton(playerListMenus[2].path, new Vector3(3, 2), new Vector2(0, 1), "N", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.None), "Set displayname coloring to none", "NoneButton");
         }
 
         public static void CreateGeneralInfoSubMenus()
@@ -197,7 +197,7 @@ namespace PlayerList
             int totalMade = 0;
             for (int i = 0; i < Math.Ceiling(EntryManager.generalInfoEntries.Count / 9f); i++)
             {
-                SubMenu subMenu = new SubMenu("UserInterface/QuickMenu", $"PlayerListMenuPage{i + 5}");
+                SubMenu subMenu = new SubMenu("UserInterface/QuickMenu", $"PlayerListMenuPage{i + 4}");
 
                 for (; totalMade < (9 * (i + 1)) && totalMade < EntryManager.generalInfoEntries.Count; totalMade++)
                 {

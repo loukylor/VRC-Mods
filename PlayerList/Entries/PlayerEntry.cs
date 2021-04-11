@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using Harmony;
 using MelonLoader;
 using PlayerList.Config;
+using PlayerList.UI;
 using PlayerList.Utilities;
 using UnhollowerBaseLib;
 using UnityEngine;
@@ -51,6 +52,12 @@ namespace PlayerList.Entries
         public static void EntryInit()
         {
             PlayerListConfig.OnConfigChangedEvent += OnStaticConfigChanged;
+            UIManager.OnQuickMenuOpenEvent += () =>
+            {
+                foreach (PlayerEntry entry in EntryManager.playerEntries.Values)
+                    entry.GetPlayerColor();
+            }; // OGT fork compatibility 
+                    
             PlayerListMod.Instance.Harmony.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend), BindingFlags.NonPublic | BindingFlags.Static)));
 
             // Definitely not stolen code from our lord and savior knah (https://github.com/knah/VRCMods/blob/master/AdvancedSafety/AdvancedSafetyMod.cs) because im not a skid

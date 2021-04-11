@@ -60,8 +60,7 @@ namespace PlayerList
         }
         public static void OnUpdate()
         {
-            localPlayerEntry?.Refresh();
-            RefreshGeneralInfoEntries();
+            RefreshAllEntries();
         }
         public static void OnSceneWasLoaded()
         {
@@ -175,9 +174,9 @@ namespace PlayerList
         public static void RefreshAllEntries()
         {
             // Dont refresh if the local player gameobject has been deleted or if the playerlist is hidden
-            if (RoomManager.field_Internal_Static_ApiWorld_0 == null || Player.prop_Player_0 == null || Player.prop_Player_0.gameObject == null || !MenuManager.playerList.active) return;
+            if (RoomManager.field_Internal_Static_ApiWorld_0 == null || Player.prop_Player_0 == null || !MenuManager.playerList.active) return;
 
-            localPlayerEntry.Refresh();
+            localPlayerEntry?.Refresh();
             RefreshGeneralInfoEntries();
         }
         public static void RefreshLayout()
