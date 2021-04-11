@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reflection;
 using Harmony;
-using MelonLoader;
 using PlayerList.Utilities;
 using UnityEngine;
 using VRC;

@@ -68,7 +68,7 @@ namespace PlayerList.Entries
             }
 
             // Use native patch here as doing a harmony patch would mean I would have to use a named type. even if i got around that with some clever logic it would break player initialization somewhat
-            foreach (MethodInfo method in typeof(VRCPlayer).GetMethods().Where(mi => mi.ReturnType.IsEnum && mi.GetParameters().Length == 1 && mi.GetParameters()[0].ParameterType == typeof(Il2CppSystem.Collections.Hashtable) && mi.Name.EndsWith("4")))
+            foreach (MethodInfo method in typeof(VRCPlayer).GetMethods().Where(mi => mi.ReturnType.IsEnum && mi.GetParameters().Length == 1 && mi.GetParameters()[0].ParameterType == typeof(Il2CppSystem.Collections.Hashtable) && Xref.CheckMethod(mi, "Failed to read showSocialRank for {0}")))
             {
                 vrcPlayerEnum = method.ReturnType;
                 unsafe
