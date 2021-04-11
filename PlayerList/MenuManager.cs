@@ -172,7 +172,7 @@ namespace PlayerList
             fontSizeLabel = new Label(playerListMenus[1].path, new Vector3(2, 1), "", "FontSizeLabel", resize: true);
             EntryManager.SetFontSize(PlayerListConfig.fontSize.Value);
 
-            playerListMenus.Add(new SubMenu("UserInterface/QuickMenu", "PlayerListMenuPage3"));
+            //playerListMenus.Add(new SubMenu("UserInterface/QuickMenu", "PlayerListMenuPage3"));
 
 
             // Initialize PlayerList Customization menu
