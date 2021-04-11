@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Harmony;
+using MelonLoader;
+using PlayerList.Utilities;
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Harmony;
-using MelonLoader;
-using PlayerList.Utilities;
 using UnhollowerBaseLib;
 using UnityEngine;
 using VRC;
@@ -24,13 +24,11 @@ namespace PlayerList.Entries
 
         public Player player;
         public string userID;
-        protected string playerColor = "#";
+        protected string playerColor;
         protected string platform;
 
         public static string separator = " | ";
         public static string leftPart = " - ";
-
-        public static bool reCacheColor;
 
         private static bool spoofFriend;
         protected static int highestPhotonIdLength = 0;
@@ -42,25 +40,46 @@ namespace PlayerList.Entries
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr OnPlayerNetDecode(IntPtr instancePointer, IntPtr objectsPointer, int objectIndex, float sendTime, IntPtr nativeMethodPointer);
-        private static OnPlayerNetDecode originalDecodeDelegate;
+        private static OnPlayerNetDecode originalDecodeDelegate = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate int OnVRCPlayerDataReceived(IntPtr instancePointer, IntPtr hashtablePointer, IntPtr nativeMethodPointer);
+        private static OnVRCPlayerDataReceived originalDataReceiveDelegate = null;
+        private static Type vrcPlayerEnum;
+
         public static void EntryInit()
         {
-            PlayerListMod.Instance.Harmony.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend))));
+            Config.OnConfigChangedEvent += OnStaticConfigChanged;
+            PlayerListMod.Instance.Harmony.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend), BindingFlags.NonPublic | BindingFlags.Static)));
 
             // Definitely not stolen code from our lord and savior knah (https://github.com/knah/VRCMods/blob/master/AdvancedSafety/AdvancedSafetyMod.cs) because im not a skid
-            foreach (MethodInfo method in typeof(PlayerNet).GetMethods().Where(mi => mi.Name.StartsWith("Method_Public_Virtual_Final_New_Void_ValueTypePublicSealed2157InObIn1144Vo71VoUnique_Int32_Single_3")))
+            foreach (MethodInfo method in typeof(PlayerNet).GetMethods().Where(mi => mi.GetParameters().Length == 3 && mi.Name.StartsWith("Method_Public_Virtual_Final_New_Void_ValueTypePublic")))
             {
                 unsafe
                 {
                     var originalMethodPointer = *(IntPtr*)(IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(method).GetValue(null);
-
-                    originalDecodeDelegate = null;
 
                     OnPlayerNetDecode replacement = (instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer) => OnPlayerNetDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
 
                     MelonUtils.NativeHookAttach((IntPtr)(&originalMethodPointer), Marshal.GetFunctionPointerForDelegate(replacement));
 
                     originalDecodeDelegate = Marshal.GetDelegateForFunctionPointer<OnPlayerNetDecode>(originalMethodPointer);
+                }
+            }
+
+            // Use native patch here as doing a harmony patch would mean I would have to use a named type. even if i got around that with some clever logic it would break player initialization somewhat
+            foreach (MethodInfo method in typeof(VRCPlayer).GetMethods().Where(mi => mi.ReturnType.IsEnum && mi.GetParameters().Length == 1 && mi.GetParameters()[0].ParameterType == typeof(Il2CppSystem.Collections.Hashtable) && mi.Name.EndsWith("4")))
+            {
+                vrcPlayerEnum = method.ReturnType;
+                unsafe
+                {
+                    var originalMethodPointer = *(IntPtr*)(IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(method).GetValue(null);
+
+                    OnVRCPlayerDataReceived replacement = (instancePointer, hashtablePointer, nativeMethodPointer) => OnVRCPlayerDataReceivedDelegate(instancePointer, hashtablePointer, nativeMethodPointer);
+
+                    MelonUtils.NativeHookAttach((IntPtr)(&originalMethodPointer), Marshal.GetFunctionPointerForDelegate(replacement));
+
+                    originalDataReceiveDelegate = Marshal.GetDelegateForFunctionPointer<OnVRCPlayerDataReceived>(originalMethodPointer);
                 }
             }
         }
@@ -75,9 +94,10 @@ namespace PlayerList.Entries
 
             textComponent.text = "Loading...";
 
+            GetPlayerColor();
             OnConfigChanged();
         }
-        public override void OnConfigChanged()
+        public static void OnStaticConfigChanged()
         {
             updateDelegate = null;
             if (Config.pingToggle.Value)
@@ -102,12 +122,39 @@ namespace PlayerList.Entries
 
             EntryManager.RefreshPlayerEntries();
         }
+        public override void OnConfigChanged()
+        {
+            GetPlayerColor();
+        }
+        private static int OnVRCPlayerDataReceivedDelegate(IntPtr instancePointer, IntPtr hashtablePointer, IntPtr nativeMethodPointer)
+        {
+            if (instancePointer == IntPtr.Zero)
+                return originalDataReceiveDelegate(instancePointer, hashtablePointer, nativeMethodPointer);
+
+            VRCPlayer vrcPlayer = new Il2CppSystem.Object(instancePointer).TryCast<VRCPlayer>();
+            if (vrcPlayer == null)
+                return originalDataReceiveDelegate(instancePointer, hashtablePointer, nativeMethodPointer);
+
+            int result = originalDataReceiveDelegate(instancePointer, hashtablePointer, nativeMethodPointer);
+
+
+            if (result == 64)
+            {
+                EntryManager.playerEntries.TryGetValue(vrcPlayer.field_Private_Player_0.GetInstanceID(), out PlayerEntry entry);
+                if (entry == null)
+                    return result;
+
+                entry.GetPlayerColor();
+            }
+
+            return result;
+        }
         private static IntPtr OnPlayerNetDecodeDelegate(IntPtr instancePointer, IntPtr objectsPointer, int objectIndex, float sendTime, IntPtr nativeMethodPointer)
         {
             if (instancePointer == IntPtr.Zero)
                 return originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
 
-            PlayerNet playerNet = new PlayerNet(instancePointer).TryCast<PlayerNet>();
+            PlayerNet playerNet = new Il2CppSystem.Object(instancePointer).TryCast<PlayerNet>();
             if (playerNet == null)
                 return originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
 
@@ -231,28 +278,6 @@ namespace PlayerList.Entries
         }
         private static void AddDisplayName(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {
-            if (reCacheColor || entry.playerColor == "#")
-            {
-                entry.playerColor = "";
-                switch (Config.DisplayNameColorMode)
-                {
-                    case DisplayNameColorMode.TrustAndFriends:
-                        entry.playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(entry.player.field_Private_APIUser_0));
-                        break;
-                    case DisplayNameColorMode.None:
-                        break;
-                    case DisplayNameColorMode.TrustOnly:
-                        // ty bono for this (https://github.com/ddakebono/)
-                        spoofFriend = true;
-                        entry.playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(entry.player.field_Private_APIUser_0));
-                        break;
-                    case DisplayNameColorMode.FriendsOnly:
-                        if (APIUser.IsFriendsWith(entry.player.field_Private_APIUser_0.id))
-                            entry.playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(entry.player.field_Private_APIUser_0));
-                        break;
-                }
-                reCacheColor = false;
-            }
             tempString += "<color=" + entry.playerColor + ">" + entry.player.field_Private_APIUser_0.displayName + "</color>" + separator;
         }
 
@@ -262,6 +287,27 @@ namespace PlayerList.Entries
             EntryManager.entries.Remove(Identifier);
             UnityEngine.Object.DestroyImmediate(gameObject);
             return;
+        }
+        private void GetPlayerColor()
+        {
+            playerColor = "";
+            switch (Config.DisplayNameColorMode)
+            {
+                case DisplayNameColorMode.TrustAndFriends:
+                    playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(player.field_Private_APIUser_0));
+                    break;
+                case DisplayNameColorMode.None:
+                    break;
+                case DisplayNameColorMode.TrustOnly:
+                    // ty bono for this (https://github.com/ddakebono/)
+                    spoofFriend = true;
+                    playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(player.field_Private_APIUser_0));
+                    break;
+                case DisplayNameColorMode.FriendsOnly:
+                    if (APIUser.IsFriendsWith(player.field_Private_APIUser_0.id))
+                        playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(player.field_Private_APIUser_0));
+                    break;
+            }
         }
 
         protected static string GetPlatform(Player player)

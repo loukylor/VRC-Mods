@@ -41,6 +41,7 @@ namespace PlayerList
             MenuManager.AddMenuListeners();
             MenuManager.CreateSubMenus();
             PlayerEntry.EntryInit();
+            LocalPlayerEntry.EntryInit();
             EntryManager.AddGeneralInfoEntries();
             MenuManager.CreateGeneralInfoSubMenus();
             MenuManager.AdjustSubMenus();

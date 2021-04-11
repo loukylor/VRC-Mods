@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Harmony;
+using MelonLoader;
 using PlayerList.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -89,20 +90,31 @@ namespace PlayerList.UI
             foreach (PropertyInfo prop in possibleProps)
                 if (prop.GetValue(QuickMenu.prop_QuickMenu_0) != null) 
                     currentMenuField = prop;
- 
+
+            if (currentMenuField == null) MelonLogger.Error("Something went wrong. In technical speak: after attempting to determine the current menu field info, it was null. The mod will likely not function properly");
+
             CurrentMenu.SetActive(false);
             
             MonoBehaviour tabManager = GameObject.Find("UserInterface/QuickMenu/QuickModeTabs").GetComponents<MonoBehaviour>().First(monoBehaviour => monoBehaviour.GetIl2CppType().GetMethods().Any(mb => mb.Name.StartsWith("ShowTabContent")));
             Il2CppSystem.Reflection.PropertyInfo tabManagerSingleton = tabManager.GetIl2CppType().GetProperties().First(pi => pi.PropertyType == tabManager.GetIl2CppType());
             tabManagerSingleton.SetValue(null, tabManager, null); // Singleton is null until QM is opened. Set it to a value so that the next line won't error
 
-            GameObject.Find("UserInterface/QuickMenu/QuickModeTabs/NotificationsTab").GetComponent<Button>().onClick.Invoke(); // Force a button click to set notifs menu as current tab menu
+            try
+            {
+                GameObject.Find("UserInterface/QuickMenu/QuickModeTabs/NotificationsTab").GetComponent<Button>().onClick.Invoke(); // Force a button click to set notifs menu as current tab menu
+            }
+            catch
+            {
+                MelonLogger.Error("Could not find NotificiationsTab button. The mod will likely not function properly");
+            }
 
             tabManagerSingleton.SetValue(null, null, null); // Set singleton back to null as to not change values willy nilly xD
 
             foreach (PropertyInfo prop in possibleProps)
                 if (prop.Name != currentMenuField.Name && prop.GetValue(QuickMenu.prop_QuickMenu_0) != null)
                     currentTabMenuField = prop;
+
+            if (currentMenuField == null) MelonLogger.Error("Something went wrong. In technical speak: after attempting to determine the current tab field info, it was null. The mod will likely not function properly");
 
             CurrentTabMenu.SetActive(false);
             

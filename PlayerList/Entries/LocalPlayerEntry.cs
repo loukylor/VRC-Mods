@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
+using Harmony;
+using MelonLoader;
+using PlayerList.Utilities;
 using UnityEngine;
 using VRC;
 using VRC.Core;
@@ -13,6 +18,12 @@ namespace PlayerList.Entries
 
         public new delegate void UpdateEntryDelegate(Player player, LocalPlayerEntry entry, ref string tempString);
         public static new UpdateEntryDelegate updateDelegate;
+        public static new void EntryInit()
+        {
+            MethodInfo OnShowSocialRankChangeMethod = typeof(QuickMenu).GetMethods()
+                .First(mi => mi.Name.StartsWith("Method_Public_Void_") && mi.GetParameters().Length == 0 && Xref.CheckUsing(mi, "Method_Public_Static_Void_EnumNPublicSealed", typeof(VRCInputManager))); // && (!mi.Name.EndsWith("1") && !mi.Name.EndsWith("8") && !mi.Name.EndsWith("12") && !mi.Name.EndsWith("17") && !mi.Name.EndsWith("6"))))
+            PlayerListMod.Instance.Harmony.Patch(OnShowSocialRankChangeMethod, null, new HarmonyMethod(typeof(LocalPlayerEntry).GetMethod(nameof(OnShowSocialRankChange), BindingFlags.NonPublic | BindingFlags.Static)));
+        }
         public override void Init(object[] parameters)
         {
             player = Player.prop_Player_0;
@@ -31,7 +42,8 @@ namespace PlayerList.Entries
             });
 
             textComponent.text = "Loading...";
-
+            
+            GetPlayerColor();
             OnConfigChanged();
         }
         public override void OnConfigChanged()
@@ -51,6 +63,8 @@ namespace PlayerList.Entries
                 updateDelegate += AddPhotonId;
             if (Config.displayNameToggle.Value)
                 updateDelegate += AddDisplayName;
+
+            GetPlayerColor();
         }
         protected override void ProcessText(object[] parameters)
         {
@@ -127,21 +141,26 @@ namespace PlayerList.Entries
         }
         private static void AddDisplayName(Player player, LocalPlayerEntry entry, ref string tempString)
         {
-            if (reCacheColor || entry.playerColor == "#")
-            {
-                entry.playerColor = "";
-                switch (Config.DisplayNameColorMode)
-                {
-                    case DisplayNameColorMode.None:
-                    case DisplayNameColorMode.FriendsOnly:
-                        break;
-                    case DisplayNameColorMode.TrustAndFriends:
-                    case DisplayNameColorMode.TrustOnly:
-                        entry.playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(APIUser.CurrentUser));
-                        break;
-                }
-            }
             tempString += "<color=" + entry.playerColor + ">" + player.field_Private_APIUser_0.displayName + "</color>" + separator;
+        }
+
+        private static void OnShowSocialRankChange()
+        {
+            EntryManager.localPlayerEntry.GetPlayerColor();
+        }
+        private void GetPlayerColor()
+        {
+            playerColor = "";
+            switch (Config.DisplayNameColorMode)
+            {
+                case DisplayNameColorMode.None:
+                case DisplayNameColorMode.FriendsOnly:
+                    break;
+                case DisplayNameColorMode.TrustAndFriends:
+                case DisplayNameColorMode.TrustOnly:
+                    playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(APIUser.CurrentUser));
+                    break;
+            }
         }
     }
 }
