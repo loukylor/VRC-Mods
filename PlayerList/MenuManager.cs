@@ -176,7 +176,7 @@ namespace PlayerList
 
 
             // Initialize PlayerList Customization menu
-            playerListMenus.Add(new SubMenu("UserInterface/QuickMenu", "PlayerListMenuPage4"));
+            playerListMenus.Add(new SubMenu("UserInterface/QuickMenu", "PlayerListMenuPage3"));
 
             new ToggleButton(playerListMenus[2].path, new Vector3(1, 0), "Enable Ping", "Disabled", new Action<bool>((state) => PlayerListConfig.pingToggle.Value = state), "Toggle player ping", "Toggle player ping", "PingToggle", PlayerListConfig.pingToggle.Value, true);
             new ToggleButton(playerListMenus[2].path, new Vector3(2, 0), "Enable Fps", "Disabled", new Action<bool>((state) => PlayerListConfig.fpsToggle.Value = state), "Toggle player fps", "Toggle player fps", "FpsToggle", PlayerListConfig.fpsToggle.Value, true);
