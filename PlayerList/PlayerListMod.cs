@@ -23,6 +23,7 @@ namespace PlayerList
             PlayerListConfig.RegisterSettings();
             UIManager.Init();
             EntryManager.Init();
+            ListPositionManager.Init();
             MenuManager.Init();
         }
         public override void VRChat_OnUiManagerInit()

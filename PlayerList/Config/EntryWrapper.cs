@@ -19,11 +19,11 @@ namespace PlayerList.Config
             set 
             {
                 if (!value.Equals(Value))
-                { 
+                {
                     OnValueChanged?.Invoke(pref.Value, value);
+                    pref.Value = value;
                     RunOnValueChangedUntyped();
                 }
-                pref.Value = value; 
             }
         }
 

@@ -81,9 +81,6 @@ namespace PlayerList
         }
         public static void OnFontSizeChange(int oldValue, int newValue)
         {
-            if (oldValue == newValue)
-                return;
-
             SetFontSize(newValue);
         }
 

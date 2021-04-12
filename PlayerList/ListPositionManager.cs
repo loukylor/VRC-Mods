@@ -20,10 +20,7 @@ namespace PlayerList
         }
         public static void OnSnapToGridSizeChanged(int oldValue, int newValue)
         {
-            if (oldValue == newValue)
-                return;
-
-            snapToGridSizeLabel.textComponent.text = $"Snap Grid\nSize: {PlayerListConfig.snapToGridSize}";
+            snapToGridSizeLabel.textComponent.text = $"Snap Grid\nSize: {newValue}";
         }
 
         public static void MovePlayerListToEndOfMenu()
