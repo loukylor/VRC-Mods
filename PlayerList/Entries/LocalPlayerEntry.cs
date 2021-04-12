@@ -31,7 +31,7 @@ namespace PlayerList.Entries
 
             platform = GetPlatform(player).PadRight(2);
 
-            NetworkHooks.OnPlayerJoin += new Action<Player>((player) =>
+            NetworkEvents.OnPlayerJoin += new Action<Player>((player) =>
             {
                 int highestId = 0;
                 foreach (int photonId in PlayerManager.prop_PlayerManager_0.field_Private_Dictionary_2_Int32_Player_0.Keys)
@@ -125,11 +125,8 @@ namespace PlayerList.Entries
         }
         private static void AddPerf(Player player, LocalPlayerEntry entry, ref string tempString)
         {
-            PerformanceRating rating = player.field_Internal_VRCPlayer_0.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall]; // Get from cache so it doesnt calculate perf all at once
-            if (rating != entry.lastPerf)
-                EntryManager.shouldSort = true;
-            entry.lastPerf = rating;
-            tempString += "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, rating)) + ">" + ParsePerformanceText(rating) + "</color>" + separator;
+            entry.perf = player.field_Internal_VRCPlayer_0.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall]; // Get from cache so it doesnt calculate perf all at once
+            tempString += "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, entry.perf)) + ">" + ParsePerformanceText(entry.perf) + "</color>" + separator;
         }
         private static void AddDistance(Player player, LocalPlayerEntry entry, ref string tempString)
         {

@@ -35,7 +35,11 @@ namespace PlayerList.Entries
         private static bool spoofFriend;
         protected static int highestPhotonIdLength = 0;
 
-        public PerformanceRating lastPerf;
+        public PerformanceRating perf;
+        public int ping;
+        public int fps;
+        public float distance;
+        public bool isFriend;
 
         public delegate void UpdateEntryDelegate(PlayerNet playerNet, PlayerEntry entry, ref string tempString);
         public static UpdateEntryDelegate updateDelegate;
@@ -102,8 +106,8 @@ namespace PlayerList.Entries
 
             textComponent.text = "Loading...";
 
+            isFriend = APIUser.IsFriendsWith(player.field_Private_APIUser_0.id);
             GetPlayerColor();
-            OnConfigChanged();
         }
         public static void OnStaticConfigChanged()
         {
@@ -181,9 +185,9 @@ namespace PlayerList.Entries
 
             return result;
         }
-        public static void UpdateEntry(PlayerNet playerNet, PlayerEntry entry = null)
+        public static void UpdateEntry(PlayerNet playerNet, PlayerEntry entry = null, bool bypassActive = false)
         {
-            if (!MenuManager.playerList.active)
+            if (!MenuManager.playerList.active && !bypassActive)
                 return;
 
             if (entry == null)
@@ -220,24 +224,24 @@ namespace PlayerList.Entries
 
         private static void AddPing(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {
-            short ping = playerNet.prop_Int16_0;
+            entry.ping = playerNet.prop_Int16_0;
 
-            tempString += "<color=" + GetPingColor(ping) + ">";
-            if (ping < 9999 && ping > -999)
-                tempString += ping.ToString().PadRight(4) + "ms</color>";
+            tempString += "<color=" + GetPingColor(entry.ping) + ">";
+            if (entry.ping < 9999 && entry.ping > -999)
+                tempString += entry.ping.ToString().PadRight(4) + "ms</color>";
             else
-                tempString += ((double)(ping / 1000)).ToString("N1").PadRight(5) + "s</color>";
+                tempString += ((double)(entry.ping / 1000)).ToString("N1").PadRight(5) + "s</color>";
             tempString += separator;
         }
         private static void AddFps(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {
-            int fps = MelonUtils.Clamp((int)(1000f / playerNet.field_Private_Byte_0), -99, 999);
+            entry.fps = MelonUtils.Clamp((int)(1000f / playerNet.field_Private_Byte_0), -99, 999);
 
-            tempString += "<color=" + GetFpsColor(fps) + ">";
+            tempString += "<color=" + GetFpsColor(entry.fps) + ">";
             if (playerNet.field_Private_Byte_0 == 0)
                 tempString += "?¿?</color>";
             else
-                tempString += fps.ToString().PadRight(3) + "</color>";
+                tempString += entry.fps.ToString().PadRight(3) + "</color>";
             tempString += separator;
         }
         private static void AddPlatform(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
@@ -246,32 +250,29 @@ namespace PlayerList.Entries
         }
         private static void AddPerf(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {
-            PerformanceRating rating = entry.player.field_Internal_VRCPlayer_0.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall]; // Get from cache so it doesnt calculate perf all at once
-            if (rating != entry.lastPerf)
-                EntryManager.shouldSort = true;
-            entry.lastPerf = rating;
-            tempString += "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, rating)) + ">" + ParsePerformanceText(rating) + "</color>" + separator;
+            entry.perf = entry.player.field_Internal_VRCPlayer_0.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall]; // Get from cache so it doesnt calculate perf all at once
+            tempString += "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, entry.perf)) + ">" + ParsePerformanceText(entry.perf) + "</color>" + separator;
         }
         private static void AddDistance(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {
             if (worldAllowed)
             {
-                float distance = (entry.player.transform.position - Player.prop_Player_0.transform.position).magnitude;
-                if (distance < 100)
+                entry.distance = (entry.player.transform.position - Player.prop_Player_0.transform.position).magnitude;
+                if (entry.distance < 100)
                 {
-                    tempString += distance.ToString("N1").PadRight(4) + "m";
+                    tempString += entry.distance.ToString("N1").PadRight(4) + "m";
                 }
-                else if (distance < 10000)
+                else if (entry.distance < 10000)
                 {
-                    tempString += (distance / 1000).ToString("N1").PadRight(3) + "km";
+                    tempString += (entry.distance / 1000).ToString("N1").PadRight(3) + "km";
                 }
-                else if (distance < 999900)
+                else if (entry.distance < 999900)
                 {
-                    tempString += (distance / 1000).ToString("N0").PadRight(3) + "km";
+                    tempString += (entry.distance / 1000).ToString("N0").PadRight(3) + "km";
                 }
                 else
                 {
-                    tempString += (distance / 9.461e+15).ToString("N2").PadRight(3) + "ly"; // If its too large for kilometers ***just convert to light years***
+                    tempString += (entry.distance / 9.461e+15).ToString("N2").PadRight(3) + "ly"; // If its too large for kilometers ***just convert to light years***
                 }
             }
             else

@@ -41,15 +41,17 @@ namespace PlayerList
 
             // This is kinda a mess but whatever
             MenuManager.AddMenuListeners();
+            MenuManager.CreateSortPages();
             MenuManager.CreateSubMenus();
             PlayerEntry.EntryInit();
             LocalPlayerEntry.EntryInit();
             EntryManager.AddGeneralInfoEntries();
             MenuManager.CreateGeneralInfoSubMenus();
             MenuManager.AdjustSubMenus();
+            EntrySortManager.Init();
 
-            // Initialize on leave and join events
-            NetworkHooks.NetworkInit();
+            // Initialize on network events
+            NetworkEvents.NetworkInit();
 
             PlayerListConfig.OnConfigChanged();
             

@@ -37,9 +37,18 @@ namespace PlayerList.Config
             set { displayNameColorMode.Value = value.ToString(); }
         }
 
-        public static EntryWrapper<bool> excludeSelfFromSort;
-        public static EntryWrapper<bool> sortFriendsFirst;
-        private static EntryWrapper<string> currentSortType;
+        private static EntryWrapper<string> currentBaseSort;
+        public static EntrySortManager.SortType CurrentBaseSortType
+        {
+            get { return (EntrySortManager.SortType)Enum.Parse(typeof(EntrySortManager.SortType), currentBaseSort.Value); }
+            set { currentBaseSort.Value = value.ToString(); }
+        }
+        private static EntryWrapper<string> currentUpperSort;
+        public static EntrySortManager.SortType CurrentUpperSortType
+        {
+            get { return (EntrySortManager.SortType)Enum.Parse(typeof(EntrySortManager.SortType), currentUpperSort.Value); }
+            set { currentUpperSort.Value = value.ToString(); }
+        }
 
         private static EntryWrapper<string> menuButtonPosition;
         public static MenuManager.MenuButtonPositionEnum MenuButtonPosition
@@ -76,7 +85,10 @@ namespace PlayerList.Config
             distanceToggle = CreateEntry(categoryIdentifier, nameof(distanceToggle), true, is_hidden: true);
             photonIdToggle = CreateEntry(categoryIdentifier, nameof(photonIdToggle), false, is_hidden: true);
             displayNameToggle = CreateEntry(categoryIdentifier, nameof(displayNameToggle), true, is_hidden: true);
+
             displayNameColorMode = CreateEntry(categoryIdentifier, nameof(displayNameColorMode), "TrustAndFriends", is_hidden: true);
+            currentBaseSort = CreateEntry(categoryIdentifier, nameof(currentBaseSort), "Default", is_hidden: true);
+            currentUpperSort = CreateEntry(categoryIdentifier, nameof(currentUpperSort), "Default", is_hidden: true);
 
             menuButtonPosition = CreateEntry(categoryIdentifier, nameof(menuButtonPosition), "TopRight", is_hidden: true);
 

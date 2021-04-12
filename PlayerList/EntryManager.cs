@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using MelonLoader;
 using PlayerList.Config;
@@ -15,48 +16,18 @@ namespace PlayerList
     {
         internal static LocalPlayerEntry localPlayerEntry = null;
 
-        public static Dictionary<int, PlayerEntry> playerEntries = new Dictionary<int, PlayerEntry>();
+        public static Dictionary<int, PlayerEntry> playerEntries = new Dictionary<int, PlayerEntry>(); // This will not be sorted
+        public static List<PlayerEntry> playerEntriesWithLocal = new List<PlayerEntry>(); // This will be sorted
         public static List<EntryBase> generalInfoEntries = new List<EntryBase>();
         public static Dictionary<int, EntryBase> entries = new Dictionary<int, EntryBase>();
-
-        public static bool shouldSort;
-        private static BaseSortType _currentBaseSortType = BaseSortType.Default;
-        public static BaseSortType CurrentBaseSortType
-        {
-            get { return _currentBaseSortType; }
-            set 
-            {
-                switch (CurrentBaseSortType)
-                {
-                    case BaseSortType.Alphabetical:
-                        curentBaseSortFunc = SortAlphabetically;
-                        break;
-                    default:
-                        curentBaseSortFunc = SortDefault;
-                        break;
-                }
-                _currentBaseSortType = value;
-            }
-        }
-        public static System.Action curentBaseSortFunc;
-
-        private static SubSortType _currentSubSortType = SubSortType.None;
-        public static SubSortType CurrentSubSortType
-        {
-            get { return _currentSubSortType; }
-            set
-            {
-
-            }
-        }
 
         public static void Init()
         {
             PlayerListConfig.fontSize.OnValueChanged += OnFontSizeChange;
             PlayerListConfig.OnConfigChangedEvent += OnConfigChanged;
-            NetworkHooks.OnPlayerJoin += OnPlayerJoin;
-            NetworkHooks.OnPlayerLeave += OnPlayerLeave;
-            NetworkHooks.OnInstanceChange += OnInstanceChange;
+            NetworkEvents.OnPlayerJoin += OnPlayerJoin;
+            NetworkEvents.OnPlayerLeave += OnPlayerLeave;
+            NetworkEvents.OnInstanceChange += OnInstanceChange;
         }
         public static void OnUpdate()
         {
@@ -92,22 +63,26 @@ namespace PlayerList
             {
                 if (localPlayerEntry != null) return;
 
-                localPlayerEntry = EntryBase.CreateInstance<LocalPlayerEntry>(Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform));
+                localPlayerEntry = EntryBase.CreateInstance<LocalPlayerEntry>(UnityEngine.Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform));
                 AddEntry(localPlayerEntry);
+                playerEntriesWithLocal.Add(localPlayerEntry);
                 localPlayerEntry.gameObject.SetActive(true);
                 return;
             }
 
-            AddPlayerEntry(EntryBase.CreateInstance<PlayerEntry>(Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform), new object[] { player }));
-            //curentBaseSortFunc();
+            AddPlayerEntry(EntryBase.CreateInstance<PlayerEntry>(UnityEngine.Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform), new object[] { player }));
         }
         public static void OnPlayerLeave(Player player)
         {
             if (!playerEntries.TryGetValue(player.GetInstanceID(), out PlayerEntry entry)) return;
 
-            Object.DestroyImmediate(entry.gameObject);
+            UnityEngine.Object.DestroyImmediate(entry.gameObject);
             entries.Remove(entry.Identifier);
             playerEntries.Remove(entry.playerInstanceId);
+            for (int i = 0; i < playerEntriesWithLocal.Count; i++)
+                if (playerEntriesWithLocal[i].playerInstanceId == entry.playerInstanceId)
+                    playerEntriesWithLocal.RemoveAt(i);
+
             RefreshLayout();
         }
 
@@ -136,28 +111,28 @@ namespace PlayerList
             AddEntry(entry);
             playerEntries.Add(entry.playerInstanceId, entry);
             entry.gameObject.SetActive(true);
-            entry.Refresh();
-            RefreshPlayerEntries();
+            RefreshPlayerEntries(true);
+            EntrySortManager.SortPlayer(entry); // This function will handle adding the player to the sorted list
         }
         public static void AddGeneralInfoEntry(EntryBase entry)
         {
             AddEntry(entry);
             generalInfoEntries.Add(entry);
         }
-        public static void RefreshPlayerEntries()
+        public static void RefreshPlayerEntries(bool bypassActive = false)
         {
-            if (RoomManager.field_Internal_Static_ApiWorld_0 == null || Player.prop_Player_0 == null || Player.prop_Player_0.gameObject == null || Player.prop_Player_0.prop_VRCPlayerApi_0 == null || !MenuManager.playerList.active) return;
+            if (RoomManager.field_Internal_Static_ApiWorld_0 == null || Player.prop_Player_0 == null || Player.prop_Player_0.gameObject == null || Player.prop_Player_0.prop_VRCPlayerApi_0 == null || (!MenuManager.playerList.active && !bypassActive)) return;
 
             foreach (PlayerEntry entry in new List<EntryBase>(playerEntries.Values)) // Slow but allows me to remove things during its run
                 if (entry.player == null)
                     entry.Remove();
             
-            if (shouldSort)
-                //curentBaseSortFunc();
-            shouldSort = false;
+            if (EntrySortManager.shouldSort)
+                EntrySortManager.SortAllPlayers();
+            EntrySortManager.shouldSort = false;
 
             foreach (PlayerEntry entry in playerEntries.Values)
-                PlayerEntry.UpdateEntry(entry.player.prop_PlayerNet_0, entry);
+                PlayerEntry.UpdateEntry(entry.player.prop_PlayerNet_0, entry, bypassActive);
 
             localPlayerEntry.Refresh();
 
@@ -186,51 +161,6 @@ namespace PlayerList
             MenuManager.fontSizeLabel.textComponent.text = $"Font\nSize: {fontSize}";
             foreach (EntryBase entry in entries.Values)
                 entry.textComponent.fontSize = fontSize;
-        }
-
-        public static void SortAlphabetically()
-        {
-            SortPlayers(delegate (PlayerEntry player1, PlayerEntry player2)
-            {
-                return player1.player.field_Private_APIUser_0.displayName.CompareTo(player2.player.field_Private_APIUser_0.displayName);
-            });
-        }
-        public static void SortDefault()
-        {
-            SortPlayers(delegate (PlayerEntry player1, PlayerEntry player2)
-            {
-                return player1.player.field_Internal_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0.CompareTo(player2.player.field_Internal_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0);
-            });
-        }
-        public static void SortPlayers(System.Comparison<PlayerEntry> comparison) // This is slow asf but it shouldn't matter too much
-        {
-            MelonLogger.Msg("SORTING");
-            List<PlayerEntry> players = playerEntries.Values.ToList();
-            players.Add(localPlayerEntry);
-
-            players.Sort(comparison);
-
-            for (int i = 0; i < players.Count; i++)
-                players[i].gameObject.transform.SetSiblingIndex(i + 1);
-        }
-
-        public enum SubSortType
-        {
-            None,
-            Trust,
-            AvatarPerf
-        }
-        public enum BaseSortType
-        {
-            Default,
-            Alphabetical
-        }
-        public enum FilterType
-        {
-            NonFriends,
-            Friends,
-            Self,
-
         }
     }
 }

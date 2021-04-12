@@ -18,6 +18,7 @@ namespace PlayerList
     class MenuManager
     {
         public static List<SubMenu> playerListMenus = new List<SubMenu>();
+        public static SubMenu sortMenu;
         public static ToggleButton menuToggleButton;
 
         public static bool shouldStayHidden;
@@ -106,8 +107,7 @@ namespace PlayerList
             MelonLogger.Msg("Initializing Menu...");
             playerListMenus.Add(new SubMenu("UserInterface/QuickMenu", "PlayerListMenuPage1"));
 
-            SingleButton backButton = new SingleButton(playerListMenus[0].path, new Vector3(5, 2), "Back", new Action(() => UIManager.OpenPage("UserInterface/QuickMenu/ShortcutMenu")), "Press to go back", "BackButton");
-            backButton.textComponent.color = Color.yellow;
+            new SingleButton(playerListMenus[0].path, new Vector3(5, 2), "Back", new Action(() => UIManager.OpenPage("UserInterface/QuickMenu/ShortcutMenu")), "Press to go back", "BackButton", color: Color.yellow);
 
             menuToggleButton = new ToggleButton(playerListMenus[0].path, new Vector3(5, 0), "Enabled", "Disabled", new Action<bool>((state) => ToggleMenu()), "Toggle the menu. Can also be toggled using Left Ctrl + F1", "Toggle the menu. Can also be toggled using Left Ctrl + F1", "ToggleMenuToggle", !shouldStayHidden);
 
@@ -147,6 +147,22 @@ namespace PlayerList
                 newElements.SetActive(true);
             });
         }
+
+        public static void CreateSortPages()
+        {
+            sortMenu = new SubMenu("UserInterface/QuickMenu", "PlayerListSortMenu");
+
+            new SingleButton(sortMenu.path, new Vector3(1, 0), "Default", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.Default)), "Set sort type to default", "DefaultSortButton");
+            new SingleButton(sortMenu.path, new Vector3(2, 0), "Alphabetical", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.Alphabetical)), "Set sort type to alphabetical", "AlphabeticalSortButton");
+            new SingleButton(sortMenu.path, new Vector3(3, 0), "Avatar Perf", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.AvatarPerf)), "Set sort type to avatar perf", "AvatarPerfSortButton");
+            new SingleButton(sortMenu.path, new Vector3(4, 0), "Distance", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.Distance)), "Set sort type to distance", "DistanceSortButton");
+            new SingleButton(sortMenu.path, new Vector3(1, 1), "Fps", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.Fps)), "Set sort type to fps", "FpsSortButton");
+            new SingleButton(sortMenu.path, new Vector3(2, 1), "Friends", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.Friends)), "Set sort type to friends", "FriendsSortButton");
+            new SingleButton(sortMenu.path, new Vector3(3, 1), "Ping", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.Ping)), "Set sort type to ping", "PingSortButton");
+            new SingleButton(sortMenu.path, new Vector3(5, 2), "Back", new Action(() => UIManager.OpenPage(playerListMenus[2].path)), "Press to go back", "BackButton", color: Color.yellow);
+            AddPlayerListToSubMenu(sortMenu);
+        }
+
         public static void CreateSubMenus()
         {
             // Initialize Movement menu
@@ -172,23 +188,25 @@ namespace PlayerList
             fontSizeLabel = new Label(playerListMenus[1].path, new Vector3(2, 1), "", "FontSizeLabel", resize: true);
             EntryManager.SetFontSize(PlayerListConfig.fontSize.Value);
 
-            //playerListMenus.Add(new SubMenu("UserInterface/QuickMenu", "PlayerListMenuPage3"));
-
+            playerListMenus.Add(new SubMenu("UserInterface/QuickMenu", "PlayerListMenuPage3"));
+            new SingleButton(playerListMenus[2].path, new Vector3(1, 0), "Base Sort Type", new Action(() => { UIManager.OpenPage(sortMenu.path); EntrySortManager.currentcomparisonProperty = EntrySortManager.baseComparisonProperty; }), "Set base sort which will run when the upper sort creates ambiguous entries", "BaseSortTypeButton", true);
+            new SingleButton(playerListMenus[2].path, new Vector3(2, 0), "Upper Sort Type", new Action(() => { UIManager.OpenPage(sortMenu.path); EntrySortManager.currentcomparisonProperty = EntrySortManager.upperComparisonProperty; }), "Set upper sort which will run on top of the base sort type", "UpperSortTypeButton", true);
+            new SingleButton(playerListMenus[2].path, new Vector3(3, 0), "Refresh", EntrySortManager.SortAllPlayers, "Sort", "RefreshSortButton");
 
             // Initialize PlayerList Customization menu
-            playerListMenus.Add(new SubMenu("UserInterface/QuickMenu", "PlayerListMenuPage3"));
+            playerListMenus.Add(new SubMenu("UserInterface/QuickMenu", "PlayerListMenuPage4"));
 
-            new ToggleButton(playerListMenus[2].path, new Vector3(1, 0), "Enable Ping", "Disabled", new Action<bool>((state) => PlayerListConfig.pingToggle.Value = state), "Toggle player ping", "Toggle player ping", "PingToggle", PlayerListConfig.pingToggle.Value, true);
-            new ToggleButton(playerListMenus[2].path, new Vector3(2, 0), "Enable Fps", "Disabled", new Action<bool>((state) => PlayerListConfig.fpsToggle.Value = state), "Toggle player fps", "Toggle player fps", "FpsToggle", PlayerListConfig.fpsToggle.Value, true);
-            new ToggleButton(playerListMenus[2].path, new Vector3(3, 0), "Enable Platform", "Disabled", new Action<bool>((state) => PlayerListConfig.platformToggle.Value = state), "Toggle player Platform", "Toggle player Platform", "PlatformToggle", PlayerListConfig.platformToggle.Value, true);
-            new ToggleButton(playerListMenus[2].path, new Vector3(1, 1), "Enable Avatar Performance", "Disabled", new Action<bool>((state) => PlayerListConfig.perfToggle.Value = state), "Toggle avatar performance", "Toggle avatar performance", "PerfToggle", PlayerListConfig.perfToggle.Value, true);
-            new ToggleButton(playerListMenus[2].path, new Vector3(2, 1), "Enable Distance", "Disabled", new Action<bool>((state) => PlayerListConfig.distanceToggle.Value = state), "Toggle distance to player", "Toggle distance to player", "DistanceToPlayerToggle", PlayerListConfig.distanceToggle.Value, true);
-            new ToggleButton(playerListMenus[2].path, new Vector3(3, 1), "Enable DisplayName", "Disabled", new Action<bool>((state) => PlayerListConfig.displayNameToggle.Value = state), "Why...?", "Why...?", "DisplayNameToggle", PlayerListConfig.displayNameToggle.Value, true);
+            new ToggleButton(playerListMenus[3].path, new Vector3(1, 0), "Enable Ping", "Disabled", new Action<bool>((state) => PlayerListConfig.pingToggle.Value = state), "Toggle player ping", "Toggle player ping", "PingToggle", PlayerListConfig.pingToggle.Value, true);
+            new ToggleButton(playerListMenus[3].path, new Vector3(2, 0), "Enable Fps", "Disabled", new Action<bool>((state) => PlayerListConfig.fpsToggle.Value = state), "Toggle player fps", "Toggle player fps", "FpsToggle", PlayerListConfig.fpsToggle.Value, true);
+            new ToggleButton(playerListMenus[3].path, new Vector3(3, 0), "Enable Platform", "Disabled", new Action<bool>((state) => PlayerListConfig.platformToggle.Value = state), "Toggle player Platform", "Toggle player Platform", "PlatformToggle", PlayerListConfig.platformToggle.Value, true);
+            new ToggleButton(playerListMenus[3].path, new Vector3(1, 1), "Enable Avatar Performance", "Disabled", new Action<bool>((state) => PlayerListConfig.perfToggle.Value = state), "Toggle avatar performance", "Toggle avatar performance", "PerfToggle", PlayerListConfig.perfToggle.Value, true);
+            new ToggleButton(playerListMenus[3].path, new Vector3(2, 1), "Enable Distance", "Disabled", new Action<bool>((state) => PlayerListConfig.distanceToggle.Value = state), "Toggle distance to player", "Toggle distance to player", "DistanceToPlayerToggle", PlayerListConfig.distanceToggle.Value, true);
+            new ToggleButton(playerListMenus[3].path, new Vector3(3, 1), "Enable DisplayName", "Disabled", new Action<bool>((state) => PlayerListConfig.displayNameToggle.Value = state), "Why...?", "Why...?", "DisplayNameToggle", PlayerListConfig.displayNameToggle.Value, true);
 
-            new QuarterButton(playerListMenus[2].path, new Vector3(3, 2), new Vector2(0, 0), "TF", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.TrustAndFriends), "Set displayname coloring to show friends and trust rank", "TrustAndFriendsButton");
-            new QuarterButton(playerListMenus[2].path, new Vector3(3, 2), new Vector2(1, 0), "T", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.TrustOnly), "Set displayname coloring to show trust rank only", "TrustOnlyButton");
-            new QuarterButton(playerListMenus[2].path, new Vector3(3, 2), new Vector2(1, 1), "F", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.FriendsOnly), "Set displayname coloring to show friends only", "FriendsOnlyButton");
-            new QuarterButton(playerListMenus[2].path, new Vector3(3, 2), new Vector2(0, 1), "N", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.None), "Set displayname coloring to none", "NoneButton");
+            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(0, 0), "TF", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.TrustAndFriends), "Set displayname coloring to show friends and trust rank", "TrustAndFriendsButton");
+            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(1, 0), "T", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.TrustOnly), "Set displayname coloring to show trust rank only", "TrustOnlyButton");
+            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(1, 1), "F", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.FriendsOnly), "Set displayname coloring to show friends only", "FriendsOnlyButton");
+            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(0, 1), "N", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.None), "Set displayname coloring to none", "NoneButton");
         }
 
         public static void CreateGeneralInfoSubMenus()
@@ -197,7 +215,7 @@ namespace PlayerList
             int totalMade = 0;
             for (int i = 0; i < Math.Ceiling(EntryManager.generalInfoEntries.Count / 9f); i++)
             {
-                SubMenu subMenu = new SubMenu("UserInterface/QuickMenu", $"PlayerListMenuPage{i + 4}");
+                SubMenu subMenu = new SubMenu("UserInterface/QuickMenu", $"PlayerListMenuPage{i + 5}");
 
                 for (; totalMade < (9 * (i + 1)) && totalMade < EntryManager.generalInfoEntries.Count; totalMade++)
                 {
@@ -224,19 +242,24 @@ namespace PlayerList
 
                 if (i == 0) continue; // Skip main config menu
 
-                EnableDisableListener subMenuListener = playerListMenus[i].gameObject.AddComponent<EnableDisableListener>();
-                subMenuListener.OnEnableEvent += new Action(() =>
-                {
-                    playerList.SetActive(!shouldStayHidden);
-                    playerListRect.anchoredPosition = Converters.ConvertToUnityUnits(new Vector3(6.5f, 3.5f));
-                });
-                subMenuListener.OnDisableEvent += new Action(() =>
-                {
-                    playerList.SetActive(false);
-                    playerListRect.anchoredPosition = PlayerListConfig.PlayerListPosition;
-                    playerListRect.localPosition = new Vector3(playerListRect.localPosition.x, playerListRect.localPosition.y, 25);
-                });
+                AddPlayerListToSubMenu(playerListMenus[i]);
             }
+        }
+
+        public static void AddPlayerListToSubMenu(SubMenu menu)
+        {
+            EnableDisableListener subMenuListener = menu.gameObject.AddComponent<EnableDisableListener>();
+            subMenuListener.OnEnableEvent += new Action(() =>
+            {
+                playerList.SetActive(!shouldStayHidden);
+                playerListRect.anchoredPosition = Converters.ConvertToUnityUnits(new Vector3(6.5f, 3.5f));
+            });
+            subMenuListener.OnDisableEvent += new Action(() =>
+            {
+                playerList.SetActive(false);
+                playerListRect.anchoredPosition = PlayerListConfig.PlayerListPosition;
+                playerListRect.localPosition = new Vector3(playerListRect.localPosition.x, playerListRect.localPosition.y, 25);
+            });
         }
         public enum MenuButtonPositionEnum
         {
