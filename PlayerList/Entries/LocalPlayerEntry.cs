@@ -27,9 +27,9 @@ namespace PlayerList.Entries
         public override void Init(object[] parameters)
         {
             player = Player.prop_Player_0;
-            gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new Action(() => OpenPlayerInQuickMenu(player)));
+            gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new Action(() => PlayerUtils.OpenPlayerInQuickMenu(player)));
 
-            platform = GetPlatform(player).PadRight(2);
+            platform = PlayerUtils.GetPlatform(player).PadRight(2);
 
             NetworkEvents.OnPlayerJoin += new Action<Player>((player) =>
             {
@@ -42,7 +42,7 @@ namespace PlayerList.Entries
             });
 
             textComponent.text = "Loading...";
-            
+
             GetPlayerColor();
             OnConfigChanged();
         }
@@ -100,14 +100,14 @@ namespace PlayerList.Entries
             player = Player.prop_Player_0;
             updateDelegate?.Invoke(player, this, ref tempString);
 
-            tempString = AddLeftPart(tempString);
-            textComponent.text = tempString;
+            withoutLeftPart = TrimExtra(tempString);
+            textComponent.text = leftPart + withoutLeftPart;
         }
 
         private static void AddPing(Player player, LocalPlayerEntry entry, ref string tempString)
         {
             short ping = (short)Photon.Pun.PhotonNetwork.field_Public_Static_LoadBalancingClient_0.prop_LoadBalancingPeer_0.RoundTripTime;
-            tempString += "<color=" + GetPingColor(ping) + ">";
+            tempString += "<color=" + PlayerUtils.GetPingColor(ping) + ">";
             if (ping < 9999 && ping > -999)
                 tempString += ping.ToString().PadRight(4) + "ms</color>";
             else
@@ -117,7 +117,7 @@ namespace PlayerList.Entries
         private static void AddFps(Player player, LocalPlayerEntry entry, ref string tempString)
         {
             int fps = Mathf.Clamp((int)(1f / Time.deltaTime), -99, 999); // Clamp between -99 and 999
-            tempString += "<color=" + GetFpsColor(fps) + ">" + fps.ToString().PadRight(3) + "</color>" + separator;
+            tempString += "<color=" + PlayerUtils.GetFpsColor(fps) + ">" + fps.ToString().PadRight(3) + "</color>" + separator;
         }
         private static void AddPlatform(Player player, LocalPlayerEntry entry, ref string tempString)
         {
@@ -126,7 +126,7 @@ namespace PlayerList.Entries
         private static void AddPerf(Player player, LocalPlayerEntry entry, ref string tempString)
         {
             entry.perf = player.field_Internal_VRCPlayer_0.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall]; // Get from cache so it doesnt calculate perf all at once
-            tempString += "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, entry.perf)) + ">" + ParsePerformanceText(entry.perf) + "</color>" + separator;
+            tempString += "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, entry.perf)) + ">" + PlayerUtils.ParsePerformanceText(entry.perf) + "</color>" + separator;
         }
         private static void AddDistance(Player player, LocalPlayerEntry entry, ref string tempString)
         {
@@ -158,6 +158,8 @@ namespace PlayerList.Entries
                     playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(APIUser.CurrentUser));
                     break;
             }
+            if (PlayerListConfig.CurrentBaseSortType == EntrySortManager.SortType.NameColor || PlayerListConfig.CurrentUpperSortType == EntrySortManager.SortType.NameColor || PlayerListConfig.CurrentHighestSortType == EntrySortManager.SortType.NameColor)
+                EntrySortManager.SortPlayer(this);
         }
     }
 }

@@ -37,17 +37,26 @@ namespace PlayerList.Config
             set { displayNameColorMode.Value = value.ToString(); }
         }
 
+        public static EntryWrapper<bool> reverseBaseSort;
         private static EntryWrapper<string> currentBaseSort;
         public static EntrySortManager.SortType CurrentBaseSortType
         {
             get { return (EntrySortManager.SortType)Enum.Parse(typeof(EntrySortManager.SortType), currentBaseSort.Value); }
             set { currentBaseSort.Value = value.ToString(); }
         }
+        public static EntryWrapper<bool> reverseUpperSort;
         private static EntryWrapper<string> currentUpperSort;
         public static EntrySortManager.SortType CurrentUpperSortType
         {
             get { return (EntrySortManager.SortType)Enum.Parse(typeof(EntrySortManager.SortType), currentUpperSort.Value); }
             set { currentUpperSort.Value = value.ToString(); }
+        }
+        public static EntryWrapper<bool> reverseHighestSort;
+        private static EntryWrapper<string> currentHighestSort;
+        public static EntrySortManager.SortType CurrentHighestSortType
+        {
+            get { return (EntrySortManager.SortType)Enum.Parse(typeof(EntrySortManager.SortType), currentHighestSort.Value); }
+            set { currentHighestSort.Value = value.ToString(); }
         }
 
         private static EntryWrapper<string> menuButtonPosition;
@@ -87,8 +96,13 @@ namespace PlayerList.Config
             displayNameToggle = CreateEntry(categoryIdentifier, nameof(displayNameToggle), true, is_hidden: true);
 
             displayNameColorMode = CreateEntry(categoryIdentifier, nameof(displayNameColorMode), "TrustAndFriends", is_hidden: true);
-            currentBaseSort = CreateEntry(categoryIdentifier, nameof(currentBaseSort), "Default", is_hidden: true);
-            currentUpperSort = CreateEntry(categoryIdentifier, nameof(currentUpperSort), "Default", is_hidden: true);
+
+            reverseBaseSort = CreateEntry(categoryIdentifier, nameof(reverseBaseSort), false, is_hidden: true);
+            currentBaseSort = CreateEntry(categoryIdentifier, nameof(currentBaseSort), "None", is_hidden: true);
+            reverseUpperSort = CreateEntry(categoryIdentifier, nameof(reverseUpperSort), false, is_hidden: true);
+            currentUpperSort = CreateEntry(categoryIdentifier, nameof(currentUpperSort), "None", is_hidden: true);
+            reverseHighestSort = CreateEntry(categoryIdentifier, nameof(reverseHighestSort), false, is_hidden: true);
+            currentHighestSort = CreateEntry(categoryIdentifier, nameof(currentHighestSort), "None", is_hidden: true);
 
             menuButtonPosition = CreateEntry(categoryIdentifier, nameof(menuButtonPosition), "TopRight", is_hidden: true);
 

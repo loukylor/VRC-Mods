@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using MelonLoader;
 using PlayerList.Config;
 using PlayerList.Entries;
@@ -16,7 +14,7 @@ namespace PlayerList
     {
         internal static LocalPlayerEntry localPlayerEntry = null;
 
-        public static Dictionary<int, PlayerEntry> playerEntries = new Dictionary<int, PlayerEntry>(); // This will not be sorted
+        public static List<PlayerEntry> playerEntries = new List<PlayerEntry>(); // This will not be sorted
         public static List<PlayerEntry> playerEntriesWithLocal = new List<PlayerEntry>(); // This will be sorted
         public static List<EntryBase> generalInfoEntries = new List<EntryBase>();
         public static Dictionary<int, EntryBase> entries = new Dictionary<int, EntryBase>();
@@ -28,6 +26,8 @@ namespace PlayerList
             NetworkEvents.OnPlayerJoin += OnPlayerJoin;
             NetworkEvents.OnPlayerLeave += OnPlayerLeave;
             NetworkEvents.OnInstanceChange += OnInstanceChange;
+            NetworkEvents.OnAvatarChanged += OnAvatarChanged;
+            NetworkEvents.OnAvatarInstantiated += OnAvatarInstantiated;
         }
         public static void OnUpdate()
         {
@@ -35,8 +35,8 @@ namespace PlayerList
         }
         public static void OnSceneWasLoaded()
         {
-            foreach (PlayerEntry playerEntry in playerEntries.Values.ToList())
-                playerEntry.Remove();
+            for (int i = playerEntries.Count - 1; i >= 0; i++)
+                playerEntries[i].Remove();
             foreach (EntryBase entry in generalInfoEntries)
                 entry.OnSceneWasLoaded();
         }
@@ -50,6 +50,16 @@ namespace PlayerList
             foreach (EntryBase entry in entries.Values)
                 entry.OnConfigChanged();
         }
+        public static void OnAvatarChanged(ApiAvatar avatar, VRCAvatarManager manager)
+        {
+            foreach (EntryBase entry in entries.Values)
+                entry.OnAvatarChanged(avatar, manager);
+        }
+        public static void OnAvatarInstantiated(VRCPlayer player, GameObject avatar)
+        {
+            foreach (EntryBase entry in entries.Values)
+                entry.OnAvatarInstantiated(player, avatar);
+        }
         public static void OnFontSizeChange(int oldValue, int newValue)
         {
             SetFontSize(newValue);
@@ -57,32 +67,26 @@ namespace PlayerList
 
         public static void OnPlayerJoin(Player player)
         {
-            if (playerEntries.ContainsKey(player.GetInstanceID())) return;
+            if (GetEntryFromPlayer(playerEntriesWithLocal, player, out _)) return;
 
             if (player.field_Private_APIUser_0.IsSelf)
             {
                 if (localPlayerEntry != null) return;
 
-                localPlayerEntry = EntryBase.CreateInstance<LocalPlayerEntry>(UnityEngine.Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform));
+                localPlayerEntry = EntryBase.CreateInstance<LocalPlayerEntry>(Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform));
+                localPlayerEntry.CalculateLeftPart();
                 AddEntry(localPlayerEntry);
                 playerEntriesWithLocal.Add(localPlayerEntry);
                 localPlayerEntry.gameObject.SetActive(true);
                 return;
             }
 
-            AddPlayerEntry(EntryBase.CreateInstance<PlayerEntry>(UnityEngine.Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform), new object[] { player }));
+            AddPlayerEntry(EntryBase.CreateInstance<PlayerEntry>(Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform), new object[] { player }));
         }
         public static void OnPlayerLeave(Player player)
         {
-            if (!playerEntries.TryGetValue(player.GetInstanceID(), out PlayerEntry entry)) return;
-
-            UnityEngine.Object.DestroyImmediate(entry.gameObject);
-            entries.Remove(entry.Identifier);
-            playerEntries.Remove(entry.playerInstanceId);
-            for (int i = 0; i < playerEntriesWithLocal.Count; i++)
-                if (playerEntriesWithLocal[i].playerInstanceId == entry.playerInstanceId)
-                    playerEntriesWithLocal.RemoveAt(i);
-
+            if (!GetEntryFromPlayer(playerEntriesWithLocal, player, out PlayerEntry entry)) return;
+            entry.Remove();
             RefreshLayout();
         }
 
@@ -100,6 +104,26 @@ namespace PlayerList
             AddGeneralInfoEntry(EntryBase.CreateInstance<InstanceMasterEntry>(Constants.generalInfoLayout.transform.Find("InstanceMaster").gameObject, includeConfig: true));
             AddGeneralInfoEntry(EntryBase.CreateInstance<InstanceCreatorEntry>(Constants.generalInfoLayout.transform.Find("InstanceCreator").gameObject, includeConfig: true));
         }
+        public static bool GetEntryFromPlayer(List<PlayerEntry> list, Player player, out PlayerEntry entry)
+        {
+            if (player == null)
+            {
+                entry = null;
+                return false;
+            }
+
+            int playerInstanceId = player.GetInstanceID();
+            foreach (PlayerEntry entryValue in list)
+            {
+                if (playerInstanceId == entryValue.playerInstanceId)
+                { 
+                    entry = entryValue;
+                    return true;
+                }
+            }
+            entry = null;
+            return false;
+        }
         public static void AddEntry(EntryBase entry)
         {
             entry.textComponent.fontSize = PlayerListConfig.fontSize.Value;
@@ -109,10 +133,10 @@ namespace PlayerList
         public static void AddPlayerEntry(PlayerEntry entry)
         {
             AddEntry(entry);
-            playerEntries.Add(entry.playerInstanceId, entry);
+            playerEntries.Add(entry);
             entry.gameObject.SetActive(true);
             RefreshPlayerEntries(true);
-            EntrySortManager.SortPlayer(entry); // This function will handle adding the player to the sorted list
+            EntrySortManager.SortPlayer(entry); 
         }
         public static void AddGeneralInfoEntry(EntryBase entry)
         {
@@ -123,15 +147,11 @@ namespace PlayerList
         {
             if (RoomManager.field_Internal_Static_ApiWorld_0 == null || Player.prop_Player_0 == null || Player.prop_Player_0.gameObject == null || Player.prop_Player_0.prop_VRCPlayerApi_0 == null || (!MenuManager.playerList.active && !bypassActive)) return;
 
-            foreach (PlayerEntry entry in new List<EntryBase>(playerEntries.Values)) // Slow but allows me to remove things during its run
+            foreach (PlayerEntry entry in playerEntries)
                 if (entry.player == null)
                     entry.Remove();
-            
-            if (EntrySortManager.shouldSort)
-                EntrySortManager.SortAllPlayers();
-            EntrySortManager.shouldSort = false;
 
-            foreach (PlayerEntry entry in playerEntries.Values)
+            foreach (PlayerEntry entry in playerEntries)
                 PlayerEntry.UpdateEntry(entry.player.prop_PlayerNet_0, entry, bypassActive);
 
             localPlayerEntry.Refresh();

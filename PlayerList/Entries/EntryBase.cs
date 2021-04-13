@@ -55,6 +55,14 @@ namespace PlayerList.Entries
         {
         }
 
+        public virtual void OnAvatarChanged(ApiAvatar avatar, VRCAvatarManager manager)
+        {
+        }
+
+        public virtual void OnAvatarInstantiated(VRCPlayer vrcPlayer, GameObject avatar)
+        {
+        }
+
         public static T CreateInstance<T>(GameObject gameObject, object[] parameters = null, bool includeConfig = false) where T : EntryBase, new()
         {
             EntryBase entry = new T

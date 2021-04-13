@@ -152,13 +152,14 @@ namespace PlayerList
         {
             sortMenu = new SubMenu("UserInterface/QuickMenu", "PlayerListSortMenu");
 
-            new SingleButton(sortMenu.path, new Vector3(1, 0), "Default", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.Default)), "Set sort type to default", "DefaultSortButton");
-            new SingleButton(sortMenu.path, new Vector3(2, 0), "Alphabetical", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.Alphabetical)), "Set sort type to alphabetical", "AlphabeticalSortButton");
-            new SingleButton(sortMenu.path, new Vector3(3, 0), "Avatar Perf", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.AvatarPerf)), "Set sort type to avatar perf", "AvatarPerfSortButton");
-            new SingleButton(sortMenu.path, new Vector3(4, 0), "Distance", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.Distance)), "Set sort type to distance", "DistanceSortButton");
-            new SingleButton(sortMenu.path, new Vector3(1, 1), "Fps", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.Fps)), "Set sort type to fps", "FpsSortButton");
+            new SingleButton(sortMenu.path, new Vector3(1, 0), "None", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.None)), "Set sort type to none", "NoneSortButton");
+            new SingleButton(sortMenu.path, new Vector3(2, 0), "Default", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.Default)), "Set sort type to default", "DefaultSortButton");
+            new SingleButton(sortMenu.path, new Vector3(3, 0), "Alphabetical", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.Alphabetical)), "Set sort type to alphabetical", "AlphabeticalSortButton");
+            new SingleButton(sortMenu.path, new Vector3(4, 0), "Avatar Perf", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.AvatarPerf)), "Set sort type to avatar perf", "AvatarPerfSortButton");
+            new SingleButton(sortMenu.path, new Vector3(1, 1), "Distance", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.Distance)), "Set sort type to distance WARNING: This may cause noticable frame drops", "DistanceSortButton");
             new SingleButton(sortMenu.path, new Vector3(2, 1), "Friends", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.Friends)), "Set sort type to friends", "FriendsSortButton");
-            new SingleButton(sortMenu.path, new Vector3(3, 1), "Ping", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.Ping)), "Set sort type to ping", "PingSortButton");
+            new SingleButton(sortMenu.path, new Vector3(3, 1), "Name Color", new Action(() => EntrySortManager.currentcomparisonProperty.SetValue(null, EntrySortManager.SortType.NameColor)), "Set sort type to displayname color", "NameColorSortButton");
+
             new SingleButton(sortMenu.path, new Vector3(5, 2), "Back", new Action(() => UIManager.OpenPage(playerListMenus[2].path)), "Press to go back", "BackButton", color: Color.yellow);
             AddPlayerListToSubMenu(sortMenu);
         }
@@ -189,9 +190,12 @@ namespace PlayerList
             EntryManager.SetFontSize(PlayerListConfig.fontSize.Value);
 
             playerListMenus.Add(new SubMenu("UserInterface/QuickMenu", "PlayerListMenuPage3"));
-            new SingleButton(playerListMenus[2].path, new Vector3(1, 0), "Base Sort Type", new Action(() => { UIManager.OpenPage(sortMenu.path); EntrySortManager.currentcomparisonProperty = EntrySortManager.baseComparisonProperty; }), "Set base sort which will run when the upper sort creates ambiguous entries", "BaseSortTypeButton", true);
-            new SingleButton(playerListMenus[2].path, new Vector3(2, 0), "Upper Sort Type", new Action(() => { UIManager.OpenPage(sortMenu.path); EntrySortManager.currentcomparisonProperty = EntrySortManager.upperComparisonProperty; }), "Set upper sort which will run on top of the base sort type", "UpperSortTypeButton", true);
-            new SingleButton(playerListMenus[2].path, new Vector3(3, 0), "Refresh", EntrySortManager.SortAllPlayers, "Sort", "RefreshSortButton");
+            new SingleButton(playerListMenus[2].path, new Vector3(1, 0), "Base Sort Type", new Action(() => { UIManager.OpenPage(sortMenu.path); EntrySortManager.currentcomparisonProperty = EntrySortManager.baseComparisonProperty; }), "Set base sort which will run when the upper sort and highest sort creates ambiguous entries", "BaseSortTypeButton", true);
+            new SingleButton(playerListMenus[2].path, new Vector3(2, 0), "Upper Sort Type", new Action(() => { UIManager.OpenPage(sortMenu.path); EntrySortManager.currentcomparisonProperty = EntrySortManager.upperComparisonProperty; }), "Set upper sort which will run on top of the base sort type and below the highest", "UpperSortTypeButton", true);
+            new SingleButton(playerListMenus[2].path, new Vector3(3, 0), "Highest Sort Type", new Action(() => { UIManager.OpenPage(sortMenu.path); EntrySortManager.currentcomparisonProperty = EntrySortManager.highestComparisonProperty; }), "Set highest sort which will run on top of the base and upper sort type", "UpperSortTypeButton", true);
+            new ToggleButton(playerListMenus[2].path, new Vector3(1, 1), "Reverse Base", "Disabled", new Action<bool>((state) => PlayerListConfig.reverseBaseSort.Value = state), "Toggle reverse order of base sort", "Toggle reverse order of base sort", "BaseReverseToggle", PlayerListConfig.reverseBaseSort.Value, true);
+            new ToggleButton(playerListMenus[2].path, new Vector3(2, 1), "Reverse Upper", "Disabled", new Action<bool>((state) => PlayerListConfig.reverseUpperSort.Value = state), "Toggle reverse order of upper sort", "Toggle reverse order of upper sort", "UpperReverseToggle", PlayerListConfig.reverseUpperSort.Value, true);
+            new ToggleButton(playerListMenus[2].path, new Vector3(3, 1), "Reverse Highest", "Disabled", new Action<bool>((state) => PlayerListConfig.reverseHighestSort.Value = state), "Toggle reverse order of upper sort", "Toggle reverse order of upper sort", "HighestReverseToggle", PlayerListConfig.reverseHighestSort.Value, true);
 
             // Initialize PlayerList Customization menu
             playerListMenus.Add(new SubMenu("UserInterface/QuickMenu", "PlayerListMenuPage4"));

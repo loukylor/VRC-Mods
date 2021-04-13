@@ -26,11 +26,10 @@ namespace PlayerList.Entries
 
         public Player player;
         public string userID;
-        protected string playerColor;
         protected string platform;
 
         public static string separator = " | ";
-        public static string leftPart = " - ";
+        public string leftPart = " - ";
 
         private static bool spoofFriend;
         protected static int highestPhotonIdLength = 0;
@@ -40,6 +39,8 @@ namespace PlayerList.Entries
         public int fps;
         public float distance;
         public bool isFriend;
+        public string playerColor;
+        public string withoutLeftPart;
 
         public delegate void UpdateEntryDelegate(PlayerNet playerNet, PlayerEntry entry, ref string tempString);
         public static UpdateEntryDelegate updateDelegate;
@@ -53,12 +54,32 @@ namespace PlayerList.Entries
         private static OnVRCPlayerDataReceived originalDataReceiveDelegate = null;
         private static Type vrcPlayerEnum;
 
+        public override bool Equals(object obj)
+        {
+            if (obj == null) 
+                return false;
+            PlayerEntry objAsEntry = obj as PlayerEntry;
+            if (objAsEntry == null) 
+                return false;
+            else 
+                return Equals(objAsEntry);
+        }
+        public bool Equals(PlayerEntry entry)
+        {
+            if (entry == null)
+                return false;
+            return entry.Identifier == Identifier;
+        }
+        public override int GetHashCode()
+        {
+            return Identifier;
+        }
         public static void EntryInit()
         {
             PlayerListConfig.OnConfigChangedEvent += OnStaticConfigChanged;
             UIManager.OnQuickMenuOpenEvent += () =>
             {
-                foreach (PlayerEntry entry in EntryManager.playerEntries.Values)
+                foreach (PlayerEntry entry in EntryManager.playerEntries)
                     entry.GetPlayerColor();
             }; // OGT fork compatibility 
                     
@@ -100,9 +121,9 @@ namespace PlayerList.Entries
             player = (Player)parameters[0];
             playerInstanceId = player.GetInstanceID();
             userID = player.field_Private_APIUser_0.id;
-            platform = platform = GetPlatform(player).PadRight(2);
+            platform = platform = PlayerUtils.GetPlatform(player).PadRight(2);
 
-            gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new Action(() => OpenPlayerInQuickMenu(player)));
+            gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new Action(() => PlayerUtils.OpenPlayerInQuickMenu(player)));
 
             textComponent.text = "Loading...";
 
@@ -126,18 +147,51 @@ namespace PlayerList.Entries
                 updateDelegate += AddPhotonId;
             if (PlayerListConfig.displayNameToggle.Value)
                 updateDelegate += AddDisplayName;
+            if (PlayerListConfig.CurrentBaseSortType == EntrySortManager.SortType.Distance || PlayerListConfig.CurrentUpperSortType == EntrySortManager.SortType.Distance || PlayerListConfig.CurrentHighestSortType == EntrySortManager.SortType.Distance)
+                updateDelegate += (PlayerNet playerNet, PlayerEntry entry, ref string tempString) => EntrySortManager.SortPlayer(entry);
 
             if (PlayerListConfig.condensedText.Value)
+            {
                 separator = "|";
+
+                if (!PlayerListConfig.numberedList.Value)
+                    foreach (PlayerEntry entry in EntryManager.playerEntriesWithLocal)
+                        entry.leftPart = "-";
+            }
             else
+            {
                 separator = " | ";
+
+                if (!PlayerListConfig.numberedList.Value)
+                    foreach (PlayerEntry entry in EntryManager.playerEntriesWithLocal)
+                        entry.leftPart = " - ";
+            }
 
             EntryManager.RefreshPlayerEntries();
         }
         public override void OnConfigChanged()
         {
             GetPlayerColor();
+            if (PlayerListConfig.CurrentBaseSortType == EntrySortManager.SortType.Distance || PlayerListConfig.CurrentUpperSortType == EntrySortManager.SortType.Distance || PlayerListConfig.CurrentHighestSortType == EntrySortManager.SortType.Distance)
+                EntrySortManager.SortPlayer(this);
         }
+        public override void OnAvatarInstantiated(VRCPlayer vrcPlayer, GameObject avatar)
+        {
+            if (vrcPlayer.field_Private_Player_0.GetInstanceID() != playerInstanceId)
+                return;
+            perf = player.field_Internal_VRCPlayer_0.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall];
+            if (PlayerListConfig.CurrentBaseSortType == EntrySortManager.SortType.AvatarPerf || PlayerListConfig.CurrentUpperSortType == EntrySortManager.SortType.AvatarPerf || PlayerListConfig.CurrentHighestSortType == EntrySortManager.SortType.AvatarPerf)
+                EntrySortManager.SortPlayer(this);
+        }
+        public override void OnAvatarChanged(ApiAvatar avatar, VRCAvatarManager manager)
+        {
+            if (manager.field_Private_VRCPlayer_0.field_Private_Player_0.GetInstanceID() != playerInstanceId)
+                return;
+            perf = PerformanceRating.None;
+            if (PlayerListConfig.CurrentBaseSortType == EntrySortManager.SortType.AvatarPerf || PlayerListConfig.CurrentUpperSortType == EntrySortManager.SortType.AvatarPerf || PlayerListConfig.CurrentHighestSortType == EntrySortManager.SortType.AvatarPerf)
+                EntrySortManager.SortPlayer(this);
+        }
+
         private static int OnVRCPlayerDataReceivedDelegate(IntPtr instancePointer, IntPtr hashtablePointer, IntPtr nativeMethodPointer)
         {
             if (instancePointer == IntPtr.Zero)
@@ -152,7 +206,7 @@ namespace PlayerList.Entries
 
             if (result == 64)
             {
-                EntryManager.playerEntries.TryGetValue(vrcPlayer.field_Private_Player_0.GetInstanceID(), out PlayerEntry entry);
+                EntryManager.GetEntryFromPlayer(EntryManager.playerEntriesWithLocal, vrcPlayer.field_Private_Player_0, out PlayerEntry entry);
                 if (entry == null)
                     return result;
 
@@ -192,7 +246,7 @@ namespace PlayerList.Entries
 
             if (entry == null)
             {
-                EntryManager.playerEntries.TryGetValue(playerNet.field_Internal_VRCPlayer_0.field_Private_Player_0.GetInstanceID(), out entry);
+                EntryManager.GetEntryFromPlayer(EntryManager.playerEntriesWithLocal, playerNet.prop_Player_0, out entry);
                 if (entry == null)
                     return;
             }
@@ -201,8 +255,8 @@ namespace PlayerList.Entries
 
             updateDelegate?.Invoke(playerNet, entry, ref tempString);
 
-            tempString = entry.AddLeftPart(tempString);
-            entry.textComponent.text = tempString;
+            entry.withoutLeftPart = entry.TrimExtra(tempString);
+            entry.textComponent.text = entry.leftPart + entry.withoutLeftPart;
         }
         private static bool OnIsFriend(ref bool __result)
         {
@@ -226,7 +280,7 @@ namespace PlayerList.Entries
         {
             entry.ping = playerNet.prop_Int16_0;
 
-            tempString += "<color=" + GetPingColor(entry.ping) + ">";
+            tempString += "<color=" + PlayerUtils.GetPingColor(entry.ping) + ">";
             if (entry.ping < 9999 && entry.ping > -999)
                 tempString += entry.ping.ToString().PadRight(4) + "ms</color>";
             else
@@ -237,7 +291,7 @@ namespace PlayerList.Entries
         {
             entry.fps = MelonUtils.Clamp((int)(1000f / playerNet.field_Private_Byte_0), -99, 999);
 
-            tempString += "<color=" + GetFpsColor(entry.fps) + ">";
+            tempString += "<color=" + PlayerUtils.GetFpsColor(entry.fps) + ">";
             if (playerNet.field_Private_Byte_0 == 0)
                 tempString += "?¿?</color>";
             else
@@ -250,8 +304,7 @@ namespace PlayerList.Entries
         }
         private static void AddPerf(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {
-            entry.perf = entry.player.field_Internal_VRCPlayer_0.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall]; // Get from cache so it doesnt calculate perf all at once
-            tempString += "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, entry.perf)) + ">" + ParsePerformanceText(entry.perf) + "</color>" + separator;
+            tempString += "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, entry.perf)) + ">" + PlayerUtils.ParsePerformanceText(entry.perf) + "</color>" + separator;
         }
         private static void AddDistance(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {
@@ -277,6 +330,7 @@ namespace PlayerList.Entries
             }
             else
             {
+                entry.distance = 0;
                 tempString += "0.0 m";
             }
             tempString += separator;
@@ -292,7 +346,8 @@ namespace PlayerList.Entries
 
         public void Remove()
         {
-            EntryManager.playerEntries.Remove(playerInstanceId);
+            EntryManager.playerEntries.Remove(this);
+            EntryManager.playerEntriesWithLocal.Remove(this);
             EntryManager.entries.Remove(Identifier);
             UnityEngine.Object.DestroyImmediate(gameObject);
             return;
@@ -317,73 +372,10 @@ namespace PlayerList.Entries
                         playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(player.field_Private_APIUser_0));
                     break;
             }
+            if (PlayerListConfig.CurrentBaseSortType == EntrySortManager.SortType.NameColor || PlayerListConfig.CurrentUpperSortType == EntrySortManager.SortType.NameColor || PlayerListConfig.CurrentHighestSortType == EntrySortManager.SortType.NameColor)
+                EntrySortManager.SortPlayer(this);
         }
-
-        protected static string GetPlatform(Player player)
-        {
-            if (player.field_Private_APIUser_0.last_platform == "standalonewindows")
-                if (player.prop_VRCPlayerApi_0.IsUserInVR())
-                    return "VR".PadRight(2);
-                else
-                    return "PC".PadRight(2);
-            else
-                return "Q".PadRight(2);
-        }
-
-        protected static void OpenPlayerInQuickMenu(Player player)
-        {
-            InputManager.SelectPlayer(player.field_Internal_VRCPlayer_0);
-            QuickMenuContextualDisplay.Method_Public_Static_Void_VRCPlayer_0(player.field_Internal_VRCPlayer_0);
-        }
-
-        protected static string GetPingColor(int ping)
-        {
-            if (ping <= 75)
-                return "#00ff00";
-            else if (ping > 75 && ping <= 125)
-                return "#008000";
-            else if (ping > 125 && ping <= 175)
-                return "#ffff00";
-            else if (ping > 175 && ping <= 225)
-                return "#ffa500";
-            else
-                return "#ff0000";
-        }
-        protected static string GetFpsColor(int fps)
-        {
-            if (fps >= 60)
-                return "#00ff00";
-            else if (fps < 60 && fps >= 45)
-                return "#008000";
-            else if (fps < 45 && fps >= 30)
-                return "#ffff00";
-            else if (fps < 30 && fps >= 15)
-                return "#ffa500";
-            else
-                return "#ff0000";
-        }
-        protected static string ParsePerformanceText(PerformanceRating rating)
-        {
-            switch (rating)
-            {
-                case PerformanceRating.VeryPoor:
-                    return "Awful";
-                case PerformanceRating.Poor:
-                    return "Poor".PadRight(5);
-                case PerformanceRating.Medium:
-                    return "Med".PadRight(5);
-                case PerformanceRating.Good:
-                    return "Good".PadRight(5);
-                case PerformanceRating.Excellent:
-                    return "Great";
-                case PerformanceRating.None:
-                    return "?¿?¿?";
-                    // TODO: add load percentage??
-                default:
-                    return rating.ToString().PadRight(5);
-            }
-        }
-        protected string AddLeftPart(string tempString)
+        protected string TrimExtra(string tempString)
         {
             if (tempString.Length > 0)
                 if (PlayerListConfig.condensedText.Value)
@@ -391,18 +383,16 @@ namespace PlayerList.Entries
                 else
                     tempString = tempString.Remove(tempString.Length - 3, 3);
 
-            if (!PlayerListConfig.numberedList.Value)
-                if (PlayerListConfig.condensedText.Value)
-                    tempString = "-" + tempString;
-                else
-                    tempString = " - " + tempString;
-            else
-                if (PlayerListConfig.condensedText.Value)
-                    tempString = $"{gameObject.transform.GetSiblingIndex() - 1}.".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 1) + tempString; // Pad by weird amount because we cant include the header and disabled template in total number of gameobjects
-                else
-                    tempString = $"{gameObject.transform.GetSiblingIndex() - 1}. ".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 2) + tempString;
-
             return tempString;
+        }
+        public string CalculateLeftPart()
+        {
+            if (PlayerListConfig.numberedList.Value)
+                if (PlayerListConfig.condensedText.Value)
+                    leftPart = $"{gameObject.transform.GetSiblingIndex() - 1}.".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 1); // Pad by weird amount because we cant include the header and disabled template in total number of gameobjects
+                else
+                    leftPart = $"{gameObject.transform.GetSiblingIndex() - 1}. ".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 2);
+            return leftPart;
         }
 
         public enum DisplayNameColorMode
