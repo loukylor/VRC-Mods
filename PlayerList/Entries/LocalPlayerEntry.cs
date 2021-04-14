@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using Harmony;
+using MelonLoader;
 using PlayerList.Config;
 using PlayerList.Utilities;
 using UnityEngine;
@@ -26,6 +27,7 @@ namespace PlayerList.Entries
         }
         public override void Init(object[] parameters)
         {
+            EntryManager.localPlayerEntry = this;
             player = Player.prop_Player_0;
             gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new Action(() => PlayerUtils.OpenPlayerInQuickMenu(player)));
 
@@ -103,15 +105,22 @@ namespace PlayerList.Entries
             withoutLeftPart = TrimExtra(tempString);
             textComponent.text = leftPart + withoutLeftPart;
         }
+        public override void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
+        {
+            MelonLogger.Msg("Checking if world is allowed to show distance...");
+            worldAllowed = false;
+            if (world != null)
+                MelonCoroutines.Start(VRCUtils.CheckWorld(world));
+        }
 
         private static void AddPing(Player player, LocalPlayerEntry entry, ref string tempString)
         {
-            short ping = (short)Photon.Pun.PhotonNetwork.field_Public_Static_LoadBalancingClient_0.prop_LoadBalancingPeer_0.RoundTripTime;
-            tempString += "<color=" + PlayerUtils.GetPingColor(ping) + ">";
-            if (ping < 9999 && ping > -999)
-                tempString += ping.ToString().PadRight(4) + "ms</color>";
+            entry.ping = (short)Photon.Pun.PhotonNetwork.field_Public_Static_LoadBalancingClient_0.prop_LoadBalancingPeer_0.RoundTripTime;
+            tempString += "<color=" + PlayerUtils.GetPingColor(entry.ping) + ">";
+            if (entry.ping < 9999 && entry.ping > -999)
+                tempString += entry.ping.ToString().PadRight(4) + "ms</color>";
             else
-                tempString += ((double)(ping / 1000)).ToString("N1").PadRight(5) + "s</color>";
+                tempString += ((double)(entry.ping / 1000)).ToString("N1").PadRight(5) + "s</color>";
             tempString += separator;
         }
         private static void AddFps(Player player, LocalPlayerEntry entry, ref string tempString)
@@ -158,7 +167,7 @@ namespace PlayerList.Entries
                     playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(APIUser.CurrentUser));
                     break;
             }
-            if (PlayerListConfig.CurrentBaseSortType == EntrySortManager.SortType.NameColor || PlayerListConfig.CurrentUpperSortType == EntrySortManager.SortType.NameColor || PlayerListConfig.CurrentHighestSortType == EntrySortManager.SortType.NameColor)
+            if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.NameColor))
                 EntrySortManager.SortPlayer(this);
         }
     }

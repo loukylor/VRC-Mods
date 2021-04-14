@@ -129,12 +129,16 @@ namespace PlayerList.Entries
 
             isFriend = APIUser.IsFriendsWith(player.field_Private_APIUser_0.id);
             GetPlayerColor();
+            if (player.prop_PlayerNet_0 != null)
+                UpdateEntry(player.prop_PlayerNet_0, this, true);
         }
         public static void OnStaticConfigChanged()
         {
             updateDelegate = null;
             if (PlayerListConfig.pingToggle.Value)
                 updateDelegate += AddPing;
+            if (PlayerListConfig.pingToggle.Value && EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.Ping))
+                updateDelegate += (PlayerNet playerNet, PlayerEntry entry, ref string tempString) => EntrySortManager.SortPlayer(entry);
             if (PlayerListConfig.fpsToggle.Value)
                 updateDelegate += AddFps;
             if (PlayerListConfig.platformToggle.Value)
@@ -147,7 +151,7 @@ namespace PlayerList.Entries
                 updateDelegate += AddPhotonId;
             if (PlayerListConfig.displayNameToggle.Value)
                 updateDelegate += AddDisplayName;
-            if (PlayerListConfig.CurrentBaseSortType == EntrySortManager.SortType.Distance || PlayerListConfig.CurrentUpperSortType == EntrySortManager.SortType.Distance || PlayerListConfig.CurrentHighestSortType == EntrySortManager.SortType.Distance)
+            if (PlayerListConfig.distanceToggle.Value && EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.Distance))
                 updateDelegate += (PlayerNet playerNet, PlayerEntry entry, ref string tempString) => EntrySortManager.SortPlayer(entry);
 
             if (PlayerListConfig.condensedText.Value)
@@ -171,16 +175,16 @@ namespace PlayerList.Entries
         }
         public override void OnConfigChanged()
         {
-            GetPlayerColor();
-            if (PlayerListConfig.CurrentBaseSortType == EntrySortManager.SortType.Distance || PlayerListConfig.CurrentUpperSortType == EntrySortManager.SortType.Distance || PlayerListConfig.CurrentHighestSortType == EntrySortManager.SortType.Distance)
+            GetPlayerColor(false);
+            if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.Distance))
                 EntrySortManager.SortPlayer(this);
         }
         public override void OnAvatarInstantiated(VRCPlayer vrcPlayer, GameObject avatar)
         {
             if (vrcPlayer.field_Private_Player_0.GetInstanceID() != playerInstanceId)
                 return;
-            perf = player.field_Internal_VRCPlayer_0.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall];
-            if (PlayerListConfig.CurrentBaseSortType == EntrySortManager.SortType.AvatarPerf || PlayerListConfig.CurrentUpperSortType == EntrySortManager.SortType.AvatarPerf || PlayerListConfig.CurrentHighestSortType == EntrySortManager.SortType.AvatarPerf)
+            perf = vrcPlayer.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall];
+            if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.AvatarPerf))
                 EntrySortManager.SortPlayer(this);
         }
         public override void OnAvatarChanged(ApiAvatar avatar, VRCAvatarManager manager)
@@ -188,7 +192,7 @@ namespace PlayerList.Entries
             if (manager.field_Private_VRCPlayer_0.field_Private_Player_0.GetInstanceID() != playerInstanceId)
                 return;
             perf = PerformanceRating.None;
-            if (PlayerListConfig.CurrentBaseSortType == EntrySortManager.SortType.AvatarPerf || PlayerListConfig.CurrentUpperSortType == EntrySortManager.SortType.AvatarPerf || PlayerListConfig.CurrentHighestSortType == EntrySortManager.SortType.AvatarPerf)
+            if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.AvatarPerf))
                 EntrySortManager.SortPlayer(this);
         }
 
@@ -268,13 +272,6 @@ namespace PlayerList.Entries
             }
             return true;
         }
-        public override void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
-        {
-            MelonLogger.Msg("Checking if world is allowed to show distance...");
-            worldAllowed = false;
-            if (world != null)
-                MelonCoroutines.Start(VRCUtils.CheckWorld(world));
-        }
 
         private static void AddPing(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {
@@ -352,7 +349,7 @@ namespace PlayerList.Entries
             UnityEngine.Object.DestroyImmediate(gameObject);
             return;
         }
-        private void GetPlayerColor()
+        private void GetPlayerColor(bool shouldSort = true)
         {
             playerColor = "";
             switch (PlayerListConfig.DisplayNameColorMode)
@@ -372,7 +369,7 @@ namespace PlayerList.Entries
                         playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(player.field_Private_APIUser_0));
                     break;
             }
-            if (PlayerListConfig.CurrentBaseSortType == EntrySortManager.SortType.NameColor || PlayerListConfig.CurrentUpperSortType == EntrySortManager.SortType.NameColor || PlayerListConfig.CurrentHighestSortType == EntrySortManager.SortType.NameColor)
+            if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.NameColor) && shouldSort)
                 EntrySortManager.SortPlayer(this);
         }
         protected string TrimExtra(string tempString)

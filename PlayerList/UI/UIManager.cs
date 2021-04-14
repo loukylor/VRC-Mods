@@ -17,6 +17,9 @@ namespace PlayerList.UI
         private static MethodInfo closeQuickMenu;
         private static MethodInfo setMenuIndex;
 
+        public static Sprite fullOnButtonSprite;
+        public static Sprite regularButtonSprite;
+
         public static event Action OnQuickMenuOpenEvent;
         public static event Action OnQuickMenuCloseEvent;
 
@@ -68,6 +71,10 @@ namespace PlayerList.UI
         }
         public static void OnSceneWasLoaded()
         {
+            ButtonReaction buttonReaction = GameObject.Find("UserInterface/QuickMenu/UIElementsMenu/NameplatesOnButton").GetComponent<ButtonReaction>();
+            fullOnButtonSprite = buttonReaction.field_Public_Sprite_0.name.Contains("Full_ON") ? buttonReaction.field_Public_Sprite_0 : buttonReaction.field_Public_Sprite_1;
+            regularButtonSprite = buttonReaction.field_Public_Sprite_0.name.Contains("White") ? buttonReaction.field_Public_Sprite_0 : buttonReaction.field_Public_Sprite_1;
+
             if (currentMenuField != null) return;
 
             // Check which fields return null

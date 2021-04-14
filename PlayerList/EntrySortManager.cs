@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using MelonLoader;
 using PlayerList.Config;
 using PlayerList.Entries;
 
@@ -8,10 +7,36 @@ namespace PlayerList
 {
     class EntrySortManager
     {
+        public static Func<PlayerEntry, PlayerSortData> sortPlayerFunction;
+        public static Func<PlayerEntry, PlayerSortData> defaultSortPlayerFunction = (entry) =>
+        {
+            PlayerSortData sortData = new PlayerSortData();
+            sortData.oldIndex = EntryManager.playerEntriesWithLocal.IndexOf(entry);
+            if (sortData.oldIndex < 0)
+                sortData.oldIndex = int.MaxValue;
+            else
+                EntryManager.playerEntriesWithLocal.RemoveAt(sortData.oldIndex);
+            
+            sortData.finalIndex = 0;
+            for (int i = 0; i < EntryManager.playerEntriesWithLocal.Count; i++)
+            {
+                int sortResult = sort(entry, EntryManager.playerEntriesWithLocal[i]);
+                if (sortResult > 0)
+                    sortData.finalIndex += sortResult;
+                else
+                    break;
+            }
+
+            EntryManager.playerEntriesWithLocal.Insert(sortData.finalIndex, entry);
+            entry.gameObject.transform.SetSiblingIndex(sortData.finalIndex + 2);
+
+            return sortData;
+        };
+
         public static PropertyInfo baseComparisonProperty;
         public static PropertyInfo upperComparisonProperty;
         public static PropertyInfo highestComparisonProperty;
-        public static PropertyInfo currentcomparisonProperty;
+        public static PropertyInfo currentComparisonProperty;
 
         public static Comparison<PlayerEntry> currentBaseComparison;
         public static Comparison<PlayerEntry> currentUpperComparison;
@@ -52,13 +77,13 @@ namespace PlayerList
             else
                 return 1;
         };
+        private static readonly Comparison<PlayerEntry> nameColorSort = (lEntry, rEntry) =>
+        {
+            return lEntry.playerColor.CompareTo(rEntry.playerColor);
+        };
         private static readonly Comparison<PlayerEntry> pingSort = (lEntry, rEntry) =>
         {
             return lEntry.ping.CompareTo(rEntry.ping);
-        };
-        private static readonly Comparison<PlayerEntry> nameColor = (lEntry, rEntry) =>
-        {
-            return lEntry.playerColor.CompareTo(rEntry.playerColor);
         };
 
         private static readonly Comparison<PlayerEntry> sort = (lEntry, rEntry) =>
@@ -68,7 +93,7 @@ namespace PlayerList
             { 
                 int upperComparison = currentUpperComparison(lEntry, rEntry) * reverseUpper;
                 if (upperComparison == 0)
-                    return currentBaseComparison(lEntry, rEntry) * reverseHighest;
+                    return currentBaseComparison(lEntry, rEntry) * reverseBase;
                 return upperComparison;
             }
             return comparison;
@@ -102,7 +127,10 @@ namespace PlayerList
                     currentBaseComparison = friendsSort;
                     break;
                 case SortType.NameColor:
-                    currentBaseComparison = nameColor;
+                    currentBaseComparison = nameColorSort;
+                    break;
+                case SortType.Ping:
+                    currentBaseComparison = pingSort;
                     break;
                 default:
                     currentBaseComparison = defaultSort;
@@ -127,7 +155,10 @@ namespace PlayerList
                     currentUpperComparison = friendsSort;
                     break;
                 case SortType.NameColor:
-                    currentUpperComparison = nameColor;
+                    currentUpperComparison = nameColorSort;
+                    break;
+                case SortType.Ping:
+                    currentUpperComparison = pingSort;
                     break;
                 default:
                     currentUpperComparison = defaultSort;
@@ -152,7 +183,10 @@ namespace PlayerList
                     currentHighestComparison = friendsSort;
                     break;
                 case SortType.NameColor:
-                    currentHighestComparison = nameColor;
+                    currentHighestComparison = nameColorSort;
+                    break;
+                case SortType.Ping:
+                    currentHighestComparison = pingSort;
                     break;
                 default:
                     currentHighestComparison = defaultSort;
@@ -174,15 +208,39 @@ namespace PlayerList
             else
                 reverseHighest = 1;
 
+            if (PlayerListConfig.ShowSelfAtTop.Value)
+            { 
+                sortPlayerFunction = (entry) =>
+                {
+                    EntryManager.playerEntriesWithLocal.Remove(EntryManager.localPlayerEntry);
+                    PlayerSortData sortData = defaultSortPlayerFunction(entry);
+
+                    EntryManager.playerEntriesWithLocal.Insert(0, EntryManager.localPlayerEntry);
+                    EntryManager.localPlayerEntry?.gameObject.transform.SetSiblingIndex(2);
+                    return sortData;
+                };
+            }
+            else
+            {
+                sortPlayerFunction = defaultSortPlayerFunction;
+            }
+
             SortAllPlayers();
         }
 
-        public static void SortAllPlayers() // This is slow asf but it shouldn't matter too much
+        public static void SortAllPlayers() // This only runs when sort type is changed
         {
             EntryManager.playerEntriesWithLocal.Sort(sort);
 
             for (int i = 0; i < EntryManager.playerEntriesWithLocal.Count; i++)
                 EntryManager.playerEntriesWithLocal[i].gameObject.transform.SetSiblingIndex(i + 2);
+
+            if (PlayerListConfig.ShowSelfAtTop.Value)
+            {
+                if (EntryManager.playerEntriesWithLocal.Remove(EntryManager.localPlayerEntry))
+                    EntryManager.playerEntriesWithLocal.Insert(0, EntryManager.localPlayerEntry);
+                EntryManager.localPlayerEntry?.gameObject.transform.SetSiblingIndex(2);
+            }
 
             if (PlayerListConfig.numberedList.Value)
                 foreach (PlayerEntry entry in EntryManager.playerEntriesWithLocal)
@@ -190,33 +248,21 @@ namespace PlayerList
         }
         public static void SortPlayer(PlayerEntry sortEntry)
         {
-            int oldIndex = EntryManager.playerEntriesWithLocal.IndexOf(sortEntry);
-            if (oldIndex < 0)
-                oldIndex = int.MaxValue;
-            else
-                EntryManager.playerEntriesWithLocal.RemoveAt(oldIndex);
-
-            int finalIndex = 0;
-            for (int i = 0; i < EntryManager.playerEntriesWithLocal.Count; i++)
-            {
-                int sortResult = sort(sortEntry, EntryManager.playerEntriesWithLocal[i]);
-                if (sortResult >= 0)
-                    finalIndex += sortResult;
-                else
-                    break;
-            }
-
-            EntryManager.playerEntriesWithLocal.Insert(finalIndex, sortEntry);
-            sortEntry.gameObject.transform.SetSiblingIndex(finalIndex + 2);
-
+            PlayerSortData sortData = sortPlayerFunction(sortEntry);
+            
             // Refresh count on numbered thingys that have changed
             if (PlayerListConfig.numberedList.Value)
                 if (EntryManager.playerEntries.Count.ToString().Length != EntryManager.playerEntriesWithLocal.Count.ToString().Length)
                     for (int i = 0; i < EntryManager.playerEntriesWithLocal.Count; i++)
                         EntryManager.playerEntriesWithLocal[i].textComponent.text = EntryManager.playerEntriesWithLocal[i].CalculateLeftPart() + EntryManager.playerEntriesWithLocal[i].withoutLeftPart;
                 else
-                    for (int i = Math.Min(oldIndex, finalIndex); i < EntryManager.playerEntriesWithLocal.Count; i ++)
+                    for (int i = Math.Min(sortData.oldIndex, sortData.finalIndex); i < EntryManager.playerEntriesWithLocal.Count; i ++)
                         EntryManager.playerEntriesWithLocal[i].textComponent.text = EntryManager.playerEntriesWithLocal[i].CalculateLeftPart() + EntryManager.playerEntriesWithLocal[i].withoutLeftPart;
+        }
+
+        public static bool IsSortTypeInUse(SortType sortType)
+        {
+            return PlayerListConfig.CurrentBaseSortType == sortType || PlayerListConfig.CurrentUpperSortType == sortType || PlayerListConfig.CurrentHighestSortType == sortType;
         }
 
         public enum SortType
@@ -227,13 +273,25 @@ namespace PlayerList
             AvatarPerf,
             Distance,
             Friends,
-            NameColor
+            NameColor,
+            Ping
         }
         public enum FilterType
         {
             NonFriends,
             Friends,
             Self
+        }
+        public struct PlayerSortData
+        {
+            public int oldIndex;
+            public int finalIndex;
+
+            public PlayerSortData(int oldIndex, int finalIndex)
+            {
+                this.oldIndex = oldIndex;
+                this.finalIndex = finalIndex;
+            }
         }
     }
 }

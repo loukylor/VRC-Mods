@@ -25,6 +25,9 @@ namespace PlayerList
             EntryManager.Init();
             ListPositionManager.Init();
             MenuManager.Init();
+            EntrySortManager.Init();
+            PlayerEntry.EntryInit();
+            LocalPlayerEntry.EntryInit();
         }
         public override void VRChat_OnUiManagerInit()
         {
@@ -43,12 +46,9 @@ namespace PlayerList
             MenuManager.AddMenuListeners();
             MenuManager.CreateSortPages();
             MenuManager.CreateSubMenus();
-            PlayerEntry.EntryInit();
-            LocalPlayerEntry.EntryInit();
             EntryManager.AddGeneralInfoEntries();
             MenuManager.CreateGeneralInfoSubMenus();
             MenuManager.AdjustSubMenus();
-            EntrySortManager.Init();
 
             // Initialize on network events
             NetworkEvents.NetworkInit();

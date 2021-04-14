@@ -35,7 +35,7 @@ namespace PlayerList
         }
         public static void OnSceneWasLoaded()
         {
-            for (int i = playerEntries.Count - 1; i >= 0; i++)
+            for (int i = playerEntries.Count - 1; i >= 0; i--)
                 playerEntries[i].Remove();
             foreach (EntryBase entry in generalInfoEntries)
                 entry.OnSceneWasLoaded();
@@ -67,16 +67,15 @@ namespace PlayerList
 
         public static void OnPlayerJoin(Player player)
         {
-            if (GetEntryFromPlayer(playerEntriesWithLocal, player, out _)) return;
-
+            if (GetEntryFromPlayer(playerEntriesWithLocal, player, out _)) return; // If already in list
             if (player.field_Private_APIUser_0.IsSelf)
             {
                 if (localPlayerEntry != null) return;
 
-                localPlayerEntry = EntryBase.CreateInstance<LocalPlayerEntry>(Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform));
+                EntryBase.CreateInstance<LocalPlayerEntry>(Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform));
+                playerEntriesWithLocal.Add(localPlayerEntry);
                 localPlayerEntry.CalculateLeftPart();
                 AddEntry(localPlayerEntry);
-                playerEntriesWithLocal.Add(localPlayerEntry);
                 localPlayerEntry.gameObject.SetActive(true);
                 return;
             }
@@ -111,7 +110,7 @@ namespace PlayerList
                 entry = null;
                 return false;
             }
-
+            
             int playerInstanceId = player.GetInstanceID();
             foreach (PlayerEntry entryValue in list)
             {
@@ -135,7 +134,6 @@ namespace PlayerList
             AddEntry(entry);
             playerEntries.Add(entry);
             entry.gameObject.SetActive(true);
-            RefreshPlayerEntries(true);
             EntrySortManager.SortPlayer(entry); 
         }
         public static void AddGeneralInfoEntry(EntryBase entry)

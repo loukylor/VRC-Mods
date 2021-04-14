@@ -7,10 +7,10 @@ namespace PlayerList.UI
     {
         public UnityEngine.UI.Button buttonComponent;
         public UiTooltip tooltipComponent;
-
         public SingleButton(GameObject parent, GameObject template, Vector3 position, string text, Action onClick, string tooltip, string buttonName, bool resize = false, Color? color = null) : base(parent, template, position, text, buttonName, resize, color)
         {
-            gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(onClick);
+            buttonComponent = gameObject.GetComponent<UnityEngine.UI.Button>();
+            buttonComponent.onClick.AddListener(onClick);
             tooltipComponent = gameObject.GetComponent<UiTooltip>();
             tooltipComponent.field_Public_String_0 = tooltip;
             tooltipComponent.field_Public_String_1 = tooltip;
