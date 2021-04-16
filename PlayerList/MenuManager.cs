@@ -124,7 +124,6 @@ namespace PlayerList
         public static void AddMenuListeners()
         {
             // Add listeners
-            // TODO: don't add listener if one already present
             EnableDisableListener shortcutMenuListener = Constants.shortcutMenu.AddComponent<EnableDisableListener>();
             shortcutMenuListener.OnEnableEvent += new Action(() => { playerList.SetActive(!shouldStayHidden); UIManager.CurrentMenu = Constants.shortcutMenu; });
             shortcutMenuListener.OnDisableEvent += new Action(() => playerList.SetActive(false));

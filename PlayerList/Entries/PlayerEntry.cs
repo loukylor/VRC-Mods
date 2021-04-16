@@ -20,12 +20,13 @@ namespace PlayerList.Entries
         // - <color={pingcolor}>{ping}ms</color> | <color={fpscolor}>{fps}</color> | {platform} | <color={perfcolor}>{perf}</color> | {relationship} | <color={rankcolor}>{displayname}</color>
         public override string Name { get { return "Player"; } }
 
+        public bool isSelf = false;
+
         public static bool worldAllowed = false;
 
-        public int playerInstanceId;
-
         public Player player;
-        public string userID;
+        public APIUser apiUser;
+        public string userId;
         protected string platform;
 
         public static string separator = " | ";
@@ -84,6 +85,7 @@ namespace PlayerList.Entries
             }; // OGT fork compatibility 
                     
             PlayerListMod.Instance.Harmony.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend), BindingFlags.NonPublic | BindingFlags.Static)));
+            //PlayerListMod.Instance.Harmony.Patch(typeof(Player).GetMethod("OnDestroy"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnPlayerDestroy), BindingFlags.NonPublic | BindingFlags.Static)));
 
             // Definitely not stolen code from our lord and savior knah (https://github.com/knah/VRCMods/blob/master/AdvancedSafety/AdvancedSafetyMod.cs) because im not a skid
             foreach (MethodInfo method in typeof(PlayerNet).GetMethods().Where(mi => mi.GetParameters().Length == 3 && mi.Name.StartsWith("Method_Public_Virtual_Final_New_Void_ValueTypePublic")))
@@ -119,15 +121,15 @@ namespace PlayerList.Entries
         public override void Init(object[] parameters)
         {
             player = (Player)parameters[0];
-            playerInstanceId = player.GetInstanceID();
-            userID = player.field_Private_APIUser_0.id;
+            apiUser = player.field_Private_APIUser_0;
+            userId = apiUser.id;
             platform = platform = PlayerUtils.GetPlatform(player).PadRight(2);
 
             gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new Action(() => PlayerUtils.OpenPlayerInQuickMenu(player)));
 
             textComponent.text = "Loading...";
 
-            isFriend = APIUser.IsFriendsWith(player.field_Private_APIUser_0.id);
+            isFriend = APIUser.IsFriendsWith(apiUser.id);
             GetPlayerColor();
             if (player.prop_PlayerNet_0 != null)
                 UpdateEntry(player.prop_PlayerNet_0, this, true);
@@ -137,8 +139,6 @@ namespace PlayerList.Entries
             updateDelegate = null;
             if (PlayerListConfig.pingToggle.Value)
                 updateDelegate += AddPing;
-            if (PlayerListConfig.pingToggle.Value && EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.Ping))
-                updateDelegate += (PlayerNet playerNet, PlayerEntry entry, ref string tempString) => EntrySortManager.SortPlayer(entry);
             if (PlayerListConfig.fpsToggle.Value)
                 updateDelegate += AddFps;
             if (PlayerListConfig.platformToggle.Value)
@@ -151,8 +151,12 @@ namespace PlayerList.Entries
                 updateDelegate += AddPhotonId;
             if (PlayerListConfig.displayNameToggle.Value)
                 updateDelegate += AddDisplayName;
-            if (PlayerListConfig.distanceToggle.Value && EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.Distance))
-                updateDelegate += (PlayerNet playerNet, PlayerEntry entry, ref string tempString) => EntrySortManager.SortPlayer(entry);
+            if (PlayerListConfig.distanceToggle.Value && EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.Distance) || PlayerListConfig.pingToggle.Value && EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.Ping))
+                updateDelegate += (PlayerNet playerNet, PlayerEntry entry, ref string tempString) =>
+                {
+                    if (new System.Random().Next(1) == 0)
+                        EntrySortManager.SortPlayer(entry);
+                };
 
             if (PlayerListConfig.condensedText.Value)
             {
@@ -181,15 +185,18 @@ namespace PlayerList.Entries
         }
         public override void OnAvatarInstantiated(VRCPlayer vrcPlayer, GameObject avatar)
         {
-            if (vrcPlayer.field_Private_Player_0.GetInstanceID() != playerInstanceId)
+            apiUser = player.field_Private_APIUser_0;
+
+            if (vrcPlayer.field_Private_Player_0.field_Private_APIUser_0?.id != userId)
                 return;
+
             perf = vrcPlayer.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall];
             if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.AvatarPerf))
                 EntrySortManager.SortPlayer(this);
         }
         public override void OnAvatarChanged(ApiAvatar avatar, VRCAvatarManager manager)
         {
-            if (manager.field_Private_VRCPlayer_0.field_Private_Player_0.GetInstanceID() != playerInstanceId)
+            if (manager.field_Private_VRCPlayer_0.field_Private_Player_0.field_Private_APIUser_0.id != userId)
                 return;
             perf = PerformanceRating.None;
             if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.AvatarPerf))
@@ -245,9 +252,9 @@ namespace PlayerList.Entries
         }
         public static void UpdateEntry(PlayerNet playerNet, PlayerEntry entry = null, bool bypassActive = false)
         {
-            if (!MenuManager.playerList.active && !bypassActive)
+            if (!(MenuManager.playerList.active || bypassActive))
                 return;
-
+            
             if (entry == null)
             {
                 EntryManager.GetEntryFromPlayer(EntryManager.playerEntriesWithLocal, playerNet.prop_Player_0, out entry);
@@ -338,7 +345,7 @@ namespace PlayerList.Entries
         }
         private static void AddDisplayName(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {
-            tempString += "<color=" + entry.playerColor + ">" + entry.player.field_Private_APIUser_0.displayName + "</color>" + separator;
+            tempString += "<color=" + entry.playerColor + ">" + entry.apiUser.displayName + "</color>" + separator;
         }
 
         public void Remove()
@@ -347,7 +354,6 @@ namespace PlayerList.Entries
             EntryManager.playerEntriesWithLocal.Remove(this);
             EntryManager.entries.Remove(Identifier);
             UnityEngine.Object.DestroyImmediate(gameObject);
-            return;
         }
         private void GetPlayerColor(bool shouldSort = true)
         {
@@ -355,18 +361,18 @@ namespace PlayerList.Entries
             switch (PlayerListConfig.DisplayNameColorMode)
             {
                 case DisplayNameColorMode.TrustAndFriends:
-                    playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(player.field_Private_APIUser_0));
+                    playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(apiUser));
                     break;
                 case DisplayNameColorMode.None:
                     break;
                 case DisplayNameColorMode.TrustOnly:
                     // ty bono for this (https://github.com/ddakebono/)
                     spoofFriend = true;
-                    playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(player.field_Private_APIUser_0));
+                    playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(apiUser));
                     break;
                 case DisplayNameColorMode.FriendsOnly:
-                    if (APIUser.IsFriendsWith(player.field_Private_APIUser_0.id))
-                        playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(player.field_Private_APIUser_0));
+                    if (APIUser.IsFriendsWith(apiUser.id))
+                        playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(apiUser));
                     break;
             }
             if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.NameColor) && shouldSort)
@@ -384,6 +390,7 @@ namespace PlayerList.Entries
         }
         public string CalculateLeftPart()
         {
+            return "";
             if (PlayerListConfig.numberedList.Value)
                 if (PlayerListConfig.condensedText.Value)
                     leftPart = $"{gameObject.transform.GetSiblingIndex() - 1}.".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 1); // Pad by weird amount because we cant include the header and disabled template in total number of gameobjects

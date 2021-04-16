@@ -7,26 +7,29 @@ namespace PlayerList
 {
     class EntrySortManager
     {
+        public static int sortStartIndex = 0;
         public static Func<PlayerEntry, PlayerSortData> sortPlayerFunction;
         public static Func<PlayerEntry, PlayerSortData> defaultSortPlayerFunction = (entry) =>
-        {
+        { 
             PlayerSortData sortData = new PlayerSortData();
-            sortData.oldIndex = EntryManager.playerEntriesWithLocal.IndexOf(entry);
-            if (sortData.oldIndex < 0)
-                sortData.oldIndex = int.MaxValue;
-            else
-                EntryManager.playerEntriesWithLocal.RemoveAt(sortData.oldIndex);
-            
-            sortData.finalIndex = 0;
-            for (int i = 0; i < EntryManager.playerEntriesWithLocal.Count; i++)
+
+            int oldIndex = EntryManager.playerEntriesWithLocal.IndexOf(entry);
+            if (oldIndex < 0)
+                return sortData;
+
+            sortData.finalIndex = sortStartIndex;
+            for (int i = sortStartIndex; i < EntryManager.playerEntriesWithLocal.Count; i++)
             {
                 int sortResult = sort(entry, EntryManager.playerEntriesWithLocal[i]);
                 if (sortResult > 0)
                     sortData.finalIndex += sortResult;
+                else if (sortResult == 0)
+                    continue;
                 else
                     break;
             }
 
+            EntryManager.playerEntriesWithLocal.RemoveAt(oldIndex);
             EntryManager.playerEntriesWithLocal.Insert(sortData.finalIndex, entry);
             entry.gameObject.transform.SetSiblingIndex(sortData.finalIndex + 2);
 
@@ -208,20 +211,25 @@ namespace PlayerList
             else
                 reverseHighest = 1;
 
-            if (PlayerListConfig.ShowSelfAtTop.Value)
-            { 
+            if (PlayerListConfig.ShowSelfAtTop.Value && EntryManager.localPlayerEntry != null)
+            {
+                EntryManager.playerEntriesWithLocal.Remove(EntryManager.localPlayerEntry);
+                EntryManager.playerEntriesWithLocal.Insert(0, EntryManager.localPlayerEntry);
+                sortStartIndex = 1;
+
                 sortPlayerFunction = (entry) =>
                 {
-                    EntryManager.playerEntriesWithLocal.Remove(EntryManager.localPlayerEntry);
                     PlayerSortData sortData = defaultSortPlayerFunction(entry);
 
-                    EntryManager.playerEntriesWithLocal.Insert(0, EntryManager.localPlayerEntry);
+                    if (EntryManager.playerEntriesWithLocal.Remove(EntryManager.localPlayerEntry))
+                        EntryManager.playerEntriesWithLocal.Insert(0, EntryManager.localPlayerEntry);
                     EntryManager.localPlayerEntry?.gameObject.transform.SetSiblingIndex(2);
                     return sortData;
                 };
             }
             else
             {
+                sortStartIndex = 0;
                 sortPlayerFunction = defaultSortPlayerFunction;
             }
 
@@ -251,13 +259,13 @@ namespace PlayerList
             PlayerSortData sortData = sortPlayerFunction(sortEntry);
             
             // Refresh count on numbered thingys that have changed
-            if (PlayerListConfig.numberedList.Value)
+            /*if (PlayerListConfig.numberedList.Value)
                 if (EntryManager.playerEntries.Count.ToString().Length != EntryManager.playerEntriesWithLocal.Count.ToString().Length)
                     for (int i = 0; i < EntryManager.playerEntriesWithLocal.Count; i++)
                         EntryManager.playerEntriesWithLocal[i].textComponent.text = EntryManager.playerEntriesWithLocal[i].CalculateLeftPart() + EntryManager.playerEntriesWithLocal[i].withoutLeftPart;
                 else
                     for (int i = Math.Min(sortData.oldIndex, sortData.finalIndex); i < EntryManager.playerEntriesWithLocal.Count; i ++)
-                        EntryManager.playerEntriesWithLocal[i].textComponent.text = EntryManager.playerEntriesWithLocal[i].CalculateLeftPart() + EntryManager.playerEntriesWithLocal[i].withoutLeftPart;
+                        EntryManager.playerEntriesWithLocal[i].textComponent.text = EntryManager.playerEntriesWithLocal[i].CalculateLeftPart() + EntryManager.playerEntriesWithLocal[i].withoutLeftPart;*/
         }
 
         public static bool IsSortTypeInUse(SortType sortType)

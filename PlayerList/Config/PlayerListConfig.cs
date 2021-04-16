@@ -13,7 +13,6 @@ namespace PlayerList.Config
         public static event Action OnConfigChangedEvent;
         private static bool hasConfigChanged;
 
-        // TODO: Make is so the vector 2 acutlaly uses the custom mapper when it gets fixed
         public static readonly string categoryIdentifier = "PlayerList Config";
         public static MelonPreferences_Category category = MelonPreferences.CreateCategory(categoryIdentifier);
         public static List<EntryWrapper> entries = new List<EntryWrapper>();

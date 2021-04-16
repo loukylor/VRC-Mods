@@ -41,6 +41,12 @@ namespace PlayerList
 
             // TODO: Add opacity options, maybe color too, (maybe even for each stage of ping and fps??)
             // TODO: Add option to sort playerlist
+            // TODO: Make is so the vector 2 acutlaly uses the custom mapper when it gets fixed
+            // TODO: add load percentage??
+            // TODO: don't add listener if one already present
+            // TODO: add indicator for those in hearing distance
+            // TODO: Figure out how to figure out how to know when someone blcosk u
+            // TODO: Separate the left part to a different text component 
 
             // This is kinda a mess but whatever
             MenuManager.AddMenuListeners();
@@ -67,12 +73,7 @@ namespace PlayerList
         {
             if (buildIndex == -1)
             {
-                if (Constants.quickMenuColliderSize != null)
-                {
-                    Constants.quickMenuColliderSize = Constants.quickMenu.GetComponent<BoxCollider>().size;
-                    ListPositionManager.CombineQMColliderAndPlayerListRect();
-                }
-
+                Constants.OnSceneWasLoaded();
                 EntryManager.OnSceneWasLoaded();
                 UIManager.OnSceneWasLoaded();
             }

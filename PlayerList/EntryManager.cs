@@ -85,6 +85,7 @@ namespace PlayerList
         public static void OnPlayerLeave(Player player)
         {
             if (!GetEntryFromPlayer(playerEntriesWithLocal, player, out PlayerEntry entry)) return;
+            
             entry.Remove();
             RefreshLayout();
         }
@@ -111,10 +112,10 @@ namespace PlayerList
                 return false;
             }
             
-            int playerInstanceId = player.GetInstanceID();
+            string playerId = player.field_Private_APIUser_0.id;
             foreach (PlayerEntry entryValue in list)
             {
-                if (playerInstanceId == entryValue.playerInstanceId)
+                if (playerId == entryValue.userId)
                 { 
                     entry = entryValue;
                     return true;
@@ -134,6 +135,7 @@ namespace PlayerList
             AddEntry(entry);
             playerEntries.Add(entry);
             entry.gameObject.SetActive(true);
+            playerEntriesWithLocal.Add(entry);
             EntrySortManager.SortPlayer(entry); 
         }
         public static void AddGeneralInfoEntry(EntryBase entry)
@@ -145,9 +147,9 @@ namespace PlayerList
         {
             if (RoomManager.field_Internal_Static_ApiWorld_0 == null || Player.prop_Player_0 == null || Player.prop_Player_0.gameObject == null || Player.prop_Player_0.prop_VRCPlayerApi_0 == null || (!MenuManager.playerList.active && !bypassActive)) return;
 
-            foreach (PlayerEntry entry in playerEntries)
-                if (entry.player == null)
-                    entry.Remove();
+            for (int i = playerEntries.Count - 1; i >= 0; i--)
+                if (playerEntries[i].player == null)
+                    playerEntries[i].Remove();
 
             foreach (PlayerEntry entry in playerEntries)
                 PlayerEntry.UpdateEntry(entry.player.prop_PlayerNet_0, entry, bypassActive);

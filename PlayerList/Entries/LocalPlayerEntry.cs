@@ -27,6 +27,7 @@ namespace PlayerList.Entries
         }
         public override void Init(object[] parameters)
         {
+            isSelf = true;
             EntryManager.localPlayerEntry = this;
             player = Player.prop_Player_0;
             gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new Action(() => PlayerUtils.OpenPlayerInQuickMenu(player)));
@@ -70,7 +71,6 @@ namespace PlayerList.Entries
         }
         protected override void ProcessText(object[] parameters)
         {
-            // TODO: Figure out how to figure out how to know when someone blcosk u
             /*
             List<PlayerEntry> playerEntries = PlayerListMod.playerEntries.Values.ToList();
             // Get blocked things
@@ -107,6 +107,7 @@ namespace PlayerList.Entries
         }
         public override void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
         {
+            // poggers - loukylor 2021
             MelonLogger.Msg("Checking if world is allowed to show distance...");
             worldAllowed = false;
             if (world != null)

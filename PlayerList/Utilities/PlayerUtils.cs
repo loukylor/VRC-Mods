@@ -64,7 +64,6 @@ namespace PlayerList.Utilities
                     return "Great";
                 case PerformanceRating.None:
                     return "?¿?¿?";
-                // TODO: add load percentage??
                 default:
                     return rating.ToString().PadRight(5);
             }

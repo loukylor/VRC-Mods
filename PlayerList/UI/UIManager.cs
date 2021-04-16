@@ -138,7 +138,7 @@ namespace PlayerList.UI
             GameObject pageGameObject = GameObject.Find(page);
             if (pageGameObject == null)
             {
-                MelonLoader.MelonLogger.Error($"Page with path {page} could not be found");
+                MelonLogger.Error($"Page with path {page} could not be found");
                 return;
             }
 
