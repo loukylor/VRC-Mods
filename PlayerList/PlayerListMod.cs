@@ -34,18 +34,17 @@ namespace PlayerList
             // Initialize Constants util
             Constants.UIInit();
 
-            MenuManager.LoadAssetBundle();
-
-            // Initialize submenu for the list 
-            MenuManager.CreateMainSubMenu();
-
             // TODO: Add opacity options, maybe color too, (maybe even for each stage of ping and fps??)
             // TODO: Make is so the vector 2 acutlaly uses the custom mapper when it gets fixed
             // TODO: add load percentage??
             // TODO: don't add listener if one already present
             // TODO: add indicator for those in hearing distance
             // TODO: Figure out how to figure out how to know when someone blcosk u
-            // TODO: Separate the left part to a different text component 
+
+            MenuManager.LoadAssetBundle();
+
+            // Initialize submenu for the list 
+            MenuManager.CreateMainSubMenu();
 
             // This is kinda a mess but whatever
             MenuManager.AddMenuListeners();

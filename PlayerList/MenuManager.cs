@@ -65,7 +65,7 @@ namespace PlayerList
             if (!playerListMenus.Any(subMenu => subMenu.gameObject.active) && !Constants.shortcutMenu.active) return;
             shouldStayHidden = !shouldStayHidden;
             menuToggleButton.State = !shouldStayHidden;
-            if (playerListMenus.Any(subMenu => subMenu.gameObject.active) || Constants.shortcutMenu.active) playerList.SetActive(!playerList.activeSelf);
+            if (playerListMenus.Any(subMenu => subMenu.gameObject.active) || (Constants.shortcutMenu.active && PlayerListConfig.onlyEnabledInConfig.Value)) playerList.SetActive(!playerList.activeSelf);
         }
 
         public static void LoadAssetBundle()
@@ -101,10 +101,6 @@ namespace PlayerList
 
             Constants.playerListLayout = playerList.transform.Find("PlayerList Viewport/PlayerList").GetComponent<VerticalLayoutGroup>();
             Constants.generalInfoLayout = playerList.transform.Find("GeneralInfo Viewport/GeneralInfo").GetComponent<VerticalLayoutGroup>();
-            Transform templateTransform = Constants.playerListLayout.transform.Find("Template");
-
-            EnableDisableListener playerListListener = playerList.AddComponent<EnableDisableListener>();
-            playerListListener.OnEnableEvent += EntryManager.RefreshAllEntries;
         }
         public static void CreateMainSubMenu()
         {
@@ -116,6 +112,7 @@ namespace PlayerList
             menuToggleButton = new ToggleButton(playerListMenus[0].path, new Vector3(5, 0), "Enabled", "Disabled", new Action<bool>((state) => ToggleMenu()), "Toggle the menu. Can also be toggled using Left Ctrl + F1", "Toggle the menu. Can also be toggled using Left Ctrl + F1", "ToggleMenuToggle", !shouldStayHidden);
 
             new ToggleButton(playerListMenus[0].path, new Vector3(5, -1), "Enabled on Start", "Disabled", new Action<bool>((state) => PlayerListConfig.enabledOnStart.Value = state), "Toggle if the list is toggled hidden on start", "Toggle if the list is toggled hidden on start", "EnabledOnStartToggle", PlayerListConfig.enabledOnStart.Value, true);
+            new ToggleButton(playerListMenus[0].path, new Vector3(5, 1), "Enabled Only in Config", "Disabled", new Action<bool>((state) => PlayerListConfig.onlyEnabledInConfig.Value = state), "Toggle if the list is toggled off outside of this menu", "Toggle if the list is toggled off outside of this menu", "OnlyEnabledInConfigToggle", PlayerListConfig.onlyEnabledInConfig.Value, true);
 
             new ToggleButton(playerListMenus[0].path, new Vector3(0, 1), "Condense Text", "Regular Text", new Action<bool>((state) => PlayerListConfig.condensedText.Value = !PlayerListConfig.condensedText.Value), "Toggle if text should be condensed", "Toggle if text should be condensed", "CondensedTextToggle", PlayerListConfig.condensedText.Value, true);
             new ToggleButton(playerListMenus[0].path, new Vector3(0, 0), "Numbered List", "Tick List", new Action<bool>((state) => PlayerListConfig.numberedList.Value = !PlayerListConfig.numberedList.Value), "Toggle if the list should be numbered or ticked", "Toggle if the list should be numbered or ticked", "NumberedTickToggle", PlayerListConfig.numberedList.Value, true);
@@ -126,7 +123,7 @@ namespace PlayerList
         {
             // Add listeners
             EnableDisableListener shortcutMenuListener = Constants.shortcutMenu.AddComponent<EnableDisableListener>();
-            shortcutMenuListener.OnEnableEvent += new Action(() => { playerList.SetActive(!shouldStayHidden); UIManager.CurrentMenu = Constants.shortcutMenu; });
+            shortcutMenuListener.OnEnableEvent += new Action(() => playerList.SetActive(!shouldStayHidden && !PlayerListConfig.onlyEnabledInConfig.Value));
             shortcutMenuListener.OnDisableEvent += new Action(() => playerList.SetActive(false));
             
             GameObject newElements = GameObject.Find("UserInterface/QuickMenu/QuickMenu_NewElements");

@@ -130,10 +130,10 @@ namespace PlayerList.UI
                 prop.SetValue(QuickMenu.prop_QuickMenu_0, null);
             QuickMenu.prop_QuickMenu_0.field_Private_Int32_0 = -1;
         }
-        public static void OnQuickMenuOpen() => OnQuickMenuOpenEvent?.Invoke();
-        public static void OnQuickMenuClose() => OnQuickMenuCloseEvent?.Invoke();
+        private static void OnQuickMenuOpen() => OnQuickMenuOpenEvent?.Invoke();
+        private static void OnQuickMenuClose() => OnQuickMenuCloseEvent?.Invoke();
         public static void SetMenuIndex(int index) => setMenuIndex.Invoke(QuickMenu.prop_QuickMenu_0, new object[] { index });
-        public static void OpenPage(string page, bool setCurrentTab = true)
+        public static void OpenPage(string page, bool setCurrentMenu = true, bool setCurrentTab = true)
         {
             GameObject pageGameObject = GameObject.Find(page);
             if (pageGameObject == null)
@@ -147,6 +147,7 @@ namespace PlayerList.UI
             if (page.Split('/').Last() == "ShortcutMenu")
             { 
                 SetMenuIndex(0);
+                CurrentMenu = pageGameObject;
             }
             else
             {
