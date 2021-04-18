@@ -129,11 +129,7 @@ namespace PlayerList.Entries
             if (PlayerListConfig.displayNameToggle.Value)
                 updateDelegate += AddDisplayName;
             if (PlayerListConfig.distanceToggle.Value && EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.Distance) || PlayerListConfig.pingToggle.Value && EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.Ping))
-                updateDelegate += (PlayerNet playerNet, PlayerEntry entry, ref string tempString) =>
-                {
-                    if (new System.Random().Next(1) == 0)
-                        EntrySortManager.SortPlayer(entry);
-                };
+                updateDelegate += (PlayerNet playerNet, PlayerEntry entry, ref string tempString) => EntrySortManager.SortPlayer(entry);
 
             if (PlayerListConfig.condensedText.Value)
                 separator = "|";
@@ -228,15 +224,20 @@ namespace PlayerList.Entries
         }
         public static void UpdateEntry(PlayerNet playerNet, PlayerEntry entry = null, bool bypassActive = false)
         {
-            if (!(MenuManager.playerList.active || bypassActive))
-                return;
-            
             if (entry == null)
             {
                 EntryManager.GetEntryFromPlayer(EntryManager.sortedPlayerEntries, playerNet.prop_Player_0, out entry);
                 if (entry == null)
                     return;
             }
+
+            // Update values but not text even if playerlist not active
+            entry.distance = (entry.player.transform.position - Player.prop_Player_0.transform.position).magnitude;
+            entry.fps = MelonUtils.Clamp((int)(1000f / playerNet.field_Private_Byte_0), -99, 999);
+            entry.ping = playerNet.prop_Int16_0;
+
+            if (!(MenuManager.playerList.active || bypassActive))
+                return;
 
             string tempString = "";
 
@@ -257,8 +258,6 @@ namespace PlayerList.Entries
 
         private static void AddPing(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {
-            entry.ping = playerNet.prop_Int16_0;
-
             tempString += "<color=" + PlayerUtils.GetPingColor(entry.ping) + ">";
             if (entry.ping < 9999 && entry.ping > -999)
                 tempString += entry.ping.ToString().PadRight(4) + "ms</color>";
@@ -268,8 +267,6 @@ namespace PlayerList.Entries
         }
         private static void AddFps(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {
-            entry.fps = MelonUtils.Clamp((int)(1000f / playerNet.field_Private_Byte_0), -99, 999);
-
             tempString += "<color=" + PlayerUtils.GetFpsColor(entry.fps) + ">";
             if (playerNet.field_Private_Byte_0 == 0)
                 tempString += "?¿?</color>";
@@ -289,7 +286,6 @@ namespace PlayerList.Entries
         {
             if (worldAllowed)
             {
-                entry.distance = (entry.player.transform.position - Player.prop_Player_0.transform.position).magnitude;
                 if (entry.distance < 100)
                 {
                     tempString += entry.distance.ToString("N1").PadRight(4) + "m";

@@ -5,6 +5,7 @@ using System.Reflection;
 using Harmony;
 using MelonLoader;
 using PlayerList.Utilities;
+using UnhollowerBaseLib;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,6 +17,18 @@ namespace PlayerList.UI
         private static MethodInfo openQuickMenu;
         private static MethodInfo closeQuickMenu;
         private static MethodInfo setMenuIndex;
+
+        private static Il2CppSystem.Reflection.MethodInfo showTabContentMethod;
+        private static Il2CppSystem.Reflection.FieldInfo setTabTabIndexField;
+        private static Il2CppSystem.Reflection.FieldInfo setTabIndexField;
+        private static Il2CppSystem.Type tabDescriptorType;
+        private static Component tabContainerComponent;
+        private static Il2CppSystem.Reflection.FieldInfo existingTabsField;
+        public static List<GameObject> ExistingTabs
+        {
+            get { return existingTabsField.GetValue(tabContainerComponent).Cast<Il2CppReferenceArray<GameObject>>().ToList(); }
+            set { existingTabsField.SetValue(tabContainerComponent, new Il2CppReferenceArray<GameObject>(value.ToArray()).Cast<Il2CppSystem.Object>()); }
+        }
 
         public static Sprite fullOnButtonSprite;
         public static Sprite regularButtonSprite;
@@ -68,6 +81,33 @@ namespace PlayerList.UI
 
             PlayerListMod.Instance.Harmony.Patch(openQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuOpen))));
             PlayerListMod.Instance.Harmony.Patch(closeQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuClose))));
+        }
+        public static void UIInit()
+        {
+            GameObject tabContainer = GameObject.Find("UserInterface/QuickMenu/QuickModeTabs");
+            foreach (Component component in tabContainer.GetComponents<Component>())
+            {
+                if (!component.GetIl2CppType().FullName.Contains("UnityEngine") && component.GetIl2CppType().GetMethods().Any(mi => mi.Name == "ShowTabContent"))
+                {
+                    tabContainerComponent = component;
+                    setTabIndexField = component.GetIl2CppType().GetFields(Il2CppSystem.Reflection.BindingFlags.NonPublic | Il2CppSystem.Reflection.BindingFlags.Instance).First(f => f.FieldType.IsEnum);
+                    foreach (Il2CppSystem.Reflection.FieldInfo field in component.GetIl2CppType().GetFields())
+                    { 
+                        if (field.FieldType.IsArray)
+                        { 
+                            existingTabsField = field;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            MonoBehaviour tabDescriptor = tabContainer.transform.GetChild(0).gameObject.GetComponents<MonoBehaviour>().First(c => c.GetIl2CppType().GetMethod("ShowTabContent") != null);
+
+            tabDescriptorType = tabDescriptor.GetIl2CppType();
+            showTabContentMethod = tabDescriptorType.GetMethod("ShowTabContent");
+            setTabTabIndexField = tabDescriptorType.GetFields().First(f => f.FieldType.IsEnum);
         }
         public static void OnSceneWasLoaded()
         {
@@ -133,6 +173,10 @@ namespace PlayerList.UI
         private static void OnQuickMenuOpen() => OnQuickMenuOpenEvent?.Invoke();
         private static void OnQuickMenuClose() => OnQuickMenuCloseEvent?.Invoke();
         public static void SetMenuIndex(int index) => setMenuIndex.Invoke(QuickMenu.prop_QuickMenu_0, new object[] { index });
+        public static void SetTabTabIndex(TabButton tab, int index) => setTabTabIndexField.SetValue(tab.gameObject.GetComponent(tabDescriptorType), new Il2CppSystem.Int32 { m_value = index }.BoxIl2CppObject());
+        public static void ShowTabContent(TabButton tab) => showTabContentMethod.Invoke(tab.gameObject.GetComponent(tabDescriptorType), null);
+        public static void SetTabIndex(int index) => setTabIndexField.SetValue(tabContainerComponent, new Il2CppSystem.Int32 { m_value = index }.BoxIl2CppObject());
+
         public static void OpenPage(string page, bool setCurrentMenu = true, bool setCurrentTab = true)
         {
             GameObject pageGameObject = GameObject.Find(page);
@@ -145,15 +189,12 @@ namespace PlayerList.UI
             CurrentMenu?.SetActive(false);
 
             if (page.Split('/').Last() == "ShortcutMenu")
-            { 
                 SetMenuIndex(0);
-                CurrentMenu = pageGameObject;
-            }
             else
-            {
                 QuickMenu.prop_QuickMenu_0.field_Private_Int32_0 = -1;
+
+            if (setCurrentMenu)
                 CurrentMenu = pageGameObject;
-            }
 
             CurrentTabMenu?.SetActive(false);
             if (setCurrentTab)

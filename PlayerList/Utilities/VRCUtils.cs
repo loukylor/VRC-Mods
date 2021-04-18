@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using Il2CppSystem.Collections.Generic;
+using PlayerList.Config;
 using PlayerList.Entries;
 using MelonLoader;
 using UnityEngine;
@@ -27,11 +28,23 @@ namespace PlayerList.Utilities
                     case "allowed":
                         MelonLogger.Msg("World allowed to show player distance");
                         PlayerEntry.worldAllowed = true;
+                        if (PlayerListConfig.CurrentBaseSortType == EntrySortManager.SortType.Distance)
+                            EntrySortManager.currentBaseComparison = EntrySortManager.distanceSort;
+                        if (PlayerListConfig.CurrentUpperSortType == EntrySortManager.SortType.Distance)
+                            EntrySortManager.currentUpperComparison = EntrySortManager.distanceSort;
+                        if (PlayerListConfig.CurrentHighestSortType == EntrySortManager.SortType.Distance)
+                            EntrySortManager.currentHighestComparison = EntrySortManager.distanceSort;
                         yield break;
 
                     case "denied":
                         MelonLogger.Msg("World NOT allowed to show player distance");
                         PlayerEntry.worldAllowed = false;
+                        if (PlayerListConfig.CurrentBaseSortType == EntrySortManager.SortType.Distance)
+                            EntrySortManager.currentBaseComparison = EntrySortManager.noneSort;
+                        if (PlayerListConfig.CurrentUpperSortType == EntrySortManager.SortType.Distance)
+                            EntrySortManager.currentUpperComparison = EntrySortManager.noneSort;
+                        if (PlayerListConfig.CurrentHighestSortType == EntrySortManager.SortType.Distance)
+                            EntrySortManager.currentHighestComparison = EntrySortManager.noneSort;
                         yield break;
                 }
             }

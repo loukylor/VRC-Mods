@@ -17,6 +17,7 @@ namespace PlayerList.Config
         public static MelonPreferences_Category category = MelonPreferences.CreateCategory(categoryIdentifier);
         public static List<EntryWrapper> entries = new List<EntryWrapper>();
 
+        public static EntryWrapper<bool> useTabMenu;
         public static EntryWrapper<bool> enabledOnStart;
         public static EntryWrapper<bool> onlyEnabledInConfig;
         public static EntryWrapper<bool> condensedText;
@@ -84,6 +85,7 @@ namespace PlayerList.Config
 
         public static void RegisterSettings()
         {
+            useTabMenu = CreateEntry(categoryIdentifier, nameof(useTabMenu), false, is_hidden: true);
             enabledOnStart = CreateEntry(categoryIdentifier, nameof(enabledOnStart), false, is_hidden: true);
             onlyEnabledInConfig = CreateEntry(categoryIdentifier, nameof(onlyEnabledInConfig), false, is_hidden: true);
 

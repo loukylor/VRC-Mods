@@ -47,7 +47,7 @@ namespace PlayerList
                 PlayerListConfig.PlayerListPosition = MenuManager.playerListRect.anchoredPosition;
                 gameObject.SetActive(!MenuManager.shouldStayHidden);
                 UIManager.OpenPage(MenuManager.playerListMenus[1].path);
-                MenuManager.playerListRect.localPosition = new Vector3(MenuManager.playerListRect.localPosition.x, MenuManager.playerListRect.localPosition.y, 25);
+                MenuManager.playerListRect.localPosition.SetZ(25);
             })));
             UIManager.OpenPage("UserInterface/QuickMenu/ShortcutMenu");
             MenuManager.playerList.SetActive(true);
@@ -61,7 +61,7 @@ namespace PlayerList
             {
                 CombineQMColliderAndPlayerListRect();
                 movingGameObjectRect.transform.position = InputManager.HitPosition;
-                movingGameObjectRect.transform.localPosition = new Vector3(movingGameObjectRect.transform.localPosition.x, movingGameObjectRect.transform.localPosition.y, oldPosition.z);
+                movingGameObjectRect.transform.localPosition.SetZ(oldPosition.z);
                 movingGameObjectRect.anchoredPosition = Converters.RoundAmount(movingGameObjectRect.anchoredPosition, PlayerListConfig.snapToGridSize.Value);
 
                 yield return null;
@@ -71,7 +71,7 @@ namespace PlayerList
             {
                 CombineQMColliderAndPlayerListRect();
                 movingGameObjectRect.transform.position = InputManager.HitPosition;
-                movingGameObjectRect.transform.localPosition = new Vector3(movingGameObjectRect.transform.localPosition.x, movingGameObjectRect.transform.localPosition.y, oldPosition.z);
+                movingGameObjectRect.transform.localPosition.SetZ(oldPosition.z);
                 movingGameObjectRect.anchoredPosition = Converters.RoundAmount(movingGameObjectRect.anchoredPosition, PlayerListConfig.snapToGridSize.Value);
 
                 yield return null;

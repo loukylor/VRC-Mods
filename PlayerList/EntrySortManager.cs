@@ -3,6 +3,7 @@ using System.Reflection;
 using PlayerList.Config;
 using PlayerList.Entries;
 using PlayerList.Utilities;
+using UnityEngine;
 
 namespace PlayerList
 {
@@ -21,7 +22,7 @@ namespace PlayerList
         public static int reverseBase = 1; // 1 = regular, -1 = reverse
         public static int reverseUpper = 1;
         public static int reverseHighest = 1;
-        private static readonly Comparison<PlayerEntry> noneSort = (lEntry, rEntry) =>
+        internal static readonly Comparison<PlayerEntry> noneSort = (lEntry, rEntry) =>
         {
             return 0;
         };
@@ -37,7 +38,7 @@ namespace PlayerList
         {
             return lEntry.player.field_Internal_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0.CompareTo(rEntry.player.field_Internal_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0);
         };
-        private static readonly Comparison<PlayerEntry> distanceSort = (lEntry, rEntry) =>
+        internal static readonly Comparison<PlayerEntry> distanceSort = (lEntry, rEntry) =>
         {
             return lEntry.distance.CompareTo(rEntry.distance);
         };
@@ -98,7 +99,10 @@ namespace PlayerList
                     currentBaseComparison = avatarPerfSort;
                     break;
                 case SortType.Distance:
-                    currentBaseComparison = distanceSort;
+                    if (PlayerEntry.worldAllowed)
+                        currentBaseComparison = distanceSort;
+                    else
+                        currentBaseComparison = noneSort;
                     break;
                 case SortType.Friends:
                     currentBaseComparison = friendsSort;
@@ -126,7 +130,10 @@ namespace PlayerList
                     currentUpperComparison = avatarPerfSort;
                     break;
                 case SortType.Distance:
-                    currentUpperComparison = distanceSort;
+                    if (PlayerEntry.worldAllowed)
+                        currentUpperComparison = distanceSort;
+                    else
+                        currentUpperComparison = noneSort;
                     break;
                 case SortType.Friends:
                     currentUpperComparison = friendsSort;
@@ -154,7 +161,10 @@ namespace PlayerList
                     currentHighestComparison = avatarPerfSort;
                     break;
                 case SortType.Distance:
-                    currentHighestComparison = distanceSort;
+                    if (PlayerEntry.worldAllowed)
+                        currentHighestComparison = distanceSort;
+                    else
+                        currentHighestComparison = noneSort;
                     break;
                 case SortType.Friends:
                     currentHighestComparison = friendsSort;
@@ -192,7 +202,10 @@ namespace PlayerList
                     EntryManager.sortedPlayerEntries.Remove(EntryManager.localPlayerEntry);
                     EntryManager.sortedPlayerEntries.Insert(0, EntryManager.localPlayerEntry);
                     for (int i = 1; i < EntryManager.sortedPlayerEntries.Count; i++)
+                    { 
                         EntryManager.sortedPlayerEntries[i].gameObject.transform.SetParent(Constants.playerListLayout.transform.GetChild(i + 2));
+                        EntryManager.sortedPlayerEntries[i].gameObject.transform.localPosition.SetZ(0);
+                    }
                 }
 
                 sortStartIndex = 1;
@@ -205,7 +218,7 @@ namespace PlayerList
             SortAllPlayers();
         }
 
-        public static void SortAllPlayers() // This only runs when sort type is changed
+        public static void SortAllPlayers() // This only runs when sort type is changed and when the qm is opened (takes around 1-2ms in a full BClub)
         {
             EntryManager.sortedPlayerEntries.Sort(sort);
 
@@ -214,7 +227,10 @@ namespace PlayerList
                     EntryManager.sortedPlayerEntries.Insert(0, EntryManager.localPlayerEntry);
 
             for (int i = 0; i < EntryManager.sortedPlayerEntries.Count; i++)
+            {
                 EntryManager.sortedPlayerEntries[i].gameObject.transform.SetParent(Constants.playerListLayout.transform.GetChild(i + 2));
+                EntryManager.sortedPlayerEntries[i].gameObject.transform.localPosition.SetZ(0);
+            }
         }
         public static void SortPlayer(PlayerEntry sortEntry)
         {
@@ -245,7 +261,10 @@ namespace PlayerList
 
             // Believe it or not but this is faster than changing the text of all the components every sort
             for (int i = Math.Min(finalIndex, oldIndex); i < EntryManager.sortedPlayerEntries.Count; i++)
+            { 
                 EntryManager.sortedPlayerEntries[i].gameObject.transform.SetParent(Constants.playerListLayout.transform.GetChild(i + 2));
+                EntryManager.sortedPlayerEntries[i].gameObject.transform.localPosition.SetZ(0);
+            }
         }
 
         public static bool IsSortTypeInUse(SortType sortType)

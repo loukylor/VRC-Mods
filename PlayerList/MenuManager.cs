@@ -29,6 +29,7 @@ namespace PlayerList
         public static RectTransform playerListRect;
 
         public static GameObject menuButton;
+        public static TabButton tabButton;
 
         private static readonly Dictionary<EntrySortManager.SortType, SingleButton> sortTypeButtonTable = new Dictionary<EntrySortManager.SortType, SingleButton>();
         private static Image currentHighlightedSortType;
@@ -36,6 +37,19 @@ namespace PlayerList
         public static void Init()
         {
             PlayerListConfig.OnConfigChangedEvent += OnConfigChanged;
+        }
+        public static void OnSceneWasLoaded()
+        {
+            if (tabButton == null)
+            {
+                tabButton = new TabButton(menuButton.GetComponent<Image>().sprite, new Action(() =>
+                {
+                    UIManager.ShowTabContent(tabButton);
+                    UIManager.OpenPage(playerListMenus[0].path, false);
+                    UIManager.SetTabIndex(tabButton.index);
+                }));
+                tabButton.gameObject.SetActive(PlayerListConfig.useTabMenu.Value);
+            }
         }
         public static void OnConfigChanged()
         {
@@ -58,6 +72,8 @@ namespace PlayerList
                     menuButton.GetComponent<RectTransform>().pivot = new Vector2(0, 0);
                     break;
             }
+            menuButton.SetActive(!PlayerListConfig.useTabMenu.Value);
+            tabButton?.gameObject.SetActive(PlayerListConfig.useTabMenu.Value);
         }
 
         public static void ToggleMenu()
@@ -86,6 +102,7 @@ namespace PlayerList
             menuButton.SetLayerRecursive(12);
             menuButton.transform.localPosition = Converters.ConvertToUnityUnits(new Vector3(4, -1));
             menuButton.GetComponent<RectTransform>().pivot = new Vector2(0, 0);
+            menuButton.SetActive(!PlayerListConfig.useTabMenu.Value);
 
             UiTooltip tooltip = menuButton.AddComponent<UiTooltip>();
             tooltip.field_Public_String_0 = "Open PlayerList menu";
@@ -94,7 +111,7 @@ namespace PlayerList
             playerList.SetLayerRecursive(12);
             playerListRect = playerList.GetComponent<RectTransform>();
             playerListRect.anchoredPosition = PlayerListConfig.PlayerListPosition;
-            playerListRect.localPosition = new Vector3(playerListRect.localPosition.x, playerListRect.localPosition.y, 25); // Do this or else it looks off for whatever reason
+            playerListRect.localPosition.SetZ(25); // Do this or else it looks off for whatever reason
             playerList.SetActive(false);
 
             shouldStayHidden = !PlayerListConfig.enabledOnStart.Value;
@@ -114,6 +131,7 @@ namespace PlayerList
             new ToggleButton(playerListMenus[0].path, new Vector3(5, -1), "Enabled on Start", "Disabled", new Action<bool>((state) => PlayerListConfig.enabledOnStart.Value = state), "Toggle if the list is toggled hidden on start", "Toggle if the list is toggled hidden on start", "EnabledOnStartToggle", PlayerListConfig.enabledOnStart.Value, true);
             new ToggleButton(playerListMenus[0].path, new Vector3(5, 1), "Enabled Only in Config", "Disabled", new Action<bool>((state) => PlayerListConfig.onlyEnabledInConfig.Value = state), "Toggle if the list is toggled off outside of this menu", "Toggle if the list is toggled off outside of this menu", "OnlyEnabledInConfigToggle", PlayerListConfig.onlyEnabledInConfig.Value, true);
 
+            new ToggleButton(playerListMenus[0].path, new Vector3(0, -1), "Tab Button", "Regular Button", new Action<bool>((state) => PlayerListConfig.useTabMenu.Value = !PlayerListConfig.useTabMenu.Value), "Toggle if the config menu button should be a regular one or a tab button", "Toggle if the config menu button should be a regular one or a tab button", "TabButtonToggle", PlayerListConfig.useTabMenu.Value, true);
             new ToggleButton(playerListMenus[0].path, new Vector3(0, 1), "Condense Text", "Regular Text", new Action<bool>((state) => PlayerListConfig.condensedText.Value = !PlayerListConfig.condensedText.Value), "Toggle if text should be condensed", "Toggle if text should be condensed", "CondensedTextToggle", PlayerListConfig.condensedText.Value, true);
             new ToggleButton(playerListMenus[0].path, new Vector3(0, 0), "Numbered List", "Tick List", new Action<bool>((state) => PlayerListConfig.numberedList.Value = !PlayerListConfig.numberedList.Value), "Toggle if the list should be numbered or ticked", "Toggle if the list should be numbered or ticked", "NumberedTickToggle", PlayerListConfig.numberedList.Value, true);
 
@@ -136,15 +154,14 @@ namespace PlayerList
             {
                 playerList.SetActive(!shouldStayHidden);
                 playerListRect.anchoredPosition = Converters.ConvertToUnityUnits(new Vector3(2.5f, 3.5f));
-                Tabs.SetActive(false);
+                EntrySortManager.SortAllPlayers();
                 newElements.SetActive(false);
             });
             playerListMenuListener.OnDisableEvent += new Action(() =>
             {
                 playerList.SetActive(false);
                 playerListRect.anchoredPosition = PlayerListConfig.PlayerListPosition;
-                playerListRect.localPosition = new Vector3(playerListRect.localPosition.x, playerListRect.localPosition.y, 25);
-                Tabs.SetActive(true);
+                playerListRect.localPosition.SetZ(25);
                 newElements.SetActive(true);
             });
         }
@@ -283,7 +300,10 @@ namespace PlayerList
 
         public static void AddPlayerListToSubMenu(SubMenu menu)
         {
-            EnableDisableListener subMenuListener = menu.gameObject.AddComponent<EnableDisableListener>();
+            EnableDisableListener subMenuListener;
+            subMenuListener = menu.gameObject.GetComponent<EnableDisableListener>();
+            if (subMenuListener == null)
+                subMenuListener = menu.gameObject.AddComponent<EnableDisableListener>();
             subMenuListener.OnEnableEvent += new Action(() =>
             {
                 playerList.SetActive(!shouldStayHidden);
@@ -293,7 +313,7 @@ namespace PlayerList
             {
                 playerList.SetActive(false);
                 playerListRect.anchoredPosition = PlayerListConfig.PlayerListPosition;
-                playerListRect.localPosition = new Vector3(playerListRect.localPosition.x, playerListRect.localPosition.y, 25);
+                playerListRect.localPosition.SetZ(25);
             });
         }
         public enum MenuButtonPositionEnum
