@@ -30,18 +30,17 @@ namespace PlayerList.Entries
         protected string platform;
 
         public static string separator = " | ";
-        public string leftPart = " - ";
 
         private static bool spoofFriend;
         protected static int highestPhotonIdLength = 0;
 
         public PerformanceRating perf;
+        public string perfString;
         public int ping;
         public int fps;
         public float distance;
         public bool isFriend;
         public string playerColor;
-        public string withoutLeftPart;
 
         public delegate void UpdateEntryDelegate(PlayerNet playerNet, PlayerEntry entry, ref string tempString);
         public static UpdateEntryDelegate updateDelegate;
@@ -53,28 +52,7 @@ namespace PlayerList.Entries
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int OnVRCPlayerDataReceived(IntPtr instancePointer, IntPtr hashtablePointer, IntPtr nativeMethodPointer);
         private static OnVRCPlayerDataReceived originalDataReceiveDelegate = null;
-        private static Type vrcPlayerEnum;
 
-        public override bool Equals(object obj)
-        {
-            if (obj == null) 
-                return false;
-            PlayerEntry objAsEntry = obj as PlayerEntry;
-            if (objAsEntry == null) 
-                return false;
-            else 
-                return Equals(objAsEntry);
-        }
-        public bool Equals(PlayerEntry entry)
-        {
-            if (entry == null)
-                return false;
-            return entry.Identifier == Identifier;
-        }
-        public override int GetHashCode()
-        {
-            return Identifier;
-        }
         public static void EntryInit()
         {
             PlayerListConfig.OnConfigChangedEvent += OnStaticConfigChanged;
@@ -85,7 +63,6 @@ namespace PlayerList.Entries
             }; // OGT fork compatibility 
                     
             PlayerListMod.Instance.Harmony.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend), BindingFlags.NonPublic | BindingFlags.Static)));
-            //PlayerListMod.Instance.Harmony.Patch(typeof(Player).GetMethod("OnDestroy"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnPlayerDestroy), BindingFlags.NonPublic | BindingFlags.Static)));
 
             // Definitely not stolen code from our lord and savior knah (https://github.com/knah/VRCMods/blob/master/AdvancedSafety/AdvancedSafetyMod.cs) because im not a skid
             foreach (MethodInfo method in typeof(PlayerNet).GetMethods().Where(mi => mi.GetParameters().Length == 3 && mi.Name.StartsWith("Method_Public_Virtual_Final_New_Void_ValueTypePublic")))
@@ -105,7 +82,6 @@ namespace PlayerList.Entries
             // Use native patch here as doing a harmony patch would mean I would have to use a named type. even if i got around that with some clever logic it would break player initialization somewhat
             foreach (MethodInfo method in typeof(VRCPlayer).GetMethods().Where(mi => mi.ReturnType.IsEnum && mi.GetParameters().Length == 1 && mi.GetParameters()[0].ParameterType == typeof(Il2CppSystem.Collections.Hashtable) && Xref.CheckMethod(mi, "Failed to read showSocialRank for {0}")))
             {
-                vrcPlayerEnum = method.ReturnType;
                 unsafe
                 {
                     var originalMethodPointer = *(IntPtr*)(IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(method).GetValue(null);
@@ -123,11 +99,12 @@ namespace PlayerList.Entries
             player = (Player)parameters[0];
             apiUser = player.field_Private_APIUser_0;
             userId = apiUser.id;
+            
             platform = platform = PlayerUtils.GetPlatform(player).PadRight(2);
+            perf = PerformanceRating.None;
+            perfString = "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, perf)) + ">" + PlayerUtils.ParsePerformanceText(perf) + "</color>";
 
             gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new Action(() => PlayerUtils.OpenPlayerInQuickMenu(player)));
-
-            textComponent.text = "Loading...";
 
             isFriend = APIUser.IsFriendsWith(apiUser.id);
             GetPlayerColor();
@@ -159,21 +136,9 @@ namespace PlayerList.Entries
                 };
 
             if (PlayerListConfig.condensedText.Value)
-            {
                 separator = "|";
-
-                if (!PlayerListConfig.numberedList.Value)
-                    foreach (PlayerEntry entry in EntryManager.playerEntriesWithLocal)
-                        entry.leftPart = "-";
-            }
             else
-            {
                 separator = " | ";
-
-                if (!PlayerListConfig.numberedList.Value)
-                    foreach (PlayerEntry entry in EntryManager.playerEntriesWithLocal)
-                        entry.leftPart = " - ";
-            }
 
             EntryManager.RefreshPlayerEntries();
         }
@@ -183,22 +148,33 @@ namespace PlayerList.Entries
             if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.Distance))
                 EntrySortManager.SortPlayer(this);
         }
-        public override void OnAvatarInstantiated(VRCPlayer vrcPlayer, GameObject avatar)
-        {
-            apiUser = player.field_Private_APIUser_0;
-
-            if (vrcPlayer.field_Private_Player_0.field_Private_APIUser_0?.id != userId)
-                return;
-
-            perf = vrcPlayer.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall];
-            if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.AvatarPerf))
-                EntrySortManager.SortPlayer(this);
-        }
         public override void OnAvatarChanged(ApiAvatar avatar, VRCAvatarManager manager)
         {
             if (manager.field_Private_VRCPlayer_0.field_Private_Player_0.field_Private_APIUser_0.id != userId)
                 return;
+            
             perf = PerformanceRating.None;
+            perfString = "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, perf)) + ">" + PlayerUtils.ParsePerformanceText(perf) + "</color>";
+
+            if (player.prop_PlayerNet_0 != null)
+                UpdateEntry(player.prop_PlayerNet_0, this, true);
+            
+            if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.AvatarPerf))
+                EntrySortManager.SortPlayer(this);
+        }
+        public override void OnAvatarInstantiated(VRCPlayer vrcPlayer, GameObject avatar)
+        {
+            apiUser = player.field_Private_APIUser_0;
+            userId = apiUser.id;
+            if (vrcPlayer.field_Private_Player_0.field_Private_APIUser_0?.id != userId)
+                return;
+
+            perf = vrcPlayer.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall];
+            perfString = "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, perf)) + ">" + PlayerUtils.ParsePerformanceText(perf) + "</color>";
+            
+            if (player.prop_PlayerNet_0 != null)
+                UpdateEntry(player.prop_PlayerNet_0, this, true);
+            
             if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.AvatarPerf))
                 EntrySortManager.SortPlayer(this);
         }
@@ -217,7 +193,7 @@ namespace PlayerList.Entries
 
             if (result == 64)
             {
-                EntryManager.GetEntryFromPlayer(EntryManager.playerEntriesWithLocal, vrcPlayer.field_Private_Player_0, out PlayerEntry entry);
+                EntryManager.GetEntryFromPlayer(EntryManager.sortedPlayerEntries, vrcPlayer.field_Private_Player_0, out PlayerEntry entry);
                 if (entry == null)
                     return result;
 
@@ -257,7 +233,7 @@ namespace PlayerList.Entries
             
             if (entry == null)
             {
-                EntryManager.GetEntryFromPlayer(EntryManager.playerEntriesWithLocal, playerNet.prop_Player_0, out entry);
+                EntryManager.GetEntryFromPlayer(EntryManager.sortedPlayerEntries, playerNet.prop_Player_0, out entry);
                 if (entry == null)
                     return;
             }
@@ -266,8 +242,7 @@ namespace PlayerList.Entries
 
             updateDelegate?.Invoke(playerNet, entry, ref tempString);
 
-            entry.withoutLeftPart = entry.TrimExtra(tempString);
-            entry.textComponent.text = entry.leftPart + entry.withoutLeftPart;
+            entry.textComponent.text = entry.TrimExtra(tempString);
         }
         private static bool OnIsFriend(ref bool __result)
         {
@@ -308,7 +283,7 @@ namespace PlayerList.Entries
         }
         private static void AddPerf(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {
-            tempString += "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, entry.perf)) + ">" + PlayerUtils.ParsePerformanceText(entry.perf) + "</color>" + separator;
+            tempString += entry.perfString + separator;
         }
         private static void AddDistance(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {
@@ -348,13 +323,6 @@ namespace PlayerList.Entries
             tempString += "<color=" + entry.playerColor + ">" + entry.apiUser.displayName + "</color>" + separator;
         }
 
-        public void Remove()
-        {
-            EntryManager.playerEntries.Remove(this);
-            EntryManager.playerEntriesWithLocal.Remove(this);
-            EntryManager.entries.Remove(Identifier);
-            UnityEngine.Object.DestroyImmediate(gameObject);
-        }
         private void GetPlayerColor(bool shouldSort = true)
         {
             playerColor = "";
@@ -387,16 +355,6 @@ namespace PlayerList.Entries
                     tempString = tempString.Remove(tempString.Length - 3, 3);
 
             return tempString;
-        }
-        public string CalculateLeftPart()
-        {
-            return "";
-            if (PlayerListConfig.numberedList.Value)
-                if (PlayerListConfig.condensedText.Value)
-                    leftPart = $"{gameObject.transform.GetSiblingIndex() - 1}.".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 1); // Pad by weird amount because we cant include the header and disabled template in total number of gameobjects
-                else
-                    leftPart = $"{gameObject.transform.GetSiblingIndex() - 1}. ".PadRight((gameObject.transform.parent.childCount - 2).ToString().Length + 2);
-            return leftPart;
         }
 
         public enum DisplayNameColorMode

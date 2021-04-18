@@ -30,10 +30,15 @@ namespace PlayerList.Entries
             isSelf = true;
             EntryManager.localPlayerEntry = this;
             player = Player.prop_Player_0;
+            apiUser = APIUser.CurrentUser;
+            userId = apiUser.id;
+
             gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new Action(() => PlayerUtils.OpenPlayerInQuickMenu(player)));
 
             platform = PlayerUtils.GetPlatform(player).PadRight(2);
-
+            perf = PerformanceRating.None;
+            perfString = "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, perf)) + ">" + PlayerUtils.ParsePerformanceText(perf) + "</color>";
+            
             NetworkEvents.OnPlayerJoin += new Action<Player>((player) =>
             {
                 int highestId = 0;
@@ -43,8 +48,6 @@ namespace PlayerList.Entries
 
                 highestPhotonIdLength = highestId.ToString().Length;
             });
-
-            textComponent.text = "Loading...";
 
             GetPlayerColor();
             OnConfigChanged();
@@ -102,8 +105,7 @@ namespace PlayerList.Entries
             player = Player.prop_Player_0;
             updateDelegate?.Invoke(player, this, ref tempString);
 
-            withoutLeftPart = TrimExtra(tempString);
-            textComponent.text = leftPart + withoutLeftPart;
+            textComponent.text = TrimExtra(tempString);
         }
         public override void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
         {
@@ -135,8 +137,7 @@ namespace PlayerList.Entries
         }
         private static void AddPerf(Player player, LocalPlayerEntry entry, ref string tempString)
         {
-            entry.perf = player.field_Internal_VRCPlayer_0.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall]; // Get from cache so it doesnt calculate perf all at once
-            tempString += "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, entry.perf)) + ">" + PlayerUtils.ParsePerformanceText(entry.perf) + "</color>" + separator;
+            tempString += entry.perfString + separator;
         }
         private static void AddDistance(Player player, LocalPlayerEntry entry, ref string tempString)
         {

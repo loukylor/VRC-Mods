@@ -15,13 +15,14 @@ namespace PlayerList
         internal static LocalPlayerEntry localPlayerEntry = null;
 
         public static List<PlayerEntry> playerEntries = new List<PlayerEntry>(); // This will not be sorted
-        public static List<PlayerEntry> playerEntriesWithLocal = new List<PlayerEntry>(); // This will be sorted
+        public static List<PlayerEntry> sortedPlayerEntries = new List<PlayerEntry>(); // This will be sorted
+        public static List<LeftSidePlayerEntry> leftSidePlayerEntries = new List<LeftSidePlayerEntry>();
         public static List<EntryBase> generalInfoEntries = new List<EntryBase>();
-        public static Dictionary<int, EntryBase> entries = new Dictionary<int, EntryBase>();
+        public static List<EntryBase> entries = new List<EntryBase>();
 
         public static void Init()
         {
-            PlayerListConfig.fontSize.OnValueChanged += OnFontSizeChange;
+            PlayerListConfig.fontSize.OnValueChanged += (oldValue, newValue) => SetFontSize(newValue);
             PlayerListConfig.OnConfigChangedEvent += OnConfigChanged;
             NetworkEvents.OnPlayerJoin += OnPlayerJoin;
             NetworkEvents.OnPlayerLeave += OnPlayerLeave;
@@ -36,58 +37,73 @@ namespace PlayerList
         public static void OnSceneWasLoaded()
         {
             for (int i = playerEntries.Count - 1; i >= 0; i--)
-                playerEntries[i].Remove();
+            { 
+                RemovePlayerEntry(playerEntries[i]);
+                RemoveLeftPlayerEntry(leftSidePlayerEntries[i + 1]); // Skip first entry
+                Object.DestroyImmediate(Constants.playerListLayout.transform.GetChild(i + 3).gameObject);
+            }
             foreach (EntryBase entry in generalInfoEntries)
                 entry.OnSceneWasLoaded();
         }
         public static void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
         {
-            foreach (EntryBase entry in entries.Values)
+            foreach (EntryBase entry in entries)
                 entry.OnInstanceChange(world, instance);
         }
         public static void OnConfigChanged()
         {
-            foreach (EntryBase entry in entries.Values)
+            foreach (EntryBase entry in entries)
                 entry.OnConfigChanged();
         }
         public static void OnAvatarChanged(ApiAvatar avatar, VRCAvatarManager manager)
         {
-            foreach (EntryBase entry in entries.Values)
+            foreach (EntryBase entry in entries)
                 entry.OnAvatarChanged(avatar, manager);
         }
         public static void OnAvatarInstantiated(VRCPlayer player, GameObject avatar)
         {
-            foreach (EntryBase entry in entries.Values)
+            foreach (EntryBase entry in entries)
                 entry.OnAvatarInstantiated(player, avatar);
-        }
-        public static void OnFontSizeChange(int oldValue, int newValue)
-        {
-            SetFontSize(newValue);
         }
 
         public static void OnPlayerJoin(Player player)
         {
-            if (GetEntryFromPlayer(playerEntriesWithLocal, player, out _)) return; // If already in list
+            if (GetEntryFromPlayer(sortedPlayerEntries, player, out _)) return; // If already in list
+
+            GameObject template;
+
             if (player.field_Private_APIUser_0.IsSelf)
             {
                 if (localPlayerEntry != null) return;
 
-                EntryBase.CreateInstance<LocalPlayerEntry>(Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform));
-                playerEntriesWithLocal.Add(localPlayerEntry);
-                localPlayerEntry.CalculateLeftPart();
+                template = Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform);
+                template.SetActive(true);
+                
+                EntryBase.CreateInstance<LocalPlayerEntry>(template.transform.Find("RightPart").gameObject);
+                sortedPlayerEntries.Add(localPlayerEntry);
                 AddEntry(localPlayerEntry);
-                localPlayerEntry.gameObject.SetActive(true);
+
+                AddLeftSidePlayerEntry(EntryBase.CreateInstance<LeftSidePlayerEntry>(template.transform.Find("LeftPart").gameObject));
+
                 return;
             }
 
-            AddPlayerEntry(EntryBase.CreateInstance<PlayerEntry>(Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform), new object[] { player }));
+            template = Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform);
+            template.SetActive(true);
+
+            AddPlayerEntry(EntryBase.CreateInstance<PlayerEntry>(template.transform.Find("RightPart").gameObject, new object[] { player }));
+            AddLeftSidePlayerEntry(EntryBase.CreateInstance<LeftSidePlayerEntry>(template.transform.Find("LeftPart").gameObject));
         }
         public static void OnPlayerLeave(Player player)
         {
-            if (!GetEntryFromPlayer(playerEntriesWithLocal, player, out PlayerEntry entry)) return;
-            
-            entry.Remove();
-            RefreshLayout();
+            int index = GetEntryFromPlayerWithIndex(sortedPlayerEntries, player, out PlayerEntry entry);
+            if (index < 0) return;
+
+            RemovePlayerEntry(entry);
+            RemoveLeftPlayerEntry(leftSidePlayerEntries[index]);
+            Object.DestroyImmediate(Constants.playerListLayout.transform.GetChild(index + 2).gameObject);
+
+            RefreshLeftPlayerEntries(leftSidePlayerEntries.Count + 1, leftSidePlayerEntries.Count, true);
         }
 
         public static void AddGeneralInfoEntries()
@@ -104,44 +120,79 @@ namespace PlayerList
             AddGeneralInfoEntry(EntryBase.CreateInstance<InstanceMasterEntry>(Constants.generalInfoLayout.transform.Find("InstanceMaster").gameObject, includeConfig: true));
             AddGeneralInfoEntry(EntryBase.CreateInstance<InstanceCreatorEntry>(Constants.generalInfoLayout.transform.Find("InstanceCreator").gameObject, includeConfig: true));
         }
-        public static bool GetEntryFromPlayer(List<PlayerEntry> list, Player player, out PlayerEntry entry)
+        public static int GetEntryFromPlayerWithIndex(List<PlayerEntry> list, Player player, out PlayerEntry entry)
         {
             if (player == null)
             {
                 entry = null;
-                return false;
+                return -1;
             }
-            
+
             string playerId = player.field_Private_APIUser_0.id;
-            foreach (PlayerEntry entryValue in list)
+            for (int i = 0; i < list.Count; i++)
             {
-                if (playerId == entryValue.userId)
-                { 
-                    entry = entryValue;
-                    return true;
+                if (playerId == list[i].userId)
+                {
+                    entry = list[i];
+                    return i;
                 }
             }
             entry = null;
-            return false;
+            return -1;
+        }
+        public static bool GetEntryFromPlayer(List<PlayerEntry> list, Player player, out PlayerEntry entry)
+        {
+            return GetEntryFromPlayerWithIndex(list, player, out entry) >= 0;
         }
         public static void AddEntry(EntryBase entry)
         {
             entry.textComponent.fontSize = PlayerListConfig.fontSize.Value;
-            entries.Add(entry.Identifier, entry);
-            RefreshLayout();
+            entries.Add(entry);
+        }
+        public static void AddLeftSidePlayerEntry(LeftSidePlayerEntry entry)
+        {
+            AddEntry(entry);
+            leftSidePlayerEntries.Add(entry);
+
+            RefreshLeftPlayerEntries(leftSidePlayerEntries.Count - 1, leftSidePlayerEntries.Count);
         }
         public static void AddPlayerEntry(PlayerEntry entry)
         {
             AddEntry(entry);
             playerEntries.Add(entry);
             entry.gameObject.SetActive(true);
-            playerEntriesWithLocal.Add(entry);
+            sortedPlayerEntries.Add(entry);
             EntrySortManager.SortPlayer(entry); 
         }
         public static void AddGeneralInfoEntry(EntryBase entry)
         {
             AddEntry(entry);
             generalInfoEntries.Add(entry);
+        }
+
+        public static void RemoveEntry(EntryBase entry)
+        {
+            entries.Remove(entry);
+            entry.Remove();
+        }
+        public static void RemoveLeftPlayerEntry(LeftSidePlayerEntry entry)
+        {
+            RemoveEntry(entry);
+            leftSidePlayerEntries.Remove(entry);
+        }
+        public static void RemovePlayerEntry(PlayerEntry entry)
+        {
+            sortedPlayerEntries.Remove(entry);
+            playerEntries.Remove(entry);
+            RemoveEntry(entry);
+        }
+
+        public static void RefreshLeftPlayerEntries(int oldCount, int newCount, bool bypassCount = false)
+        {
+            // If new digit reached (like 9 - 10)
+            if (oldCount.ToString().Length < newCount.ToString().Length || bypassCount)
+                foreach (LeftSidePlayerEntry updateEntry in leftSidePlayerEntries)
+                    updateEntry.CalculateLeftPart();
         }
         public static void RefreshPlayerEntries(bool bypassActive = false)
         {
@@ -155,8 +206,6 @@ namespace PlayerList
                 PlayerEntry.UpdateEntry(entry.player.prop_PlayerNet_0, entry, bypassActive);
 
             localPlayerEntry.Refresh();
-
-            RefreshLayout();
         }
         public static void RefreshGeneralInfoEntries()
         {
@@ -171,6 +220,7 @@ namespace PlayerList
             localPlayerEntry?.Refresh();
             RefreshGeneralInfoEntries();
         }
+
         public static void RefreshLayout()
         {
             LayoutRebuilder.ForceRebuildLayoutImmediate(Constants.playerListLayout.GetComponent<RectTransform>());
@@ -179,7 +229,7 @@ namespace PlayerList
         public static void SetFontSize(int fontSize)
         {
             MenuManager.fontSizeLabel.textComponent.text = $"Font\nSize: {fontSize}";
-            foreach (EntryBase entry in entries.Values)
+            foreach (EntryBase entry in entries)
                 entry.textComponent.fontSize = fontSize;
         }
     }

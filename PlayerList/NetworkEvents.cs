@@ -26,9 +26,10 @@ namespace PlayerList
         {
             OnAvatarChanged?.Invoke(__0, __instance);
         }
-        private static void OnAvatarInstantiatedMethod(VRCPlayer __instance, GameObject __0)
+        private static void OnAvatarInstantiatedMethod(VRCPlayer __instance, GameObject __0, bool __2)
         {
-            OnAvatarInstantiated?.Invoke(__instance, __0);
+            if (__2)
+                OnAvatarInstantiated?.Invoke(__instance, __0);
         }
 
         public static void NetworkInit()
@@ -39,7 +40,7 @@ namespace PlayerList
             var field1 = NetworkManager.field_Internal_Static_NetworkManager_0.field_Internal_VRCEventDelegate_1_Player_1;
             PlayerListMod.Instance.Harmony.Patch(typeof(RoomManager).GetMethod("Method_Public_Static_Boolean_ApiWorld_ApiWorldInstance_String_Int32_0"), null, new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnInstanceChangeMethod), BindingFlags.NonPublic | BindingFlags.Static)));
             PlayerListMod.Instance.Harmony.Patch(typeof(VRCAvatarManager).GetMethods().First(mi => mi.Name.StartsWith("Method_Public_Boolean_ApiAvatar_String_Single_")), null, new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnAvatarChangeMethod), BindingFlags.NonPublic | BindingFlags.Static)));
-            PlayerListMod.Instance.Harmony.Patch(typeof(VRCPlayer).GetMethods().First(mi => mi.Name.StartsWith("Method_Private_Void_GameObject_VRC_AvatarDescriptor_Boolean_") && Xref.CheckMethod(mi, "Avatar is Ready, Initializing")), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnAvatarInstantiatedMethod), BindingFlags.NonPublic | BindingFlags.Static)));
+            PlayerListMod.Instance.Harmony.Patch(typeof(VRCPlayer).GetMethods().First(mi => mi.Name.StartsWith("Method_Private_Void_GameObject_VRC_AvatarDescriptor_Boolean_") && !Xref.CheckMethod(mi, "Avatar is Ready, Initializing")), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnAvatarInstantiatedMethod), BindingFlags.NonPublic | BindingFlags.Static)));
 
             field0.field_Private_HashSet_1_UnityAction_1_T_0.Add(new Action<Player>((player) => OnPlayerJoin?.Invoke(player)));
             field1.field_Private_HashSet_1_UnityAction_1_T_0.Add(new Action<Player>((player) => OnPlayerLeave?.Invoke(player)));

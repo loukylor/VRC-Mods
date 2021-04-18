@@ -7,7 +7,7 @@ using PlayerList.Utilities;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.3.1", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.4.0", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace PlayerList
@@ -40,7 +40,6 @@ namespace PlayerList
             MenuManager.CreateMainSubMenu();
 
             // TODO: Add opacity options, maybe color too, (maybe even for each stage of ping and fps??)
-            // TODO: Add option to sort playerlist
             // TODO: Make is so the vector 2 acutlaly uses the custom mapper when it gets fixed
             // TODO: add load percentage??
             // TODO: don't add listener if one already present

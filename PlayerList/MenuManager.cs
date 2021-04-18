@@ -101,6 +101,7 @@ namespace PlayerList
 
             Constants.playerListLayout = playerList.transform.Find("PlayerList Viewport/PlayerList").GetComponent<VerticalLayoutGroup>();
             Constants.generalInfoLayout = playerList.transform.Find("GeneralInfo Viewport/GeneralInfo").GetComponent<VerticalLayoutGroup>();
+            Transform templateTransform = Constants.playerListLayout.transform.Find("Template");
 
             EnableDisableListener playerListListener = playerList.AddComponent<EnableDisableListener>();
             playerListListener.OnEnableEvent += EntryManager.RefreshAllEntries;
@@ -159,10 +160,10 @@ namespace PlayerList
             sortTypeButtonTable.Add(EntrySortManager.SortType.Default, new SingleButton(sortMenu.path, new Vector3(2, 0), "Default", new Action(() => EntrySortManager.currentComparisonProperty.SetValue(null, EntrySortManager.SortType.Default)), "Set sort type to default", "DefaultSortButton"));
             sortTypeButtonTable.Add(EntrySortManager.SortType.Alphabetical, new SingleButton(sortMenu.path, new Vector3(3, 0), "Alphabetical", new Action(() => EntrySortManager.currentComparisonProperty.SetValue(null, EntrySortManager.SortType.Alphabetical)), "Set sort type to alphabetical", "AlphabeticalSortButton"));
             sortTypeButtonTable.Add(EntrySortManager.SortType.AvatarPerf, new SingleButton(sortMenu.path, new Vector3(4, 0), "Avatar Perf", new Action(() => EntrySortManager.currentComparisonProperty.SetValue(null, EntrySortManager.SortType.AvatarPerf)), "Set sort type to avatar perf", "AvatarPerfSortButton"));
-            sortTypeButtonTable.Add(EntrySortManager.SortType.Distance, new SingleButton(sortMenu.path, new Vector3(1, 1), "Distance", new Action(() => EntrySortManager.currentComparisonProperty.SetValue(null, EntrySortManager.SortType.Distance)), "Set sort type to distance WARNING: This may cause noticable frame drops", "DistanceSortButton"));
+            sortTypeButtonTable.Add(EntrySortManager.SortType.Distance, new SingleButton(sortMenu.path, new Vector3(1, 1), "Distance", new Action(() => EntrySortManager.currentComparisonProperty.SetValue(null, EntrySortManager.SortType.Distance)), "Set sort type to distance\nWARNING: This may cause noticable frame drops", "DistanceSortButton"));
             sortTypeButtonTable.Add(EntrySortManager.SortType.Friends, new SingleButton(sortMenu.path, new Vector3(2, 1), "Friends", new Action(() => EntrySortManager.currentComparisonProperty.SetValue(null, EntrySortManager.SortType.Friends)), "Set sort type to friends", "FriendsSortButton"));
             sortTypeButtonTable.Add(EntrySortManager.SortType.NameColor, new SingleButton(sortMenu.path, new Vector3(3, 1), "Name Color", new Action(() => EntrySortManager.currentComparisonProperty.SetValue(null, EntrySortManager.SortType.NameColor)), "Set sort type to displayname color", "NameColorSortButton"));
-            sortTypeButtonTable.Add(EntrySortManager.SortType.Ping, new SingleButton(sortMenu.path, new Vector3(4, 1), "Ping", new Action(() => EntrySortManager.currentComparisonProperty.SetValue(null, EntrySortManager.SortType.Ping)), "Set sort type to ping", "PingSortButton"));
+            sortTypeButtonTable.Add(EntrySortManager.SortType.Ping, new SingleButton(sortMenu.path, new Vector3(4, 1), "Ping", new Action(() => EntrySortManager.currentComparisonProperty.SetValue(null, EntrySortManager.SortType.Ping)), "Set sort type to ping\nWARNING: This may cause noticable frame drops", "PingSortButton"));
             
             new SingleButton(sortMenu.path, new Vector3(5, 2), "Back", new Action(() => UIManager.OpenPage(playerListMenus[2].path)), "Press to go back", "BackButton", color: Color.yellow);
             AddPlayerListToSubMenu(sortMenu);

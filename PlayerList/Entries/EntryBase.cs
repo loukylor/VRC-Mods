@@ -27,6 +27,27 @@ namespace PlayerList.Entries
             get { return _identifier; }
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+            EntryBase objAsEntry = obj as EntryBase;
+            if (objAsEntry == null)
+                return false;
+            else
+                return Equals(objAsEntry);
+        }
+        public bool Equals(EntryBase entry)
+        {
+            if (entry == null)
+                return false;
+            return entry._identifier == _identifier;
+        }
+        public override int GetHashCode()
+        {
+            return _identifier;
+        }
+
         public virtual void Init(object[] parameters = null)
         {
         }
@@ -61,6 +82,12 @@ namespace PlayerList.Entries
 
         public virtual void OnAvatarInstantiated(VRCPlayer vrcPlayer, GameObject avatar)
         {
+        }
+
+        public virtual void Remove()
+        {
+            Object.DestroyImmediate(gameObject);
+            EntryManager.entries.Remove(this);
         }
 
         public static T CreateInstance<T>(GameObject gameObject, object[] parameters = null, bool includeConfig = false) where T : EntryBase, new()

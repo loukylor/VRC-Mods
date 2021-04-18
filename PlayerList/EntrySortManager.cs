@@ -2,39 +2,13 @@
 using System.Reflection;
 using PlayerList.Config;
 using PlayerList.Entries;
+using PlayerList.Utilities;
 
 namespace PlayerList
 {
     class EntrySortManager
     {
         public static int sortStartIndex = 0;
-        public static Func<PlayerEntry, PlayerSortData> sortPlayerFunction;
-        public static Func<PlayerEntry, PlayerSortData> defaultSortPlayerFunction = (entry) =>
-        { 
-            PlayerSortData sortData = new PlayerSortData();
-
-            int oldIndex = EntryManager.playerEntriesWithLocal.IndexOf(entry);
-            if (oldIndex < 0)
-                return sortData;
-
-            sortData.finalIndex = sortStartIndex;
-            for (int i = sortStartIndex; i < EntryManager.playerEntriesWithLocal.Count; i++)
-            {
-                int sortResult = sort(entry, EntryManager.playerEntriesWithLocal[i]);
-                if (sortResult > 0)
-                    sortData.finalIndex += sortResult;
-                else if (sortResult == 0)
-                    continue;
-                else
-                    break;
-            }
-
-            EntryManager.playerEntriesWithLocal.RemoveAt(oldIndex);
-            EntryManager.playerEntriesWithLocal.Insert(sortData.finalIndex, entry);
-            entry.gameObject.transform.SetSiblingIndex(sortData.finalIndex + 2);
-
-            return sortData;
-        };
 
         public static PropertyInfo baseComparisonProperty;
         public static PropertyInfo upperComparisonProperty;
@@ -211,26 +185,21 @@ namespace PlayerList
             else
                 reverseHighest = 1;
 
-            if (PlayerListConfig.ShowSelfAtTop.Value && EntryManager.localPlayerEntry != null)
+            if (PlayerListConfig.ShowSelfAtTop.Value)
             {
-                EntryManager.playerEntriesWithLocal.Remove(EntryManager.localPlayerEntry);
-                EntryManager.playerEntriesWithLocal.Insert(0, EntryManager.localPlayerEntry);
+                if (EntryManager.localPlayerEntry != null)
+                { 
+                    EntryManager.sortedPlayerEntries.Remove(EntryManager.localPlayerEntry);
+                    EntryManager.sortedPlayerEntries.Insert(0, EntryManager.localPlayerEntry);
+                    for (int i = 1; i < EntryManager.sortedPlayerEntries.Count; i++)
+                        EntryManager.sortedPlayerEntries[i].gameObject.transform.SetParent(Constants.playerListLayout.transform.GetChild(i + 2));
+                }
+
                 sortStartIndex = 1;
-
-                sortPlayerFunction = (entry) =>
-                {
-                    PlayerSortData sortData = defaultSortPlayerFunction(entry);
-
-                    if (EntryManager.playerEntriesWithLocal.Remove(EntryManager.localPlayerEntry))
-                        EntryManager.playerEntriesWithLocal.Insert(0, EntryManager.localPlayerEntry);
-                    EntryManager.localPlayerEntry?.gameObject.transform.SetSiblingIndex(2);
-                    return sortData;
-                };
             }
             else
             {
                 sortStartIndex = 0;
-                sortPlayerFunction = defaultSortPlayerFunction;
             }
 
             SortAllPlayers();
@@ -238,34 +207,45 @@ namespace PlayerList
 
         public static void SortAllPlayers() // This only runs when sort type is changed
         {
-            EntryManager.playerEntriesWithLocal.Sort(sort);
-
-            for (int i = 0; i < EntryManager.playerEntriesWithLocal.Count; i++)
-                EntryManager.playerEntriesWithLocal[i].gameObject.transform.SetSiblingIndex(i + 2);
+            EntryManager.sortedPlayerEntries.Sort(sort);
 
             if (PlayerListConfig.ShowSelfAtTop.Value)
-            {
-                if (EntryManager.playerEntriesWithLocal.Remove(EntryManager.localPlayerEntry))
-                    EntryManager.playerEntriesWithLocal.Insert(0, EntryManager.localPlayerEntry);
-                EntryManager.localPlayerEntry?.gameObject.transform.SetSiblingIndex(2);
-            }
+                if (EntryManager.sortedPlayerEntries.Remove(EntryManager.localPlayerEntry))
+                    EntryManager.sortedPlayerEntries.Insert(0, EntryManager.localPlayerEntry);
 
-            if (PlayerListConfig.numberedList.Value)
-                foreach (PlayerEntry entry in EntryManager.playerEntriesWithLocal)
-                    entry.textComponent.text = entry.CalculateLeftPart() + entry.withoutLeftPart;
+            for (int i = 0; i < EntryManager.sortedPlayerEntries.Count; i++)
+                EntryManager.sortedPlayerEntries[i].gameObject.transform.SetParent(Constants.playerListLayout.transform.GetChild(i + 2));
         }
         public static void SortPlayer(PlayerEntry sortEntry)
         {
-            PlayerSortData sortData = sortPlayerFunction(sortEntry);
-            
-            // Refresh count on numbered thingys that have changed
-            /*if (PlayerListConfig.numberedList.Value)
-                if (EntryManager.playerEntries.Count.ToString().Length != EntryManager.playerEntriesWithLocal.Count.ToString().Length)
-                    for (int i = 0; i < EntryManager.playerEntriesWithLocal.Count; i++)
-                        EntryManager.playerEntriesWithLocal[i].textComponent.text = EntryManager.playerEntriesWithLocal[i].CalculateLeftPart() + EntryManager.playerEntriesWithLocal[i].withoutLeftPart;
+            // This function takes around 0.01 - 0.1 ms in a full BC (excluding garbage collection)
+            int oldIndex = EntryManager.sortedPlayerEntries.IndexOf(sortEntry);
+            if (oldIndex < 0)
+                return;
+
+            int finalIndex = sortStartIndex;
+            int sortResult;
+            for (int i = sortStartIndex; i < EntryManager.sortedPlayerEntries.Count; i++)
+            {
+                if (i == oldIndex)
+                    continue;
+
+                sortResult = sort(sortEntry, EntryManager.sortedPlayerEntries[i]);
+                if (sortResult > 0)
+                    finalIndex += sortResult;
                 else
-                    for (int i = Math.Min(sortData.oldIndex, sortData.finalIndex); i < EntryManager.playerEntriesWithLocal.Count; i ++)
-                        EntryManager.playerEntriesWithLocal[i].textComponent.text = EntryManager.playerEntriesWithLocal[i].CalculateLeftPart() + EntryManager.playerEntriesWithLocal[i].withoutLeftPart;*/
+                    break;
+            }
+
+            EntryManager.sortedPlayerEntries.RemoveAt(oldIndex);
+            if (finalIndex < EntryManager.sortedPlayerEntries.Count)
+                EntryManager.sortedPlayerEntries.Insert(finalIndex, sortEntry);
+            else
+                EntryManager.sortedPlayerEntries.Add(sortEntry);
+
+            // Believe it or not but this is faster than changing the text of all the components every sort
+            for (int i = Math.Min(finalIndex, oldIndex); i < EntryManager.sortedPlayerEntries.Count; i++)
+                EntryManager.sortedPlayerEntries[i].gameObject.transform.SetParent(Constants.playerListLayout.transform.GetChild(i + 2));
         }
 
         public static bool IsSortTypeInUse(SortType sortType)
@@ -289,17 +269,6 @@ namespace PlayerList
             NonFriends,
             Friends,
             Self
-        }
-        public struct PlayerSortData
-        {
-            public int oldIndex;
-            public int finalIndex;
-
-            public PlayerSortData(int oldIndex, int finalIndex)
-            {
-                this.oldIndex = oldIndex;
-                this.finalIndex = finalIndex;
-            }
         }
     }
 }
