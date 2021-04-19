@@ -11,7 +11,6 @@ namespace UserInfoExtentions.Utilities
     {
         private static MethodInfo popupV2;
         private static MethodInfo popupV1;
-        private static MethodInfo closePopup;
 
         public static MenuController menuController;
 
@@ -29,8 +28,6 @@ namespace UserInfoExtentions.Utilities
                         var possibleMethods = typeof(VRCUiPopupManager).GetMethods().Where(mb => mb.Name.StartsWith("Method_Public_Void_String_String_String_Action_Action_1_VRCUiPopup_") && !mb.Name.Contains("PDM"));
             popupV1 = typeof(VRCUiPopupManager).GetMethods()
                 .First(mb => mb.Name.StartsWith("Method_Public_Void_String_String_String_Action_Action_1_VRCUiPopup_") && !mb.Name.Contains("PDM") && Xref.CheckMethod(mb, "UserInterface/MenuContent/Popups/StandardPopup"));
-            closePopup = typeof(VRCUiPopupManager).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_") && mb.Name.Length <= 21 && !mb.Name.Contains("PDM") && Xref.CheckMethod(mb, "POPUP"));
         }
 
         public static void UiInit()
@@ -50,7 +47,17 @@ namespace UserInfoExtentions.Utilities
         }
         public static void ClosePopup()
         {
-            closePopup.Invoke(VRCUiPopupManager.field_Private_Static_VRCUiPopupManager_0, null);
+            VRCUiPopup popup = VRCUiManager.prop_VRCUiManager_0.field_Internal_VRCUiPopup_0;
+            if (popup == null) // If null try grabbing from the screen stack
+            {
+                foreach (VRCUiPage vrcUIPage in VRCUiManager.prop_VRCUiManager_0.field_Internal_Dictionary_2_String_VRCUiPage_0.Values)
+                    popup = vrcUIPage.TryCast<VRCUiPopup>();
+
+                if (popup == null)
+                    return;
+            }
+
+            popup.Close();
         }
     }
 }
