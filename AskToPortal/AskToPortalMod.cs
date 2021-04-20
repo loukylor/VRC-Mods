@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using AskToPortal.Components;
 using AskToPortal.Utilities;
 using Harmony;
 using MelonLoader;
@@ -53,19 +52,13 @@ namespace AskToPortal
                 Harmony.Patch(typeof(PortalInternal).GetMethod("OnDestroy"), prefix: new HarmonyMethod(typeof(AskToPortalMod).GetMethod("OnPortalDestroyed", BindingFlags.Static | BindingFlags.Public)));
 
                 VRCUtils.Init();
-                ComponentManager.Init(Harmony);
 
                 MelonLogger.Msg("Initialized!");
             }
         }
-        public override void VRChat_OnUiManagerInit()
-        {
-            if (!hasPortalConfirmation) ComponentManager.UiInit();
-        }
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
             cachedDroppers.Clear();
-            ComponentManager.OnSceneWasLoaded();
         }
 
         public static void OnPortalDropped(MonoBehaviour __instance, Player __3)
