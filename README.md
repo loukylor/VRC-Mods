@@ -25,6 +25,7 @@ More detailed instructions and more mods can be found in the [VRChat Modding Gro
 - [CloningBeGone](#cloningbegone)
 - [InstanceHistory](#instancehistory)
 - [PlayerList](#playerlist)
+- [PreviewScroller](#previewscroller)
 - [ReloadAvatars](#reloadavatars)
 - [UserInfoExtensions](#userinfoextensions)
 
@@ -98,6 +99,9 @@ Oh yea, also report any errors to me. You can make an issue or ping/DM me.
 
 ## Picture of List
 ![Picture of List](https://i.imgur.com/Tt6ZYqB.png)
+
+# PreviewScroller
+A mod that let's you sort of scroll the avatar preview so you can control where it's facing
 
 # ReloadAvatars
 Adds buttons to reload a single user's avatar or all users' avatar.
