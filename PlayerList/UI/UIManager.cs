@@ -66,21 +66,21 @@ namespace PlayerList.UI
         public static void Init()
         {
             closeQuickMenu = typeof(QuickMenu).GetMethods()
-                .Where(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM") && Xref.CheckUsed(mb, "Method_Public_Void_Int32_Boolean_")).First();
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM") && Xref.CheckUsed(mb, "Method_Public_Void_Int32_Boolean_"));
 
             openQuickMenu = typeof(QuickMenu).GetMethods()
-                 .Where(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && mb.GetParameters().Any(pi => pi.HasDefaultValue == false)).First();
+                 .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && mb.GetParameters().Any(pi => pi.HasDefaultValue == false));
 
             setMenuIndex = typeof(QuickMenu).GetMethods()
-                .Where(mb => mb.Name.StartsWith("Method_Public_Void_Int32_") && mb.Name.Length <= 27 && Xref.CheckUsed(mb, "Method_Public_Void_Boolean_")).First();
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Int32_") && mb.Name.Length <= 27 && Xref.CheckUsed(mb, "Method_Public_Void_Boolean_"));
 
             QuickMenuContextualDisplayEnum = typeof(QuickMenuContextualDisplay).GetNestedTypes()
-                .Where(type => type.Name.StartsWith("Enum")).First();
+                .First(type => type.Name.StartsWith("Enum"));
 
             QuickMenuContexualDisplayMethod = typeof(QuickMenuContextualDisplay).GetMethod($"Method_Public_Void_{QuickMenuContextualDisplayEnum.Name}_0");
 
-            PlayerListMod.Instance.Harmony.Patch(openQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuOpen))));
-            PlayerListMod.Instance.Harmony.Patch(closeQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuClose))));
+            PlayerListMod.Instance.Harmony.Patch(openQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuOpen), BindingFlags.NonPublic | BindingFlags.Static)));
+            PlayerListMod.Instance.Harmony.Patch(closeQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuClose), BindingFlags.NonPublic | BindingFlags.Static)));
         }
         public static void UIInit()
         {
