@@ -90,8 +90,8 @@ namespace UserInfoExtensions
         public static void HideAllPopups()
         {
             VRCUtils.ClosePopup();
-            BioButtons.bioLanguagesPopup.Close();
-            BioButtons.bioLinksPopup.Close();
+            BioButtons.bioLanguagesPopup?.Close();
+            BioButtons.bioLinksPopup?.Close();
             menu.Hide();
         }
         public static void AddModule(ModuleBase module)

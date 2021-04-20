@@ -26,9 +26,10 @@ namespace UserInfoExtentions.Modules
             UserInfoExtensionsMod.menu.AddSimpleButton("To Quick Menu", ToQuickMenu);
 
             closeMenu = typeof(VRCUiManager).GetMethods()
-                            .Where(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_Boolean_") && !mb.Name.Contains("_PDM_")).OrderBy(mb => ((UnhollowerBaseLib.Attributes.CallerCountAttribute)Attribute.GetCustomAttribute(mb, typeof(UnhollowerBaseLib.Attributes.CallerCountAttribute))).Count).Last();
+                .Where(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_Boolean_") && !mb.Name.Contains("_PDM_"))
+                .OrderBy(mb => UnhollowerSupport.GetIl2CppMethodCallerCount(mb)).Last();
             openQuickMenu = typeof(QuickMenu).GetMethods()
-                            .Where(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && mb.GetParameters().Any(pi => pi.HasDefaultValue == false)).First();
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && mb.GetParameters().Any(pi => pi.HasDefaultValue == false));
             clickMethod = typeof(VRCUiCursor).GetMethods()
                 .First(mi => mi.Name.StartsWith("Method_Public_Void_VRCPlayer_") && mi.GetParameters().Any(pi => pi.ParameterType == typeof(VRCPlayer)));
         }
