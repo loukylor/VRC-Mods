@@ -17,7 +17,7 @@ namespace AskToPortal.Utilities
             popupV2 = typeof(VRCUiPopupManager).GetMethods()
                 .First(mb => mb.Name.StartsWith("Method_Public_Void_String_String_String_Action_String_Action_Action_1_VRCUiPopup_") && !mb.Name.Contains("PDM") && Xref.CheckMethod(mb, "UserInterface/MenuContent/Popups/StandardPopupV2"));
             closeMenu = typeof(VRCUiManager).GetMethods()
-                 .Where(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && Xref.CheckUsed(mb, "ShowAddMessagePopup")).First();
+                 .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && Xref.CheckUsed(mb, "ShowAddMessagePopup"));
         }
         public static void ClosePopup() => VRCUiManager.prop_VRCUiManager_0.HideScreen("POPUP");
         public static void CloseMenu() => closeMenu.Invoke(VRCUiManager.prop_VRCUiManager_0, new object[] { false });
