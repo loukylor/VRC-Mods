@@ -38,9 +38,8 @@ namespace UserInfoExtensions
             menu.AddLabel("General Things");
             menu.AddSpacer();
             menu.AddSimpleButton("Back", () => menu.Hide());
-            userDetailsMenu.AddSimpleButton("UserInfoExtensions", async () => 
+            userDetailsMenu.AddSimpleButton("UserInfoExtensions", () => 
             {
-                await AsyncUtils.YieldToMainThread();
                 HideAllPopups();
                 menu.Show();
                 foreach (ModuleBase module in modules)
@@ -64,9 +63,8 @@ namespace UserInfoExtensions
 
             MelonLogger.Msg("UI Initialized!");
         }
-        public override async void OnPreferencesSaved()
+        public override void OnPreferencesSaved()
         {
-            await AsyncUtils.YieldToMainThread();
             foreach (ModuleBase module in modules)
                 module.OnPreferencesSaved();
         }
@@ -74,9 +72,8 @@ namespace UserInfoExtensions
         {
             if (AsyncUtils.toMainThreadQueue.TryDequeue(out Action action)) action();
         }
-        public static async void OnUserInfoOpen()
+        public static void OnUserInfoOpen()
         {
-            await AsyncUtils.YieldToMainThread();
             foreach (ModuleBase module in modules)
                 module.OnUserInfoOpen();
         }
