@@ -3,7 +3,6 @@ using System.Reflection;
 using PlayerList.Config;
 using PlayerList.Entries;
 using PlayerList.Utilities;
-using UnityEngine;
 
 namespace PlayerList
 {

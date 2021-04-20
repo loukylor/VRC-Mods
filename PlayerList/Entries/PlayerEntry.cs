@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -46,12 +47,12 @@ namespace PlayerList.Entries
         public static UpdateEntryDelegate updateDelegate;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate IntPtr OnPlayerNetDecode(IntPtr instancePointer, IntPtr objectsPointer, int objectIndex, float sendTime, IntPtr nativeMethodPointer);
-        private static OnPlayerNetDecode originalDecodeDelegate = null;
+        private delegate IntPtr OnPlayerNetDecodeDelegate(IntPtr instancePointer, IntPtr objectsPointer, int objectIndex, float sendTime, IntPtr nativeMethodPointer);
+        private static List<OnPlayerNetDecodeDelegate> dontGarbageCollectDelegates = new List<OnPlayerNetDecodeDelegate>();
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate int OnVRCPlayerDataReceived(IntPtr instancePointer, IntPtr hashtablePointer, IntPtr nativeMethodPointer);
-        private static OnVRCPlayerDataReceived originalDataReceiveDelegate = null;
+        private delegate int OnVRCPlayerDataReceivedDelegate(IntPtr instancePointer, IntPtr hashtablePointer, IntPtr nativeMethodPointer);
+        private static OnVRCPlayerDataReceivedDelegate originalDataReceiveDelegate;
 
         public static void EntryInit()
         {
@@ -65,33 +66,36 @@ namespace PlayerList.Entries
             PlayerListMod.Instance.Harmony.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend), BindingFlags.NonPublic | BindingFlags.Static)));
 
             // Definitely not stolen code from our lord and savior knah (https://github.com/knah/VRCMods/blob/master/AdvancedSafety/AdvancedSafetyMod.cs) because im not a skid
-            foreach (MethodInfo method in typeof(PlayerNet).GetMethods().Where(mi => mi.GetParameters().Length == 3 && mi.Name.StartsWith("Method_Public_Virtual_Final_New_Void_ValueTypePublic")))
+            foreach (MethodInfo method in typeof(PlayerNet).GetMethods().Where(mi => mi.GetParameters().Length == 3 && mi.Name.StartsWith("Method_Public_Virtual_Final_New_Void_ValueTypePublicSealed2157InObIn1157Ob4471Unique_Int32_Single_0")))
             {
                 unsafe
                 {
                     var originalMethodPointer = *(IntPtr*)(IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(method).GetValue(null);
 
-                    OnPlayerNetDecode replacement = (instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer) => OnPlayerNetDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
+                    OnPlayerNetDecodeDelegate originalDecodeDelegate = null;
+
+                    OnPlayerNetDecodeDelegate replacement = (instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer) => OnPlayerNetPatch(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer, originalDecodeDelegate);
+
+                    dontGarbageCollectDelegates.Add(replacement);
 
                     MelonUtils.NativeHookAttach((IntPtr)(&originalMethodPointer), Marshal.GetFunctionPointerForDelegate(replacement));
-
-                    originalDecodeDelegate = Marshal.GetDelegateForFunctionPointer<OnPlayerNetDecode>(originalMethodPointer);
+                    
+                    originalDecodeDelegate = Marshal.GetDelegateForFunctionPointer<OnPlayerNetDecodeDelegate>(originalMethodPointer);
                 }
             }
 
             // Use native patch here as doing a harmony patch would mean I would have to use a named type. even if i got around that with some clever logic it would break player initialization somewhat
-            foreach (MethodInfo method in typeof(VRCPlayer).GetMethods().Where(mi => mi.ReturnType.IsEnum && mi.GetParameters().Length == 1 && mi.GetParameters()[0].ParameterType == typeof(Il2CppSystem.Collections.Hashtable) && Xref.CheckMethod(mi, "Failed to read showSocialRank for {0}")))
+            unsafe
             {
-                unsafe
-                {
-                    var originalMethodPointer = *(IntPtr*)(IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(method).GetValue(null);
+                MethodInfo method = typeof(VRCPlayer).GetMethods().First(mi => mi.ReturnType.IsEnum && mi.GetParameters().Length == 1 && mi.GetParameters()[0].ParameterType == typeof(Il2CppSystem.Collections.Hashtable) && Xref.CheckMethod(mi, "Failed to read showSocialRank for {0}"));
 
-                    OnVRCPlayerDataReceived replacement = (instancePointer, hashtablePointer, nativeMethodPointer) => OnVRCPlayerDataReceivedDelegate(instancePointer, hashtablePointer, nativeMethodPointer);
+                var originalMethodPointer = *(IntPtr*)(IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(method).GetValue(null);
 
-                    MelonUtils.NativeHookAttach((IntPtr)(&originalMethodPointer), Marshal.GetFunctionPointerForDelegate(replacement));
+                OnVRCPlayerDataReceivedDelegate replacement = (instancePointer, hashtablePointer, nativeMethodPointer) => OnVRCPlayerDataReceivedPatch(instancePointer, hashtablePointer, nativeMethodPointer);
 
-                    originalDataReceiveDelegate = Marshal.GetDelegateForFunctionPointer<OnVRCPlayerDataReceived>(originalMethodPointer);
-                }
+                MelonUtils.NativeHookAttach((IntPtr)(&originalMethodPointer), Marshal.GetFunctionPointerForDelegate(replacement));
+
+                originalDataReceiveDelegate = Marshal.GetDelegateForFunctionPointer<OnVRCPlayerDataReceivedDelegate>(originalMethodPointer);
             }
         }
         public override void Init(object[] parameters)
@@ -175,7 +179,7 @@ namespace PlayerList.Entries
                 EntrySortManager.SortPlayer(this);
         }
 
-        private static int OnVRCPlayerDataReceivedDelegate(IntPtr instancePointer, IntPtr hashtablePointer, IntPtr nativeMethodPointer)
+        private static int OnVRCPlayerDataReceivedPatch(IntPtr instancePointer, IntPtr hashtablePointer, IntPtr nativeMethodPointer)
         {
             if (instancePointer == IntPtr.Zero)
                 return originalDataReceiveDelegate(instancePointer, hashtablePointer, nativeMethodPointer);
@@ -198,7 +202,7 @@ namespace PlayerList.Entries
 
             return result;
         }
-        private static IntPtr OnPlayerNetDecodeDelegate(IntPtr instancePointer, IntPtr objectsPointer, int objectIndex, float sendTime, IntPtr nativeMethodPointer)
+        private static IntPtr OnPlayerNetPatch(IntPtr instancePointer, IntPtr objectsPointer, int objectIndex, float sendTime, IntPtr nativeMethodPointer, OnPlayerNetDecodeDelegate originalDecodeDelegate)
         {
             if (instancePointer == IntPtr.Zero)
                 return originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
@@ -207,13 +211,22 @@ namespace PlayerList.Entries
             if (playerNet == null)
                 return originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
 
+            EntryManager.GetEntryFromPlayer(EntryManager.sortedPlayerEntries, playerNet.prop_Player_0, out PlayerEntry entry);
+            if (entry == null)
+                return originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
+
+            // Update values but not text even if playerlist not active and before decode
+            entry.distance = (entry.player.transform.position - Player.prop_Player_0.transform.position).magnitude;
+            entry.fps = MelonUtils.Clamp((int)(1000f / playerNet.field_Private_Byte_0), -99, 999);
+            entry.ping = playerNet.prop_Int16_0;
+
             IntPtr result = originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
             if (result == IntPtr.Zero)
                 return result;
 
             try
             {
-                UpdateEntry(playerNet);
+                UpdateEntry(playerNet, entry);
             }
             catch (Exception ex)
             {
@@ -222,20 +235,8 @@ namespace PlayerList.Entries
 
             return result;
         }
-        public static void UpdateEntry(PlayerNet playerNet, PlayerEntry entry = null, bool bypassActive = false)
+        public static void UpdateEntry(PlayerNet playerNet, PlayerEntry entry, bool bypassActive = false)
         {
-            if (entry == null)
-            {
-                EntryManager.GetEntryFromPlayer(EntryManager.sortedPlayerEntries, playerNet.prop_Player_0, out entry);
-                if (entry == null)
-                    return;
-            }
-
-            // Update values but not text even if playerlist not active
-            entry.distance = (entry.player.transform.position - Player.prop_Player_0.transform.position).magnitude;
-            entry.fps = MelonUtils.Clamp((int)(1000f / playerNet.field_Private_Byte_0), -99, 999);
-            entry.ping = playerNet.prop_Int16_0;
-
             if (!(MenuManager.playerList.active || bypassActive))
                 return;
 
@@ -268,7 +269,7 @@ namespace PlayerList.Entries
         private static void AddFps(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {
             tempString += "<color=" + PlayerUtils.GetFpsColor(entry.fps) + ">";
-            if (playerNet.field_Private_Byte_0 == 0)
+            if (entry.fps == 0)
                 tempString += "?¿?</color>";
             else
                 tempString += entry.fps.ToString().PadRight(3) + "</color>";
