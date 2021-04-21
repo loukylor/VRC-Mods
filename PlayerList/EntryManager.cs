@@ -122,7 +122,7 @@ namespace PlayerList
         }
         public static int GetEntryFromPlayerWithIndex(List<PlayerEntry> list, Player player, out PlayerEntry entry)
         {
-            if (player == null)
+            if (player == null || player.field_Private_APIUser_0 == null)
             {
                 entry = null;
                 return -1;
