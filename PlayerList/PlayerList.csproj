@@ -41,6 +41,9 @@
 		<Reference Include="Photon-DotNet">
 		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\Photon-DotNet.dll</HintPath>
 		</Reference>
+		<Reference Include="UIExpansionKit">
+		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\Mods\UIExpansionKit.dll</HintPath>
+		</Reference>
 		<Reference Include="UnhollowerBaseLib">
 			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\UnhollowerBaseLib.dll</HintPath>
 		</Reference>

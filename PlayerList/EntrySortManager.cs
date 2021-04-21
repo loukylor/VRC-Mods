@@ -41,10 +41,10 @@ namespace PlayerList
         {
             return lEntry.distance.CompareTo(rEntry.distance);
         };
-        private static readonly Comparison<PlayerEntry> fpsSort = (lEntry, rEntry) =>
+        /*private static readonly Comparison<PlayerEntry> fpsSort = (lEntry, rEntry) =>
         {
             return lEntry.fps.CompareTo(rEntry.fps);
-        };
+        };*/
         private static readonly Comparison<PlayerEntry> friendsSort = (lEntry, rEntry) =>
         {
             if (!lEntry.isFriend && rEntry.isFriend)

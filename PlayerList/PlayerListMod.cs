@@ -9,6 +9,7 @@ using UnityEngine;
 
 [assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.4.0", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
+[assembly: MelonOptionalDependencies(new string[1] { "UIExpansionKit" })]
 
 namespace PlayerList
 {
@@ -38,7 +39,6 @@ namespace PlayerList
             // TODO: Add opacity options, maybe color too, (maybe even for each stage of ping and fps??)
             // TODO: Make is so the vector 2 acutlaly uses the custom mapper when it gets fixed
             // TODO: add load percentage??
-            // TODO: don't add listener if one already present
             // TODO: add indicator for those in hearing distance
             // TODO: Crash indication
 

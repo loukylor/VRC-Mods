@@ -140,10 +140,21 @@ namespace PlayerList
         public static void AddMenuListeners()
         {
             // Add listeners
-            EnableDisableListener shortcutMenuListener = Constants.shortcutMenu.AddComponent<EnableDisableListener>();
-            shortcutMenuListener.OnEnableEvent += new Action(() => playerList.SetActive(!shouldStayHidden && !PlayerListConfig.onlyEnabledInConfig.Value));
-            shortcutMenuListener.OnDisableEvent += new Action(() => playerList.SetActive(false));
-            
+            if (MelonHandler.Mods.Any(x => x.Info.Name.Equals("UI Expansion Kit")))
+            {
+                typeof(UIXManager).GetMethod("AddListenerToShortcutMenu").Invoke(null, new object[2]
+                {
+                    new Action(() => playerList.SetActive(!shouldStayHidden && !PlayerListConfig.onlyEnabledInConfig.Value)),
+                    new Action(() => playerList.SetActive(false))
+                });
+            }
+            else
+            { 
+                EnableDisableListener shortcutMenuListener = Constants.shortcutMenu.AddComponent<EnableDisableListener>();
+                shortcutMenuListener.OnEnableEvent += new Action(() => playerList.SetActive(!shouldStayHidden && !PlayerListConfig.onlyEnabledInConfig.Value));
+                shortcutMenuListener.OnDisableEvent += new Action(() => playerList.SetActive(false));
+            }
+
             GameObject newElements = GameObject.Find("UserInterface/QuickMenu/QuickMenu_NewElements");
             GameObject Tabs = GameObject.Find("UserInterface/QuickMenu/QuickModeTabs");
 

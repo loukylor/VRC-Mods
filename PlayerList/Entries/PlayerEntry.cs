@@ -48,7 +48,7 @@ namespace PlayerList.Entries
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr OnPlayerNetDecodeDelegate(IntPtr instancePointer, IntPtr objectsPointer, int objectIndex, float sendTime, IntPtr nativeMethodPointer);
-        private static List<OnPlayerNetDecodeDelegate> dontGarbageCollectDelegates = new List<OnPlayerNetDecodeDelegate>();
+        private static readonly List<OnPlayerNetDecodeDelegate> dontGarbageCollectDelegates = new List<OnPlayerNetDecodeDelegate>();
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int OnVRCPlayerDataReceivedDelegate(IntPtr instancePointer, IntPtr hashtablePointer, IntPtr nativeMethodPointer);
@@ -76,7 +76,7 @@ namespace PlayerList.Entries
 
                     OnPlayerNetDecodeDelegate replacement = (instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer) => OnPlayerNetPatch(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer, originalDecodeDelegate);
 
-                    dontGarbageCollectDelegates.Add(replacement);
+                    dontGarbageCollectDelegates.Add(replacement); // Add to list to prevent from being garbage collected
 
                     MelonUtils.NativeHookAttach((IntPtr)(&originalMethodPointer), Marshal.GetFunctionPointerForDelegate(replacement));
                     
@@ -217,7 +217,7 @@ namespace PlayerList.Entries
 
             // Update values but not text even if playerlist not active and before decode
             entry.distance = (entry.player.transform.position - Player.prop_Player_0.transform.position).magnitude;
-            entry.fps = MelonUtils.Clamp((int)(1000f / playerNet.field_Private_Byte_0), -99, 999);
+            entry.fps = MelonUtils.Clamp((int)(1000f / playerNet.field_Private_Byte_0 == 0 ? 0 : playerNet.field_Private_Byte_0), -99, 999);
             entry.ping = playerNet.prop_Int16_0;
 
             IntPtr result = originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
