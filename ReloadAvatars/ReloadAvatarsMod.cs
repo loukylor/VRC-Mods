@@ -5,7 +5,7 @@ using MelonLoader;
 using UIExpansionKit.API;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(ReloadAvatars.ReloadAvatarsMod), "ReloadAvatars", "1.0.2", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(ReloadAvatars.ReloadAvatarsMod), "ReloadAvatars", "1.0.3", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace ReloadAvatars
@@ -25,7 +25,7 @@ namespace ReloadAvatars
             reloadAllAvatarsPref = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("ReloadAvatars", "ReloadAllAvatars", true, "Enable/Disable Reload All Avatars Button");
 
             MethodInfo reloadAvatarMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.Name.StartsWith("Method_Private_Void_Boolean_") && mi.Name.Length < 31 && mi.GetParameters().Any(pi => pi.IsOptional));
-            MethodInfo reloadAllAvatarsMethod = typeof(VRCPlayer).GetMethods().Where(mi => mi.Name.StartsWith("Method_Public_Void_Boolean_") && mi.Name.Length < 30 && mi.GetParameters().Any(pi => pi.IsOptional)).First(); // Both methods seem to do the same thing
+            MethodInfo reloadAllAvatarsMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.Name.StartsWith("Method_Public_Void_Boolean_") && mi.Name.Length < 30 && mi.GetParameters().Any(pi => pi.IsOptional));// Both methods seem to do the same thing
 
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.UserQuickMenu).AddSimpleButton("Reload Avatar", new Action(() =>
             {
@@ -44,6 +44,7 @@ namespace ReloadAvatars
                 try
                 {
                     reloadAllAvatarsMethod.Invoke(VRCPlayer.field_Internal_Static_VRCPlayer_0, new object[] { true });
+                    reloadAvatarMethod.Invoke(VRCPlayer.field_Internal_Static_VRCPlayer_0, new object[] { true }); // Ensure self is also reloaded (reload is not networked)
                 }
                 catch (Exception ex)
                 {
