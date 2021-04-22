@@ -31,7 +31,7 @@ namespace ReloadAvatars
             {
                 try
                 {
-                    reloadAvatarMethod.Invoke(QuickMenu.prop_QuickMenu_0.field_Private_Player_0.field_Internal_VRCPlayer_0, new object[] { true });
+                    reloadAvatarMethod.Invoke(QuickMenu.prop_QuickMenu_0.field_Private_Player_0.prop_VRCPlayer_0, new object[] { true });
                 }
                 catch (Exception ex)
                 {

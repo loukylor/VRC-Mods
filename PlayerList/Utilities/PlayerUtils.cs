@@ -18,8 +18,8 @@ namespace PlayerList.Utilities
 
         public static void OpenPlayerInQuickMenu(Player player)
         {
-            InputManager.SelectPlayer(player.field_Internal_VRCPlayer_0);
-            QuickMenuContextualDisplay.Method_Public_Static_Void_VRCPlayer_0(player.field_Internal_VRCPlayer_0);
+            InputManager.SelectPlayer(player.prop_VRCPlayer_0);
+            QuickMenuContextualDisplay.Method_Public_Static_Void_VRCPlayer_0(player.prop_VRCPlayer_0);
         }
 
         public static string GetPingColor(int ping)

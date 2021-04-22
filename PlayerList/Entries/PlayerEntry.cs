@@ -150,7 +150,7 @@ namespace PlayerList.Entries
         }
         public override void OnAvatarChanged(ApiAvatar avatar, VRCAvatarManager manager)
         {
-            if (manager.field_Private_VRCPlayer_0.field_Private_Player_0.field_Private_APIUser_0.id != userId)
+            if (manager.field_Private_VRCPlayer_0.prop_Player_0.field_Private_APIUser_0.id != userId)
                 return;
             
             perf = PerformanceRating.None;
@@ -166,7 +166,7 @@ namespace PlayerList.Entries
         {
             apiUser = player.field_Private_APIUser_0;
             userId = apiUser.id;
-            if (vrcPlayer.field_Private_Player_0.field_Private_APIUser_0?.id != userId)
+            if (vrcPlayer.prop_Player_0.field_Private_APIUser_0?.id != userId)
                 return;
 
             perf = vrcPlayer.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall];
@@ -193,7 +193,7 @@ namespace PlayerList.Entries
 
             if (result == 64)
             {
-                EntryManager.GetEntryFromPlayer(EntryManager.sortedPlayerEntries, vrcPlayer.field_Private_Player_0, out PlayerEntry entry);
+                EntryManager.GetEntryFromPlayer(EntryManager.sortedPlayerEntries, vrcPlayer.prop_Player_0, out PlayerEntry entry);
                 if (entry == null)
                     return result;
 
@@ -217,7 +217,7 @@ namespace PlayerList.Entries
 
             // Update values but not text even if playerlist not active and before decode
             entry.distance = (entry.player.transform.position - Player.prop_Player_0.transform.position).magnitude;
-            entry.fps = MelonUtils.Clamp((int)(1000f / playerNet.field_Private_Byte_0 == 0 ? 0 : playerNet.field_Private_Byte_0), -99, 999);
+            entry.fps = MelonUtils.Clamp(1000f / playerNet.field_Private_Byte_0 == 0 ? 0 : playerNet.field_Private_Byte_0, -99, 999);
             entry.ping = playerNet.prop_Int16_0;
 
             IntPtr result = originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
@@ -313,7 +313,7 @@ namespace PlayerList.Entries
         }
         private static void AddPhotonId(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {
-            tempString += entry.player.field_Internal_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0.ToString().PadRight(highestPhotonIdLength) + separator;
+            tempString += entry.player.prop_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0.ToString().PadRight(highestPhotonIdLength) + separator;
         }
         private static void AddDisplayName(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {

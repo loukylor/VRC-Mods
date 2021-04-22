@@ -35,7 +35,7 @@ namespace PlayerList
         };
         private static readonly Comparison<PlayerEntry> defaultSort = (lEntry, rEntry) =>
         {
-            return lEntry.player.field_Internal_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0.CompareTo(rEntry.player.field_Internal_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0);
+            return lEntry.player.prop_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0.CompareTo(rEntry.player.prop_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0);
         };
         internal static readonly Comparison<PlayerEntry> distanceSort = (lEntry, rEntry) =>
         {
