@@ -4,7 +4,7 @@ using System.Reflection;
 using UnityEngine;
 using VRC.Core;
 using VRC.UI;
-using MelonLoader;
+
 namespace UserInfoExtentions.Utilities
 {
     class VRCUtils

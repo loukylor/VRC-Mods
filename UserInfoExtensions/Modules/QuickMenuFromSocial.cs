@@ -49,7 +49,7 @@ namespace UserInfoExtentions.Modules
                     closeMenu.Invoke(VRCUiManager.prop_VRCUiManager_0, new object[] { true, false }); //Closes Big Menu
                     openQuickMenu.Invoke(QuickMenu.prop_QuickMenu_0, new object[] { true }); //Opens Quick Menu
 
-                    if (VRCUiCursorManager.Method_Public_Static_VRCUiCursor_0().gameObject.activeSelf) clickMethod.Invoke(VRCUiCursorManager.Method_Public_Static_VRCUiCursor_0(), new object[] { player.field_Internal_VRCPlayer_0 });
+                    if (VRCUiCursorManager.Method_Public_Static_VRCUiCursor_0().gameObject.activeSelf) clickMethod.Invoke(VRCUiCursorManager.Method_Public_Static_VRCUiCursor_0(), new object[] { player.prop_VRCPlayer_0 });
 
                     QuickMenu.prop_QuickMenu_0.Method_Public_Void_Player_0(player); //Does the rest lmao
 
