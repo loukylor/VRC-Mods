@@ -11,7 +11,7 @@ namespace PlayerList.Config
     static class PlayerListConfig
     {
         public static event Action OnConfigChangedEvent;
-        private static bool hasConfigChanged;
+        private static bool hasConfigChanged = false;
 
         public static readonly string categoryIdentifier = "PlayerList Config";
         public static MelonPreferences_Category category = MelonPreferences.CreateCategory(categoryIdentifier);
@@ -118,7 +118,7 @@ namespace PlayerList.Config
             _playerListPositionY = CreateEntry(categoryIdentifier, nameof(_playerListPositionY), 3.5f, is_hidden: true);
 
             foreach (EntryWrapper entry in entries)
-                entry.OnValueChangedUntyped += OnConfigChanged;
+                entry.OnValueChangedUntyped += new Action(() => OnConfigChanged());
         }
 
         public static EntryWrapper<T> CreateEntry<T>(string category_identifier, string entry_identifier, T default_value, string display_name = null, bool is_hidden = false)
@@ -145,10 +145,10 @@ namespace PlayerList.Config
             ListPositionManager.shouldMove = false;
         }
 
-        public static void OnConfigChanged()
+        public static void OnConfigChanged(bool shouldSetHasConfigChanged = true)
         {
             OnConfigChangedEvent?.Invoke();
-            hasConfigChanged = true;
+            hasConfigChanged = shouldSetHasConfigChanged;
         }
 
         public static List<T> ReadList<T>(TomlObject value)

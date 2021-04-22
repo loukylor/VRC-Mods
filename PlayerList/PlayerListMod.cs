@@ -58,8 +58,8 @@ namespace PlayerList
             // Initialize on network events
             NetworkEvents.NetworkInit();
 
-            PlayerListConfig.OnConfigChanged();
-            
+            PlayerListConfig.OnConfigChanged(false);
+
             MelonLogger.Msg("Initialized!");
         }
 
