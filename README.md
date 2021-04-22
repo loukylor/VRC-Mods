@@ -52,8 +52,8 @@ So for example, you can have cloning on in Invite+ worlds and off in all the oth
 A basic instance history mod
 
 ## Features
-It's very basic as of now, but I plan on adding support for importing the configs of different instance history mods
-I also would like to make this very customizable, so support for both regular buttons and UIX buttons and the ability to move the regular button around.
+It has an optinal dependency for UIX when opening the instance history menu. This means you can run with or without it.
+It is highly recommnded to use UIX because it's just easier, although there are preferences to change the position of the regular button if you don't like UIX.
 
 ## Credits
 - [DubyaDude](https://github.com/DubyaDude) as I used [RubyButtonAPI](https://github.com/DubyaDude/RubyButtonAPI) as reference for my button API.
