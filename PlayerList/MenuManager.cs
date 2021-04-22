@@ -73,6 +73,12 @@ namespace PlayerList
                     break;
             }
             menuButton.SetActive(!PlayerListConfig.useTabMenu.Value);
+            if (PlayerListConfig.useTabMenu.Value && (tabButton != null && !tabButton.gameObject.activeSelf))
+            {
+                UIManager.ShowTabContent(tabButton);
+                UIManager.OpenPage(playerListMenus[0].path, false);
+                UIManager.SetTabIndex(tabButton.index);
+            }
             tabButton?.gameObject.SetActive(PlayerListConfig.useTabMenu.Value);
         }
 
