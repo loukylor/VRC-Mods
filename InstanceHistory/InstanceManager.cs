@@ -18,23 +18,41 @@ namespace InstanceHistory
             MelonLogger.Msg("Loading Instances...");
 
             if (!File.Exists(instanceDatabasePath))
-            { 
-                using (StreamWriter stream = File.CreateText(instanceDatabasePath))
-                    stream.WriteLine("[]");
+            {
+                File.WriteAllText(instanceDatabasePath, "[]");
+                MelonLogger.Msg("InstanceHistory.json not found. Creating new one...");
             }
             else
             {
-                JArray array = JArray.Parse(File.ReadAllText(instanceDatabasePath));
-                foreach (JToken token in array)
-                    instances.Add(JObject.Parse(token.ToString()).ToObject<WorldInstance>());
-            }
+                string text = File.ReadAllText(instanceDatabasePath);
+                if (string.IsNullOrWhiteSpace(text))
+                { 
+                    File.WriteAllText(instanceDatabasePath, "[]");
+                    text = "[]";
+                    MelonLogger.Msg("InstanceHistory.json is empty. Creating new one...");
+                }
 
+                try
+                {
+                    JArray array = JArray.Parse(text);
+                    foreach (JToken token in array)
+                        instances.Add(JObject.Parse(token.ToString()).ToObject<WorldInstance>());
+                }
+                catch (Exception ex)
+                {
+                    MelonLogger.Error("Something went wrong while parsing the json file.\nIt is likely that your InstanceHistory.json file is corrupted and will need to be manually deleted. Find it in the VRChat/UserData folder.\nFor debug purposes in case this is not the case, here is the error:\n" + ex.ToString());
+                    return;
+                }
+            }
+            
+            MelonLogger.Msg("Instances Loaded!");
+            
             WorldManager.OnEnterWorldEvent += new Action<ApiWorld, ApiWorldInstance>((world, instance) => Add(world, instance));
         }
 
         public static void Add(ApiWorld world, ApiWorldInstance instance)
         {
-            instances.Add(new WorldInstance(world.name, world.id, instance.idWithTags));
+            instances.Insert(0, new WorldInstance(world.name, world.id, instance.idWithTags));
 
             File.WriteAllText(instanceDatabasePath, JsonConvert.SerializeObject(instances, Formatting.Indented));
         }

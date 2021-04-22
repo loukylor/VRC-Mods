@@ -1,9 +1,9 @@
 ﻿using System;
 using InstanceHistory.UI;
+using InstanceHistory.Utilities;
 using MelonLoader;
 using UnityEngine;
 using UnityEngine.UI;
-using UIExpansionKit.API;
 
 namespace InstanceHistory
 {
@@ -48,9 +48,7 @@ namespace InstanceHistory
                     else
                     {
                         InstanceManager.WorldInstance instance = InstanceManager.instances[InstanceIndex + i];
-                        string instanceText = instance.worldName + instance.instanceId.Split('~')[0];
-                        buttons[i].textComponent.text = instanceText;
-                        buttons[i].textComponent.text = instanceText;
+                        buttons[i].textComponent.text = instance.worldName + ": " + instance.instanceId.Split('~')[0];
                         buttons[i].buttonComponent.onClick = new Button.ButtonClickedEvent();
                         buttons[i].buttonComponent.onClick.AddListener(new Action(() => WorldManager.EnterWorld(instance.worldId + ":" + instance.instanceId)));
                         buttons[i].gameObject.SetActive(true);
@@ -67,6 +65,7 @@ namespace InstanceHistory
             get { return Mathf.CeilToInt(InstanceManager.instances.Count / 9f); }
         }
 
+        public static SingleButton openButton;
         public static SubMenu menu;
         private static readonly SingleButton[] buttons = new SingleButton[9];
         private static SingleButton pageUp;
@@ -80,8 +79,13 @@ namespace InstanceHistory
 
             menu = new SubMenu(QuickMenu.prop_QuickMenu_0.gameObject, "InstanceHistoryModMenu");
 
-            //new SingleButton(QuickMenu.prop_QuickMenu_0.transform.FindChild("ShortcutMenu").gameObject, new Vector3(0, 0), "Instance History", new Action(OpenInstanceHistoryMenu), "Open instance history", "InstancenHistoryButton");
-            ExpansionKitApi.GetExpandedMenu(ExpandedMenu.QuickMenu).AddSimpleButton("Open Instance History", new Action(OpenInstanceHistoryMenu));
+            openButton = new SingleButton(QuickMenu.prop_QuickMenu_0.transform.FindChild("ShortcutMenu").gameObject, new Vector3(Config.openButtonX.Value, Config.openButtonY.Value), "Instance History", new Action(OpenInstanceHistoryMenu), "Open instance history", "InstancenHistoryButton");
+            openButton.gameObject.SetActive(!(InstanceHistoryMod.HasUIX && Config.useUIX.Value));
+            Config.openButtonX.OnValueChanged += OnPositionChange;
+            Config.openButtonY.OnValueChanged += OnPositionChange;
+
+            if (InstanceHistoryMod.HasUIX)
+                typeof(UIXManager).GetMethod("AddOpenButtonToUIX").Invoke(null, null);
 
             pageUp = new SingleButton(menu.gameObject, "UserInterface/QuickMenu/EmojiMenu/PageUp", new Vector3(4, 0), "", new Action(() => InstanceIndex -= 9), $"Go up a page", "UpPageButton");
             pageDown = new SingleButton(menu.gameObject, "UserInterface/QuickMenu/EmojiMenu/PageDown", new Vector3(4, 2), "", new Action(() => InstanceIndex += 9), $"Go down a page", "DownPageButton");
@@ -91,12 +95,21 @@ namespace InstanceHistory
 
             for (int i = 0; i < 9; i++)
                 buttons[i] = new SingleButton(menu.gameObject, new Vector3((i % 3) + 1, Mathf.Floor(i / 3)), "Placeholder text", null, "Placeholder text", $"World Button {i + 1}", resize: true);
+
+            MelonLogger.Msg("UI Loaded!");
         }
 
         public static void OpenInstanceHistoryMenu()
         {
             UIManager.OpenPage(menu.path);
             InstanceIndex = 0;
+        }
+
+        private static void OnPositionChange(float oldValue, float newValue)
+        {
+            if (oldValue == newValue) return;
+
+            openButton.gameObject.transform.localPosition = Converters.ConvertToUnityUnits(new Vector3(Config.openButtonX.Value, Config.openButtonY.Value));
         }
     }
 }

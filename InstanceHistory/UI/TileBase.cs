@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using InstanceHistory.Utilities;
+using UnityEngine;
 
 namespace InstanceHistory.UI
 {
@@ -14,7 +15,7 @@ namespace InstanceHistory.UI
             get { return _position; }
             set
             {
-                gameObject.transform.localPosition = UIManager.ConvertToUnityUnits(value);
+                gameObject.transform.localPosition = Converters.ConvertToUnityUnits(value);
                 _position = value;
             }
         }

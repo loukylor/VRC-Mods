@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Harmony;
 using InstanceHistory.Utilities;
+using MelonLoader;
 using VRC.Core;
 
 namespace InstanceHistory
@@ -25,7 +26,17 @@ namespace InstanceHistory
             enterWorldMethod = typeof(VRCFlowManager).GetMethod("Method_Public_Void_String_WorldTransitionInfo_Action_1_String_Boolean_0");
         }
 
-        public static void OnEnterWorld(ApiWorld __0, ApiWorldInstance __1) => OnEnterWorldEvent.Invoke(__0, __1);
+        public static void OnEnterWorld(ApiWorld __0, ApiWorldInstance __1)
+        {
+            try
+            {
+                OnEnterWorldEvent.Invoke(__0, __1);
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error("Something went wrong, this was most likely caused by your InstanceHistory.json file failing to parse correctly.\nHere is the error for debug purposes:\n" + ex.ToString());
+            }
+        }
         public static void EnterWorld(string roomId)
         {
             object currentPortalInfo = Activator.CreateInstance(typeof(WorldTransitionInfo), new object[2] { Enum.Parse(transitionInfoEnum, "Menu"), "WorldInfo_Go" });

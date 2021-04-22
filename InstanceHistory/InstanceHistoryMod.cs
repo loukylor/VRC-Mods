@@ -1,18 +1,22 @@
-﻿using InstanceHistory.UI;
+﻿using System.Linq;
+using InstanceHistory.UI;
 using InstanceHistory.Utilities;
 using MelonLoader;
 
 [assembly: MelonInfo(typeof(InstanceHistory.InstanceHistoryMod), "InstanceHistory", "0.0.1", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
+[assembly: MelonOptionalDependencies(new string[1] { "UIExpansionKit" })]
 
 namespace InstanceHistory
 {
     public class InstanceHistoryMod : MelonMod
     {
+        internal static bool HasUIX { get { return MelonHandler.Mods.Any(x => x.Info.Name.Equals("UI Expansion Kit")); } }
         public static InstanceHistoryMod Instance { get; private set; }
         public override void OnApplicationStart()
         {
             Instance = this;
+            Config.Init();
             VRCUtils.Init();
             UIManager.Init();
             WorldManager.Init();
