@@ -173,8 +173,8 @@ namespace PlayerList.UI
         private static void OnQuickMenuOpen() => OnQuickMenuOpenEvent?.Invoke();
         private static void OnQuickMenuClose() => OnQuickMenuCloseEvent?.Invoke();
         public static void SetMenuIndex(int index) => setMenuIndex.Invoke(QuickMenu.prop_QuickMenu_0, new object[] { index });
-        public static void SetTabTabIndex(TabButton tab, int index) => setTabTabIndexField.SetValue(tab.gameObject.GetComponent(tabDescriptorType), new Il2CppSystem.Int32 { m_value = index }.BoxIl2CppObject());
-        public static void ShowTabContent(TabButton tab) => showTabContentMethod.Invoke(tab.gameObject.GetComponent(tabDescriptorType), null);
+        public static void SetTabTabIndex(GameObject tab, int index) => setTabTabIndexField.SetValue(tab.gameObject.GetComponent(tabDescriptorType), new Il2CppSystem.Int32 { m_value = index }.BoxIl2CppObject());
+        public static void ShowTabContent(GameObject tab) => showTabContentMethod.Invoke(tab.gameObject.GetComponent(tabDescriptorType), null);
         public static void SetTabIndex(int index) => setTabIndexField.SetValue(tabContainerComponent, new Il2CppSystem.Int32 { m_value = index }.BoxIl2CppObject());
 
         public static void OpenPage(string page, bool setCurrentMenu = true, bool setCurrentTab = true)
@@ -189,9 +189,15 @@ namespace PlayerList.UI
             CurrentMenu?.SetActive(false);
 
             if (page.Split('/').Last() == "ShortcutMenu")
+            {
+                UIManager.ShowTabContent(ExistingTabs[0]);
                 SetMenuIndex(0);
+                SetTabIndex(0);
+            }
             else
+            { 
                 QuickMenu.prop_QuickMenu_0.field_Private_Int32_0 = -1;
+            }
 
             if (setCurrentMenu)
                 CurrentMenu = pageGameObject;

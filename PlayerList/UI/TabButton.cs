@@ -14,7 +14,7 @@ namespace PlayerList.UI
         public TabButton(Sprite image, Action onClick) : base(GameObject.Find("UserInterface/QuickMenu/QuickModeTabs"), GameObject.Find("UserInterface/QuickMenu/QuickModeTabs/HomeTab"), Vector3.zero, "PlayerListTab")
         {
             UIManager.ExistingTabs = UIManager.ExistingTabs.Concat(new List<GameObject>() { gameObject }).ToList(); // Inefficient code is my motto
-            UIManager.SetTabTabIndex(this, UIManager.ExistingTabs.Count);
+            UIManager.SetTabTabIndex(gameObject, UIManager.ExistingTabs.Count);
             index = UIManager.ExistingTabs.Count;
 
             gameObject.transform.Find("Icon").GetComponent<Image>().sprite = image;

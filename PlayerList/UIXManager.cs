@@ -12,8 +12,8 @@ namespace PlayerList
             if (shortcutMenuListener == null)
                 shortcutMenuListener = Constants.shortcutMenu.AddComponent<EnableDisableListener>();
 
-            shortcutMenuListener.OnEnabled += onDisable;
-            shortcutMenuListener.OnDisabled += onEnable;
+            shortcutMenuListener.OnEnabled += onEnable;
+            shortcutMenuListener.OnDisabled += onDisable;
         }
     }
 }

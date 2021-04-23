@@ -44,7 +44,7 @@ namespace PlayerList
             {
                 tabButton = new TabButton(menuButton.GetComponent<Image>().sprite, new Action(() =>
                 {
-                    UIManager.ShowTabContent(tabButton);
+                    UIManager.ShowTabContent(tabButton.gameObject);
                     UIManager.OpenPage(playerListMenus[0].path, false);
                     UIManager.SetTabIndex(tabButton.index);
                 }));
@@ -75,7 +75,7 @@ namespace PlayerList
             menuButton.SetActive(!PlayerListConfig.useTabMenu.Value);
             if (PlayerListConfig.useTabMenu.Value && (tabButton != null && !tabButton.gameObject.activeSelf))
             {
-                UIManager.ShowTabContent(tabButton);
+                UIManager.ShowTabContent(tabButton.gameObject);
                 UIManager.OpenPage(playerListMenus[0].path, false);
                 UIManager.SetTabIndex(tabButton.index);
             }
