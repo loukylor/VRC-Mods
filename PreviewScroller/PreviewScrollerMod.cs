@@ -42,6 +42,7 @@ namespace PreviewScroller
             scrollRect.content = scrollerContentRect;
             scrollRect.movementType = ScrollRect.MovementType.Unrestricted;
             scrollRect.decelerationRate = 0.03f;
+            scrollRect.scrollSensitivity = 6;
             scrollRect.onValueChanged = new ScrollRect.ScrollRectEvent();
             GameObject pedestal = GameObject.Find("UserInterface/MenuContent/Screens/Avatar/AvatarPreviewBase/MainRoot/MainModel");
             pedestal.transform.localPosition += new Vector3(0, 0.5f);
