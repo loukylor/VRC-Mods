@@ -16,7 +16,7 @@ namespace PlayerList.Utilities
         {
             string worldId = world.id;
             // Check if black/whitelisted from EmmVRC - thanks Emilia and the rest of EmmVRC Staff
-            WWW www = new WWW($"https://thetrueyoshifan.com/RiskyFuncsCheck.php?worldid={worldId}", null, new Dictionary<string, string>());
+            WWW www = new WWW($"https://dl.emmvrc.com/riskyfuncs.php?worldid={worldId}", null, new Dictionary<string, string>());
             while (!www.isDone)
                 yield return new WaitForEndOfFrame();
             string result = www.text?.Trim().ToLower();
