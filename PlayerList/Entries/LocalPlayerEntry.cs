@@ -36,9 +36,13 @@ namespace PlayerList.Entries
             gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new Action(() => PlayerUtils.OpenPlayerInQuickMenu(player)));
 
             platform = PlayerUtils.GetPlatform(player).PadRight(2);
-            perf = PerformanceRating.None;
+            // Join event runs after avatar instantiation event so perf calculations *should* be finished (also not sure if this will throw null refs so gonna release without a check and hope for the best)
+            perf = player.prop_VRCPlayer_0.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall];
             perfString = "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, perf)) + ">" + PlayerUtils.ParsePerformanceText(perf) + "</color>";
-            
+
+            pingAddingDelegate = DefaultPingAdding;
+            fpsAddingDelegate = DefaultFpsAdding;
+
             NetworkEvents.OnPlayerJoin += new Action<Player>((player) =>
             {
                 int highestId = 0;
@@ -105,7 +109,8 @@ namespace PlayerList.Entries
             player = Player.prop_Player_0;
             updateDelegate?.Invoke(player, this, ref tempString);
 
-            textComponent.text = TrimExtra(tempString);
+            if (tempString != textComponent.text)
+                textComponent.text = TrimExtra(tempString);
         }
         public override void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
         {
@@ -128,8 +133,13 @@ namespace PlayerList.Entries
         }
         private static void AddFps(Player player, LocalPlayerEntry entry, ref string tempString)
         {
-            int fps = Mathf.Clamp((int)(1f / Time.deltaTime), -99, 999); // Clamp between -99 and 999
-            tempString += "<color=" + PlayerUtils.GetFpsColor(fps) + ">" + fps.ToString().PadRight(3) + "</color>" + separator;
+            if (entry.timer.ElapsedMilliseconds >= 250)
+            { 
+                entry.fps = Mathf.Clamp((int)(1f / Time.deltaTime), -99, 999); // Clamp between -99 and 999
+                entry.timer.Restart();
+            }
+
+            tempString += "<color=" + PlayerUtils.GetFpsColor(entry.fps) + ">" + entry.fps.ToString().PadRight(3) + "</color>" + separator;
         }
         private static void AddPlatform(Player player, LocalPlayerEntry entry, ref string tempString)
         {

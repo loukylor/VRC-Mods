@@ -108,8 +108,5 @@ namespace PlayerList.Entries
 
             return (T)entry;
         }
-        protected void ChangeEntry(string identifier, string value) => textComponent.text = textComponent.text.Replace($"{{{identifier}}}", value);
-        protected void ChangeEntry(string identifier, object value) => textComponent.text = textComponent.text.Replace($"{{{identifier}}}", value.ToString());
-        protected void ResetEntry() => textComponent.text = _originalText;
     }
 }

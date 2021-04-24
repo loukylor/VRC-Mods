@@ -16,19 +16,17 @@ namespace PlayerList.Entries
         }
         public IEnumerator GetInstanceCreator(ApiWorldInstance instance)
         {
-            ResetEntry();
-
             string creator = instance.GetInstanceCreator();
 
             if (creator != null)
             { 
                 if (creator == APIUser.CurrentUser.id)
                 {
-                    ChangeEntry("instancecreator", APIUser.CurrentUser.displayName);
+                    textComponent.text = OriginalText.Replace("{instancecreator}", APIUser.CurrentUser.displayName);
                     yield break;
                 }
 
-                ChangeEntry("instancecreator", "Loading...");
+                textComponent.text = OriginalText.Replace("{instancecreator}", "Loading...");
 
                 yield return new WaitForSeconds(4);
 
@@ -37,14 +35,12 @@ namespace PlayerList.Entries
             }
             else
             {
-                ResetEntry();
-                ChangeEntry("instancecreator", "No Instance Creator");
+                textComponent.text = OriginalText.Replace("{instancecreator}", "No Instance Creator");
             }
         }
         public void OnIdReceived(APIUser user)
         {
-            ResetEntry();
-            ChangeEntry("instancecreator", user.displayName);
+            textComponent.text = OriginalText.Replace("{instancecreator}", user.displayName);
         }
     }
 }

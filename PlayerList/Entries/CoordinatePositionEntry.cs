@@ -1,4 +1,4 @@
-﻿using System;
+﻿using PlayerList.Utilities;
 using UnityEngine;
 using VRC;
 
@@ -8,19 +8,19 @@ namespace PlayerList.Entries
     {
         public override string Name { get { return "Coordinate Position"; } }
 
-        private Vector3Int lastPos;
+        private Vector3 lastPos;
 
         protected override void ProcessText(object[] parameters = null)
         {
-            Vector3Int pos = Vector3Int.RoundToInt(Player.prop_Player_0.gameObject.transform.position);
+            Vector3 pos = Player.prop_Player_0.gameObject.transform.position.RoundAmount(0.1f);
 
             if (pos == lastPos) return;
             lastPos = pos;
 
             string tempString = OriginalText;
-            tempString = tempString.Replace("{x}", Math.Round(Player.prop_Player_0.gameObject.transform.position.x, 1).ToString());
-            tempString = tempString.Replace("{y}", Math.Round(Player.prop_Player_0.gameObject.transform.position.y, 1).ToString());
-            tempString = tempString.Replace("{z}", Math.Round(Player.prop_Player_0.gameObject.transform.position.z, 1).ToString());
+            tempString = tempString.Replace("{x}", lastPos.x.ToString());
+            tempString = tempString.Replace("{y}", lastPos.y.ToString());
+            tempString = tempString.Replace("{z}", lastPos.z.ToString());
             textComponent.text = tempString;
         }
     }

@@ -10,7 +10,7 @@ namespace PlayerList.Entries
 
         public override void Init(object[] parameters = null)
         {
-            ChangeEntry("gameversion", buildNumber);
+            textComponent.text = OriginalText.Replace("{gameversion}", buildNumber.ToString());
         }
     }
 }

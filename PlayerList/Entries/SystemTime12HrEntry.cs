@@ -15,8 +15,7 @@ namespace PlayerList.Entries
                 return;
 
             lastTime = timeString;
-            ResetEntry();
-            ChangeEntry("systemtime12hr", timeString);
+            textComponent.text = OriginalText.Replace("{systemtime12hr}", timeString);
         }
     }
 }

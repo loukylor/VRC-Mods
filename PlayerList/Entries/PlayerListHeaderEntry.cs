@@ -1,19 +1,19 @@
-﻿namespace PlayerList.Entries
+﻿using VRC;
+
+namespace PlayerList.Entries
 {
     class PlayerListHeaderEntry : EntryBase
     {
         public override string Name { get { return "PlayerList Header"; } }
 
-        public int lastPlayerCount;
-
-        protected override void ProcessText(object[] parameters = null)
+        public override void Init(object[] parameters = null)
         {
-            if (lastPlayerCount == EntryManager.playerEntries.Count + 1)
-                return;
-
-            lastPlayerCount = EntryManager.playerEntries.Count + 1; // Is doing it like this any faster?
-            ResetEntry();
-            ChangeEntry("playercount", EntryManager.playerEntries.Count + 1);
+            NetworkEvents.OnPlayerJoin += OnPlayerCountChange;
+            NetworkEvents.OnPlayerLeave += OnPlayerCountChange;
+        }
+        private void OnPlayerCountChange(Player player)
+        {
+            textComponent.text = OriginalText.Replace("{playercount}", PlayerManager.field_Private_Static_PlayerManager_0.field_Private_List_1_Player_0.Count.ToString());
         }
     }
 }

@@ -16,8 +16,7 @@ namespace PlayerList.Entries
                 return;
             
             lastTime = timeString;
-            ResetEntry();
-            ChangeEntry("roomtime", timeString);
+            textComponent.text = OriginalText.Replace("{roomtime}", timeString);
         }
     }
 }
