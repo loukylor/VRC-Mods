@@ -190,7 +190,7 @@ namespace PlayerList.UI
 
             if (page.Split('/').Last() == "ShortcutMenu")
             {
-                UIManager.ShowTabContent(ExistingTabs[0]);
+                ShowTabContent(ExistingTabs[0]);
                 SetMenuIndex(0);
                 SetTabIndex(0);
             }

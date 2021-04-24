@@ -62,7 +62,7 @@ namespace PlayerList
                 CombineQMColliderAndPlayerListRect();
                 movingGameObjectRect.transform.position = InputManager.HitPosition;
                 movingGameObjectRect.transform.localPosition.SetZ(oldPosition.z);
-                movingGameObjectRect.anchoredPosition = Converters.RoundAmount(movingGameObjectRect.anchoredPosition, PlayerListConfig.snapToGridSize.Value);
+                movingGameObjectRect.anchoredPosition = movingGameObjectRect.anchoredPosition.RoundAmount(PlayerListConfig.snapToGridSize.Value);
 
                 yield return null;
             }
@@ -72,7 +72,7 @@ namespace PlayerList
                 CombineQMColliderAndPlayerListRect();
                 movingGameObjectRect.transform.position = InputManager.HitPosition;
                 movingGameObjectRect.transform.localPosition.SetZ(oldPosition.z);
-                movingGameObjectRect.anchoredPosition = Converters.RoundAmount(movingGameObjectRect.anchoredPosition, PlayerListConfig.snapToGridSize.Value);
+                movingGameObjectRect.anchoredPosition = movingGameObjectRect.anchoredPosition.RoundAmount(PlayerListConfig.snapToGridSize.Value);
 
                 yield return null;
             }

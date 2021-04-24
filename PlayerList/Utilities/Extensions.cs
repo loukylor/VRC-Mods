@@ -24,5 +24,17 @@ namespace PlayerList.Utilities
         {
             vector.Set(vector.x, vector.y, newZ);
         }
+        public static float RoundAmount(this float i, float lowestDecimal)
+        {
+            return Mathf.Round(i / lowestDecimal) * lowestDecimal;
+        }
+        public static Vector3 RoundAmount(this Vector3 i, float lowestDecimal)
+        {
+            return new Vector3(i.x.RoundAmount(lowestDecimal), i.y.RoundAmount(lowestDecimal), i.z.RoundAmount(lowestDecimal));
+        }
+        public static Vector2 RoundAmount(this Vector2 i, float lowestDecimal)
+        {
+            return new Vector2(i.x.RoundAmount(lowestDecimal), i.y.RoundAmount(lowestDecimal));
+        }
     }
 }

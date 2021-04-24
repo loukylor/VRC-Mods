@@ -85,9 +85,9 @@ namespace PlayerList
         public static void ToggleMenu()
         {
             if (!playerListMenus.Any(subMenu => subMenu.gameObject.active) && !Constants.shortcutMenu.active) return;
+            menuToggleButton.State = shouldStayHidden;
             shouldStayHidden = !shouldStayHidden;
-            menuToggleButton.State = !shouldStayHidden;
-            if (playerListMenus.Any(subMenu => subMenu.gameObject.active) || (Constants.shortcutMenu.active && PlayerListConfig.onlyEnabledInConfig.Value)) playerList.SetActive(!playerList.activeSelf);
+            if (playerListMenus.Any(subMenu => subMenu.gameObject.active) || Constants.shortcutMenu.active) playerList.SetActive(!playerList.activeSelf);
         }
 
         public static void LoadAssetBundle()
@@ -270,7 +270,8 @@ namespace PlayerList
             new ToggleButton(playerListMenus[3].path, new Vector3(3, 0), "Enable Platform", "Disabled", new Action<bool>((state) => PlayerListConfig.platformToggle.Value = state), "Toggle player Platform", "Toggle player Platform", "PlatformToggle", PlayerListConfig.platformToggle.Value, true);
             new ToggleButton(playerListMenus[3].path, new Vector3(1, 1), "Enable Avatar Performance", "Disabled", new Action<bool>((state) => PlayerListConfig.perfToggle.Value = state), "Toggle avatar performance", "Toggle avatar performance", "PerfToggle", PlayerListConfig.perfToggle.Value, true);
             new ToggleButton(playerListMenus[3].path, new Vector3(2, 1), "Enable Distance", "Disabled", new Action<bool>((state) => PlayerListConfig.distanceToggle.Value = state), "Toggle distance to player", "Toggle distance to player", "DistanceToPlayerToggle", PlayerListConfig.distanceToggle.Value, true);
-            new ToggleButton(playerListMenus[3].path, new Vector3(3, 1), "Enable DisplayName", "Disabled", new Action<bool>((state) => PlayerListConfig.displayNameToggle.Value = state), "Why...?", "Why...?", "DisplayNameToggle", PlayerListConfig.displayNameToggle.Value, true);
+            new ToggleButton(playerListMenus[3].path, new Vector3(3, 1), "Enable Freeze Detection", "Disabled", new Action<bool>((state) => PlayerListConfig.freezeDetectionToggle.Value = state), "Toggle Freeze Detection\nPing or FPS must be toggled on fo this to show up", "Toggle Freeze Detection\nPing or FPS must be toggled on fo this to show up", "FreezeDetectionToggle", PlayerListConfig.freezeDetectionToggle.Value, true);
+            new ToggleButton(playerListMenus[3].path, new Vector3(1, 2), "Enable DisplayName", "Disabled", new Action<bool>((state) => PlayerListConfig.displayNameToggle.Value = state), "Why...?", "Why...?", "DisplayNameToggle", PlayerListConfig.displayNameToggle.Value, true);
 
             new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(0, 0), "TF", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.TrustAndFriends), "Set displayname coloring to show friends and trust rank", "TrustAndFriendsButton");
             new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(1, 0), "T", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.TrustOnly), "Set displayname coloring to show trust rank only", "TrustOnlyButton");

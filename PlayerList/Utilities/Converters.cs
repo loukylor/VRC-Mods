@@ -16,13 +16,5 @@ namespace PlayerList.Utilities
             menuUnits.y *= -1;
             return menuUnits;
         }
-        public static int RoundAmount(double i, int amount)
-        {
-            return ((int)Math.Round(i / amount)) * amount;
-        }
-        public static Vector3 RoundAmount(Vector3 i, int amount)
-        {
-            return new Vector3(RoundAmount(i.x, amount), RoundAmount(i.y, amount), RoundAmount(i.z, amount));
-        }
     }
 }
