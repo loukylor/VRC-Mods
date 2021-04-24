@@ -33,6 +33,7 @@ namespace PlayerList.Config
         public static EntryWrapper<bool> photonIdToggle;
         public static EntryWrapper<bool> displayNameToggle;
         private static EntryWrapper<string> displayNameColorMode;
+        public static EntryWrapper<bool> freezeDetectionToggle;
 
         public static PlayerEntry.DisplayNameColorMode DisplayNameColorMode
         {
@@ -101,8 +102,8 @@ namespace PlayerList.Config
             distanceToggle = CreateEntry(categoryIdentifier, nameof(distanceToggle), true, is_hidden: true);
             photonIdToggle = CreateEntry(categoryIdentifier, nameof(photonIdToggle), false, is_hidden: true);
             displayNameToggle = CreateEntry(categoryIdentifier, nameof(displayNameToggle), true, is_hidden: true);
-
             displayNameColorMode = CreateEntry(categoryIdentifier, nameof(displayNameColorMode), "TrustAndFriends", is_hidden: true);
+            freezeDetectionToggle = CreateEntry(categoryIdentifier, nameof(freezeDetectionToggle), false, is_hidden: true);
 
             reverseBaseSort = CreateEntry(categoryIdentifier, nameof(reverseBaseSort), false, is_hidden: true);
             currentBaseSort = CreateEntry(categoryIdentifier, nameof(currentBaseSort), "None", is_hidden: true);
@@ -149,20 +150,6 @@ namespace PlayerList.Config
         {
             OnConfigChangedEvent?.Invoke();
             hasConfigChanged = shouldSetHasConfigChanged;
-        }
-
-        public static List<T> ReadList<T>(TomlObject value)
-        {
-            return MelonPreferences.Mapper.ReadArray<T>(value).ToList();
-        }
-        public static TomlObject WriteList<T>(List<T> value)
-        {
-            TomlArray array = new TomlArray();
-
-            for (int i = 0; i < value.Count; i++)
-                array.Add(value);
-
-            return array;
         }
     }
 }

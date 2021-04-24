@@ -4,7 +4,6 @@ using PlayerList.Config;
 using PlayerList.Entries;
 using PlayerList.Utilities;
 using UnityEngine;
-using UnityEngine.UI;
 using VRC;
 using VRC.Core;
 
@@ -20,6 +19,7 @@ namespace PlayerList
         public static List<EntryBase> generalInfoEntries = new List<EntryBase>();
         public static List<EntryBase> entries = new List<EntryBase>();
 
+        public static System.Diagnostics.Stopwatch timer = System.Diagnostics.Stopwatch.StartNew();
         public static void Init()
         {
             PlayerListConfig.fontSize.OnValueChanged += (oldValue, newValue) => SetFontSize(newValue);
@@ -42,28 +42,30 @@ namespace PlayerList
                 RemoveLeftPlayerEntry(leftSidePlayerEntries[i + 1]); // Skip first entry
                 Object.DestroyImmediate(Constants.playerListLayout.transform.GetChild(i + 3).gameObject);
             }
-            foreach (EntryBase entry in generalInfoEntries)
-                entry.OnSceneWasLoaded();
         }
         public static void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
         {
             foreach (EntryBase entry in entries)
                 entry.OnInstanceChange(world, instance);
+            RefreshLeftPlayerEntries(0, 0, true);
         }
         public static void OnConfigChanged()
         {
             foreach (EntryBase entry in entries)
                 entry.OnConfigChanged();
         }
+        // Despite only having one entry that uses this, there can be multiple instances of those entries and it's easier to just loop like this
         public static void OnAvatarChanged(ApiAvatar avatar, VRCAvatarManager manager)
         {
-            foreach (EntryBase entry in entries)
+            foreach (EntryBase entry in playerEntries)
                 entry.OnAvatarChanged(avatar, manager);
+            localPlayerEntry?.OnAvatarChanged(avatar, manager);
         }
         public static void OnAvatarInstantiated(VRCPlayer player, GameObject avatar)
         {
-            foreach (EntryBase entry in entries)
+            foreach (EntryBase entry in playerEntries)
                 entry.OnAvatarInstantiated(player, avatar);
+            localPlayerEntry?.OnAvatarInstantiated(player, avatar);
         }
 
         public static void OnPlayerJoin(Player player)
@@ -190,7 +192,7 @@ namespace PlayerList
         public static void RefreshLeftPlayerEntries(int oldCount, int newCount, bool bypassCount = false)
         {
             // If new digit reached (like 9 - 10)
-            if (oldCount.ToString().Length < newCount.ToString().Length || bypassCount)
+            if (oldCount.ToString().Length != newCount.ToString().Length || bypassCount)
                 foreach (LeftSidePlayerEntry updateEntry in leftSidePlayerEntries)
                     updateEntry.CalculateLeftPart();
         }
@@ -198,13 +200,8 @@ namespace PlayerList
         {
             if (RoomManager.field_Internal_Static_ApiWorld_0 == null || Player.prop_Player_0 == null || Player.prop_Player_0.gameObject == null || Player.prop_Player_0.prop_VRCPlayerApi_0 == null || (!MenuManager.playerList.active && !bypassActive)) return;
 
-            for (int i = playerEntries.Count - 1; i >= 0; i--)
-                if (playerEntries[i].player == null)
-                    playerEntries[i].Remove();
-
             foreach (PlayerEntry entry in playerEntries)
                 PlayerEntry.UpdateEntry(entry.player.prop_PlayerNet_0, entry, bypassActive);
-
             localPlayerEntry.Refresh();
         }
         public static void RefreshGeneralInfoEntries()
@@ -212,20 +209,23 @@ namespace PlayerList
             foreach (EntryBase entry in generalInfoEntries)
                 entry.Refresh();
         }
+        public static void CheckEntriesForFreeze()
+        {
+            foreach (PlayerEntry entry in playerEntries)
+                entry.CheckFreeze();
+        }
         public static void RefreshAllEntries()
         {
+            if (PlayerListConfig.freezeDetectionToggle.Value)
+                CheckEntriesForFreeze();
+            
             // Dont refresh if the local player gameobject has been deleted or if the playerlist is hidden
             if (RoomManager.field_Internal_Static_ApiWorld_0 == null || Player.prop_Player_0 == null || !MenuManager.playerList.active) return;
-
+            
             localPlayerEntry?.Refresh();
             RefreshGeneralInfoEntries();
         }
 
-        public static void RefreshLayout()
-        {
-            LayoutRebuilder.ForceRebuildLayoutImmediate(Constants.playerListLayout.GetComponent<RectTransform>());
-            LayoutRebuilder.ForceRebuildLayoutImmediate(Constants.generalInfoLayout.GetComponent<RectTransform>());
-        }
         public static void SetFontSize(int fontSize)
         {
             MenuManager.fontSizeLabel.textComponent.text = $"Font\nSize: {fontSize}";

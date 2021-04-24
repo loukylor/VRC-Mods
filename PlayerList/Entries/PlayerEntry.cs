@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -42,9 +43,14 @@ namespace PlayerList.Entries
         public float distance;
         public bool isFriend;
         public string playerColor;
+        public bool isFrozen;
+
+        protected readonly Stopwatch timer = Stopwatch.StartNew();
 
         public delegate void UpdateEntryDelegate(PlayerNet playerNet, PlayerEntry entry, ref string tempString);
         public static UpdateEntryDelegate updateDelegate;
+        protected UpdateEntryDelegate pingAddingDelegate;
+        protected UpdateEntryDelegate fpsAddingDelegate;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr OnPlayerNetDecodeDelegate(IntPtr instancePointer, IntPtr objectsPointer, int objectIndex, float sendTime, IntPtr nativeMethodPointer);
@@ -60,7 +66,10 @@ namespace PlayerList.Entries
             UIManager.OnQuickMenuOpenEvent += () =>
             {
                 foreach (PlayerEntry entry in EntryManager.playerEntries)
+                {
                     entry.GetPlayerColor();
+                    UpdateEntry(entry.player.prop_PlayerNet_0, entry);
+                }
             }; // OGT fork compatibility 
                     
             PlayerListMod.Instance.Harmony.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend), BindingFlags.NonPublic | BindingFlags.Static)));
@@ -107,6 +116,9 @@ namespace PlayerList.Entries
             platform = platform = PlayerUtils.GetPlatform(player).PadRight(2);
             perf = PerformanceRating.None;
             perfString = "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, perf)) + ">" + PlayerUtils.ParsePerformanceText(perf) + "</color>";
+
+            pingAddingDelegate = DefaultPingAdding;
+            fpsAddingDelegate = DefaultFpsAdding;
 
             gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new Action(() => PlayerUtils.OpenPlayerInQuickMenu(player)));
 
@@ -215,10 +227,22 @@ namespace PlayerList.Entries
             if (entry == null)
                 return originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
 
-            // Update values but not text even if playerlist not active and before decode
-            entry.distance = (entry.player.transform.position - Player.prop_Player_0.transform.position).magnitude;
-            entry.fps = MelonUtils.Clamp(1000f / playerNet.field_Private_Byte_0 == 0 ? 0 : playerNet.field_Private_Byte_0, -99, 999);
-            entry.ping = playerNet.prop_Int16_0;
+            try
+            {
+                entry.timer.Restart();
+                entry.isFrozen = false;
+                entry.pingAddingDelegate = DefaultPingAdding;
+                entry.fpsAddingDelegate = DefaultFpsAdding;
+
+                // Update values but not text even if playerlist not active and before decode
+                entry.distance = (entry.player.transform.position - Player.prop_Player_0.transform.position).magnitude;
+                entry.fps = MelonUtils.Clamp(1000f / playerNet.field_Private_Byte_0 == 0 ? 0 : playerNet.field_Private_Byte_0, -99, 999);
+                entry.ping = playerNet.prop_Int16_0;
+            }
+            catch
+            {
+
+            }
 
             IntPtr result = originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
             if (result == IntPtr.Zero)
@@ -259,6 +283,10 @@ namespace PlayerList.Entries
 
         private static void AddPing(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {
+            entry.pingAddingDelegate(playerNet, entry, ref tempString);
+        }
+        protected static void DefaultPingAdding(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
+        {
             tempString += "<color=" + PlayerUtils.GetPingColor(entry.ping) + ">";
             if (entry.ping < 9999 && entry.ping > -999)
                 tempString += entry.ping.ToString().PadRight(4) + "ms</color>";
@@ -266,7 +294,15 @@ namespace PlayerList.Entries
                 tempString += ((double)(entry.ping / 1000)).ToString("N1").PadRight(5) + "s</color>";
             tempString += separator;
         }
+        protected static void CrashPingAdding(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
+        {
+            tempString += "<color=red>FROZEN</color>" + separator;
+        }
         private static void AddFps(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
+        {
+            entry.fpsAddingDelegate(playerNet, entry, ref tempString);
+        }
+        protected static void DefaultFpsAdding(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {
             tempString += "<color=" + PlayerUtils.GetFpsColor(entry.fps) + ">";
             if (entry.fps == 0)
@@ -274,6 +310,10 @@ namespace PlayerList.Entries
             else
                 tempString += entry.fps.ToString().PadRight(3) + "</color>";
             tempString += separator;
+        }
+        protected static void CrashFpsAdding(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
+        {
+            tempString += "<color=red>FRZ</color>" + separator;
         }
         private static void AddPlatform(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {
@@ -318,6 +358,29 @@ namespace PlayerList.Entries
         private static void AddDisplayName(PlayerNet playerNet, PlayerEntry entry, ref string tempString)
         {
             tempString += "<color=" + entry.playerColor + ">" + entry.apiUser.displayName + "</color>" + separator;
+        }
+
+        public void CheckFreeze()
+        {
+            if (timer.ElapsedMilliseconds <= 1000) return;
+
+            OnFreeze();
+        }
+        public void OnFreeze()
+        {
+            if (isFrozen) return;
+
+            isFrozen = true;
+            pingAddingDelegate = CrashPingAdding;
+            fpsAddingDelegate = CrashFpsAdding;
+            try
+            {
+                UpdateEntry(player.prop_PlayerNet_0, this, true);
+            }
+            catch (NullReferenceException)
+            {
+                
+            }
         }
 
         private void GetPlayerColor(bool shouldSort = true)
