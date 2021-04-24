@@ -64,7 +64,9 @@ Adds a player list to the ShortcutMenu
 ## Features
 Each entry to the player list is a button that will open the user in the QuickMenu on click.
 The player's name will be colored to the rank they are (OGTrustRanks compatible!), each entry also has the player's ping, fps, platform, avatar performance and distance from you.
-You may also toggle each of these on and off, so if you don't like how the avatar performance takes up space, you can turn it off.
+There is also some primitive freeze detection, so if a player hasn't contacted the server for a second, the ping and/or fps parts of the player will say they're frozen.
+You may also toggle each of these on and off, including the freeze detection.
+So, if you don't like how the avatar performance takes up space, you can turn it off.
 
 Note: distance from you will be disabled in worlds that do not allow risky functions.
 
