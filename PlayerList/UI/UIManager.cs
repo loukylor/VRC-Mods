@@ -108,9 +108,7 @@ namespace PlayerList.UI
             tabDescriptorType = tabDescriptor.GetIl2CppType();
             showTabContentMethod = tabDescriptorType.GetMethod("ShowTabContent");
             setTabTabIndexField = tabDescriptorType.GetFields().First(f => f.FieldType.IsEnum);
-        }
-        public static void OnSceneWasLoaded()
-        {
+
             ButtonReaction buttonReaction = GameObject.Find("UserInterface/QuickMenu/UIElementsMenu/NameplatesOnButton").GetComponent<ButtonReaction>();
             fullOnButtonSprite = buttonReaction.field_Public_Sprite_0.name.Contains("Full_ON") ? buttonReaction.field_Public_Sprite_0 : buttonReaction.field_Public_Sprite_1;
             regularButtonSprite = buttonReaction.field_Public_Sprite_0.name.Contains("White") ? buttonReaction.field_Public_Sprite_0 : buttonReaction.field_Public_Sprite_1;
@@ -135,13 +133,13 @@ namespace PlayerList.UI
 
             // Find out which menu actually got set
             foreach (PropertyInfo prop in possibleProps)
-                if (prop.GetValue(QuickMenu.prop_QuickMenu_0) != null) 
+                if (prop.GetValue(QuickMenu.prop_QuickMenu_0) != null)
                     currentMenuField = prop;
 
             if (currentMenuField == null) MelonLogger.Error("Something went wrong. In technical speak: after attempting to determine the current menu field info, it was null. The mod will likely not function properly");
 
             CurrentMenu.SetActive(false);
-            
+
             MonoBehaviour tabManager = GameObject.Find("UserInterface/QuickMenu/QuickModeTabs").GetComponents<MonoBehaviour>().First(monoBehaviour => monoBehaviour.GetIl2CppType().GetMethods().Any(mb => mb.Name.StartsWith("ShowTabContent")));
             Il2CppSystem.Reflection.PropertyInfo tabManagerSingleton = tabManager.GetIl2CppType().GetProperties().First(pi => pi.PropertyType == tabManager.GetIl2CppType());
             tabManagerSingleton.SetValue(null, tabManager, null); // Singleton is null until QM is opened. Set it to a value so that the next line won't error
@@ -164,7 +162,7 @@ namespace PlayerList.UI
             if (currentMenuField == null) MelonLogger.Error("Something went wrong. In technical speak: after attempting to determine the current tab field info, it was null. The mod will likely not function properly");
 
             CurrentTabMenu.SetActive(false);
-            
+
             // Set to null as to not change values unexpectedly 
             foreach (PropertyInfo prop in possibleProps)
                 prop.SetValue(QuickMenu.prop_QuickMenu_0, null);

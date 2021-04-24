@@ -239,9 +239,9 @@ namespace PlayerList.Entries
                 entry.fps = MelonUtils.Clamp(1000f / playerNet.field_Private_Byte_0 == 0 ? 0 : playerNet.field_Private_Byte_0, -99, 999);
                 entry.ping = playerNet.prop_Int16_0;
             }
-            catch
+            catch (Exception ex)
             {
-
+                MelonLogger.Error("Something went horribly wrong:\n" + ex.ToString());
             }
 
             IntPtr result = originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);

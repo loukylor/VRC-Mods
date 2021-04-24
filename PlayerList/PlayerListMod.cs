@@ -75,7 +75,6 @@ namespace PlayerList
                 MenuManager.OnSceneWasLoaded();
                 Constants.OnSceneWasLoaded();
                 EntryManager.OnSceneWasLoaded();
-                UIManager.OnSceneWasLoaded();
             }
         }
     }

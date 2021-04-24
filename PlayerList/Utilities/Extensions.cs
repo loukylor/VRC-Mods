@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace PlayerList.Utilities
 {
@@ -26,7 +27,7 @@ namespace PlayerList.Utilities
         }
         public static float RoundAmount(this float i, float lowestDecimal)
         {
-            return Mathf.Round(i / lowestDecimal) * lowestDecimal;
+            return (float)Math.Round(i / lowestDecimal) * lowestDecimal;
         }
         public static Vector3 RoundAmount(this Vector3 i, float lowestDecimal)
         {
