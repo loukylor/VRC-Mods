@@ -240,7 +240,7 @@ namespace PlayerList.Entries
 
                 // Update values but not text even if playerlist not active and before decode
                 entry.distance = (entry.player.transform.position - Player.prop_Player_0.transform.position).magnitude;
-                entry.fps = MelonUtils.Clamp(playerNet.field_Private_Byte_0 == 0 ? 0 : ((int)1000f / playerNet.field_Private_Byte_0), -99, 999);
+                entry.fps = MelonUtils.Clamp((int)(1000f / playerNet.field_Private_Byte_0), -99, 999);
                 entry.ping = playerNet.prop_Int16_0;
 
                 UpdateEntry(playerNet, entry);

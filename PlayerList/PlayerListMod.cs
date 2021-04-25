@@ -70,12 +70,11 @@ namespace PlayerList
         }
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
-            if (buildIndex == -1)
-            {
-                MenuManager.OnSceneWasLoaded();
-                Constants.OnSceneWasLoaded();
-                EntryManager.OnSceneWasLoaded();
-            }
+            if (buildIndex != -1) return;
+
+            MenuManager.OnSceneWasLoaded();
+            Constants.OnSceneWasLoaded();
+            EntryManager.OnSceneWasLoaded();
         }
     }
 }

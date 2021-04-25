@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using MelonLoader;
-using MelonLoader.Tomlyn.Model;
 using PlayerList.Entries;
 using UnityEngine;
 
@@ -13,7 +11,7 @@ namespace PlayerList.Config
         public static event Action OnConfigChangedEvent;
         private static bool hasConfigChanged = false;
 
-        public static readonly string categoryIdentifier = "PlayerList Config";
+        public const string categoryIdentifier = "PlayerList Config";
         public static MelonPreferences_Category category = MelonPreferences.CreateCategory(categoryIdentifier);
         public static List<EntryWrapper> entries = new List<EntryWrapper>();
 

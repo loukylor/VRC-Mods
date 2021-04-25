@@ -10,10 +10,6 @@
 	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	</PropertyGroup>
-
 	<ItemGroup>
 		<None Remove="playerlistmod.assetbundle" />
 	</ItemGroup>
@@ -77,7 +73,7 @@
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="move &quot;bin\Debug\net472\PlayerList.dll&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\VRChat\Mods&quot;" />
+		<Exec Command="move &quot;bin\Release\net472\PlayerList.dll&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\VRChat\Mods&quot;" />
 	</Target>
 
 </Project>
