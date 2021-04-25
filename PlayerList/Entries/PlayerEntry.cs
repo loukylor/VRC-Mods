@@ -87,7 +87,7 @@ namespace PlayerList.Entries
             PlayerListMod.Instance.Harmony.Patch(typeof(APIUser).GetMethod("UnfriendUser"), null, new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnUnfriend), BindingFlags.NonPublic | BindingFlags.Static)));
 
             // Definitely not stolen code from our lord and savior knah (https://github.com/knah/VRCMods/blob/master/AdvancedSafety/AdvancedSafetyMod.cs) because im not a skid
-            foreach (MethodInfo method in typeof(PlayerNet).GetMethods().Where(mi => mi.GetParameters().Length == 3 && mi.Name.StartsWith("Method_Public_Virtual_Final_New_Void_ValueTypePublicSealed2157InObIn1157Ob4471Unique_Int32_Single_")))
+            foreach (MethodInfo method in typeof(PlayerNet).GetMethods().Where(mi => mi.GetParameters().Length == 3 && mi.Name.StartsWith("Method_Public_Virtual_Final_New_Void_ValueTypePublicSealed")))
             {
                 unsafe
                 {
