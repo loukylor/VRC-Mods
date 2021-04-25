@@ -227,6 +227,10 @@ namespace PlayerList.Entries
             if (entry == null)
                 return originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
 
+            IntPtr result = originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
+            if (result == IntPtr.Zero)
+                return result;
+            
             try
             {
                 entry.timer.Restart();
@@ -236,20 +240,9 @@ namespace PlayerList.Entries
 
                 // Update values but not text even if playerlist not active and before decode
                 entry.distance = (entry.player.transform.position - Player.prop_Player_0.transform.position).magnitude;
-                entry.fps = MelonUtils.Clamp(1000f / playerNet.field_Private_Byte_0 == 0 ? 0 : playerNet.field_Private_Byte_0, -99, 999);
+                entry.fps = MelonUtils.Clamp(playerNet.field_Private_Byte_0 == 0 ? 0 : ((int)1000f / playerNet.field_Private_Byte_0), -99, 999);
                 entry.ping = playerNet.prop_Int16_0;
-            }
-            catch (Exception ex)
-            {
-                MelonLogger.Error("Something went horribly wrong:\n" + ex.ToString());
-            }
 
-            IntPtr result = originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
-            if (result == IntPtr.Zero)
-                return result;
-
-            try
-            {
                 UpdateEntry(playerNet, entry);
             }
             catch (Exception ex)
@@ -362,7 +355,7 @@ namespace PlayerList.Entries
 
         public void CheckFreeze()
         {
-            if (timer.ElapsedMilliseconds <= 1000) return;
+            if (timer.ElapsedMilliseconds <= 1500) return;
 
             OnFreeze();
         }
