@@ -115,8 +115,7 @@ namespace PlayerList.Entries
         public override void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
         {
             // poggers - loukylor 2021
-            MelonLogger.Msg("Checking if world is allowed to show distance...");
-            worldAllowed = false;
+            WorldAllowed = false;
             if (world != null)
                 MelonCoroutines.Start(VRCUtils.CheckWorld(world));
         }

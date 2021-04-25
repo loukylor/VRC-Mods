@@ -27,24 +27,12 @@ namespace PlayerList.Utilities
                 {
                     case "allowed":
                         MelonLogger.Msg("World allowed to show player distance");
-                        PlayerEntry.worldAllowed = true;
-                        if (PlayerListConfig.CurrentBaseSortType == EntrySortManager.SortType.Distance)
-                            EntrySortManager.currentBaseComparison = EntrySortManager.distanceSort;
-                        if (PlayerListConfig.CurrentUpperSortType == EntrySortManager.SortType.Distance)
-                            EntrySortManager.currentUpperComparison = EntrySortManager.distanceSort;
-                        if (PlayerListConfig.CurrentHighestSortType == EntrySortManager.SortType.Distance)
-                            EntrySortManager.currentHighestComparison = EntrySortManager.distanceSort;
+                        PlayerEntry.WorldAllowed = true;
                         yield break;
 
                     case "denied":
                         MelonLogger.Msg("World NOT allowed to show player distance");
-                        PlayerEntry.worldAllowed = false;
-                        if (PlayerListConfig.CurrentBaseSortType == EntrySortManager.SortType.Distance)
-                            EntrySortManager.currentBaseComparison = EntrySortManager.noneSort;
-                        if (PlayerListConfig.CurrentUpperSortType == EntrySortManager.SortType.Distance)
-                            EntrySortManager.currentUpperComparison = EntrySortManager.noneSort;
-                        if (PlayerListConfig.CurrentHighestSortType == EntrySortManager.SortType.Distance)
-                            EntrySortManager.currentHighestComparison = EntrySortManager.noneSort;
+                        PlayerEntry.WorldAllowed = false;
                         yield break;
                 }
             }
@@ -64,13 +52,13 @@ namespace PlayerList.Utilities
                                 if (worldTag.IndexOf("game", StringComparison.OrdinalIgnoreCase) >= 0)
                                 {
                                     MelonLogger.Msg("World NOT allowed to show player distance");
-                                    PlayerEntry.worldAllowed = false;
+                                    PlayerEntry.WorldAllowed = false;
                                     return;
                                 }
                             }
 
                             MelonLogger.Msg("World allowed to show player distance");
-                            PlayerEntry.worldAllowed = true;
+                            PlayerEntry.WorldAllowed = true;
                             return;
                         }
                         else

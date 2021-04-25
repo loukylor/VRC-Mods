@@ -83,6 +83,7 @@ namespace PlayerList
             highestComparisonProperty = typeof(PlayerListConfig).GetProperty(nameof(PlayerListConfig.CurrentHighestSortType));
 
             PlayerListConfig.OnConfigChangedEvent += OnStaticConfigChange;
+            PlayerEntry.OnWorldAllowedChanged += OnWorldAllowedChanged;
         }
         private static void OnStaticConfigChange()
         {
@@ -98,7 +99,7 @@ namespace PlayerList
                     currentBaseComparison = avatarPerfSort;
                     break;
                 case SortType.Distance:
-                    if (PlayerEntry.worldAllowed)
+                    if (PlayerEntry.WorldAllowed)
                         currentBaseComparison = distanceSort;
                     else
                         currentBaseComparison = noneSort;
@@ -129,7 +130,7 @@ namespace PlayerList
                     currentUpperComparison = avatarPerfSort;
                     break;
                 case SortType.Distance:
-                    if (PlayerEntry.worldAllowed)
+                    if (PlayerEntry.WorldAllowed)
                         currentUpperComparison = distanceSort;
                     else
                         currentUpperComparison = noneSort;
@@ -160,7 +161,7 @@ namespace PlayerList
                     currentHighestComparison = avatarPerfSort;
                     break;
                 case SortType.Distance:
-                    if (PlayerEntry.worldAllowed)
+                    if (PlayerEntry.WorldAllowed)
                         currentHighestComparison = distanceSort;
                     else
                         currentHighestComparison = noneSort;
@@ -215,6 +216,27 @@ namespace PlayerList
             }
 
             SortAllPlayers();
+        }
+        private static void OnWorldAllowedChanged()
+        {
+            if (PlayerEntry.WorldAllowed)
+            { 
+                if (PlayerListConfig.CurrentBaseSortType == SortType.Distance)
+                    currentBaseComparison = distanceSort;
+                if (PlayerListConfig.CurrentUpperSortType == SortType.Distance)
+                    currentUpperComparison = distanceSort;
+                if (PlayerListConfig.CurrentHighestSortType == SortType.Distance)
+                    currentHighestComparison = distanceSort;
+            }
+            else
+            {
+                if (PlayerListConfig.CurrentBaseSortType == SortType.Distance)
+                    currentBaseComparison = noneSort;
+                if (PlayerListConfig.CurrentUpperSortType == SortType.Distance)
+                    currentUpperComparison = noneSort;
+                if (PlayerListConfig.CurrentHighestSortType == SortType.Distance)
+                    currentHighestComparison = noneSort;
+            }
         }
 
         public static void SortAllPlayers() // This only runs when sort type is changed and when the qm is opened (takes around 1-2ms in a full BClub)
