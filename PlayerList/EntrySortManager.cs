@@ -82,7 +82,7 @@ namespace PlayerList
             upperComparisonProperty = typeof(PlayerListConfig).GetProperty(nameof(PlayerListConfig.CurrentUpperSortType));
             highestComparisonProperty = typeof(PlayerListConfig).GetProperty(nameof(PlayerListConfig.CurrentHighestSortType));
 
-            PlayerListConfig.OnConfigChangedEvent += OnStaticConfigChange;
+            PlayerListConfig.OnConfigChanged += OnStaticConfigChange;
             PlayerEntry.OnWorldAllowedChanged += OnWorldAllowedChanged;
         }
         private static void OnStaticConfigChange()

@@ -8,7 +8,7 @@ namespace PlayerList.Config
 {
     static class PlayerListConfig
     {
-        public static event Action OnConfigChangedEvent;
+        public static event Action OnConfigChanged;
         private static bool hasConfigChanged = false;
 
         public const string categoryIdentifier = "PlayerList Config";
@@ -117,7 +117,7 @@ namespace PlayerList.Config
             _playerListPositionY = CreateEntry(categoryIdentifier, nameof(_playerListPositionY), 3.5f, is_hidden: true);
 
             foreach (EntryWrapper entry in entries)
-                entry.OnValueChangedUntyped += new Action(() => OnConfigChanged());
+                entry.OnValueChangedUntyped += new Action(() => OnConfigChange());
         }
 
         public static EntryWrapper<T> CreateEntry<T>(string category_identifier, string entry_identifier, T default_value, string display_name = null, bool is_hidden = false)
@@ -144,9 +144,9 @@ namespace PlayerList.Config
             ListPositionManager.shouldMove = false;
         }
 
-        public static void OnConfigChanged(bool shouldSetHasConfigChanged = true)
+        public static void OnConfigChange(bool shouldSetHasConfigChanged = true)
         {
-            OnConfigChangedEvent?.Invoke();
+            OnConfigChanged?.Invoke();
             hasConfigChanged = shouldSetHasConfigChanged;
         }
     }

@@ -43,7 +43,7 @@ namespace PlayerList.Entries
             pingAddingDelegate = DefaultPingAdding;
             fpsAddingDelegate = DefaultFpsAdding;
 
-            NetworkEvents.OnPlayerJoin += new Action<Player>((player) =>
+            NetworkEvents.OnPlayerJoined += new Action<Player>((player) =>
             {
                 int highestId = 0;
                 foreach (int photonId in PlayerManager.prop_PlayerManager_0.field_Private_Dictionary_2_Int32_Player_0.Keys)

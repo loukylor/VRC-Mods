@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using MelonLoader;
 using Photon.Realtime;
+using PlayerList.Utilities;
 using VRC.Core;
 
 namespace PlayerList.Entries
@@ -13,7 +14,7 @@ namespace PlayerList.Entries
 
         public override void Init(object[] parameters = null)
         {
-            NetworkEvents.OnMasterChange += OnMasterChange;
+            NetworkEvents.OnMasterChanged += OnMasterChanged;
         }
         public override void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
         {
@@ -40,7 +41,7 @@ namespace PlayerList.Entries
                 yield return null;
             }
         }
-        private void OnMasterChange(Player player)
+        private void OnMasterChanged(Player player)
         {
             textComponent.text = OriginalText.Replace("{instancemaster}", player.field_Public_Player_0.field_Private_APIUser_0.displayName);
         }

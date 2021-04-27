@@ -36,7 +36,7 @@ namespace PlayerList
 
         public static void Init()
         {
-            PlayerListConfig.OnConfigChangedEvent += OnConfigChanged;
+            PlayerListConfig.OnConfigChanged += OnConfigChanged;
         }
         public static void OnSceneWasLoaded()
         {

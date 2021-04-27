@@ -23,10 +23,10 @@ namespace PlayerList
         public static void Init()
         {
             PlayerListConfig.fontSize.OnValueChanged += (oldValue, newValue) => SetFontSize(newValue);
-            PlayerListConfig.OnConfigChangedEvent += OnConfigChanged;
-            NetworkEvents.OnPlayerJoin += OnPlayerJoin;
-            NetworkEvents.OnPlayerLeave += OnPlayerLeave;
-            NetworkEvents.OnInstanceChange += OnInstanceChange;
+            PlayerListConfig.OnConfigChanged += OnConfigChanged;
+            NetworkEvents.OnPlayerJoined += OnPlayerJoined;
+            NetworkEvents.OnPlayerLeft += OnPlayerLeft;
+            NetworkEvents.OnInstanceChanged += OnInstanceChanged;
             NetworkEvents.OnAvatarChanged += OnAvatarChanged;
             NetworkEvents.OnAvatarInstantiated += OnAvatarInstantiated;
         }
@@ -43,7 +43,7 @@ namespace PlayerList
                 Object.DestroyImmediate(Constants.playerListLayout.transform.GetChild(i + 3).gameObject);
             }
         }
-        public static void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
+        public static void OnInstanceChanged(ApiWorld world, ApiWorldInstance instance)
         {
             foreach (EntryBase entry in entries)
                 entry.OnInstanceChange(world, instance);
@@ -68,7 +68,7 @@ namespace PlayerList
             localPlayerEntry?.OnAvatarInstantiated(player, avatar);
         }
 
-        public static void OnPlayerJoin(Player player)
+        public static void OnPlayerJoined(Player player)
         {
             if (GetEntryFromPlayer(sortedPlayerEntries, player, out _)) return; // If already in list
 
@@ -96,7 +96,7 @@ namespace PlayerList
             AddPlayerEntry(EntryBase.CreateInstance<PlayerEntry>(template.transform.Find("RightPart").gameObject, new object[] { player }));
             AddLeftSidePlayerEntry(EntryBase.CreateInstance<LeftSidePlayerEntry>(template.transform.Find("LeftPart").gameObject));
         }
-        public static void OnPlayerLeave(Player player)
+        public static void OnPlayerLeft(Player player)
         {
             int index = GetEntryFromPlayerWithIndex(sortedPlayerEntries, player, out PlayerEntry entry);
             if (index < 0) return;
