@@ -37,10 +37,10 @@ namespace PlayerList
         public static void OnSceneWasLoaded()
         {
             for (int i = playerEntries.Count - 1; i >= 0; i--)
-            { 
+            {
+                Object.DestroyImmediate(playerEntries[i].gameObject.transform.parent.gameObject);   
                 RemovePlayerEntry(playerEntries[i]);
                 RemoveLeftPlayerEntry(leftSidePlayerEntries[i + 1]); // Skip first entry
-                Object.DestroyImmediate(playerEntries[i].gameObject);
             }
         }
         public static void OnInstanceChanged(ApiWorld world, ApiWorldInstance instance)
