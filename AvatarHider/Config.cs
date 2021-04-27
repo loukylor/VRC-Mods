@@ -29,7 +29,7 @@ namespace AvatarHider
             HideAvatarsCompletely = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(HideAvatarsCompletely), false, "Completely Hide Avatars Rather Than Just Renderers (Lags on avatar show, better avg framerate)");
             IgnoreFriends = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(IgnoreFriends), true, "Ignore Friends");
             ExcludeShownAvatars = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(ExcludeShownAvatars), true, "Exclude Shown Avatars");
-            IncludeHiddenAvatars = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(IncludeHiddenAvatars), false, "Include Shown Avatars");
+            IncludeHiddenAvatars = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(IncludeHiddenAvatars), false, "Include Hidden Avatars");
             DisableSpawnSound = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(DisableSpawnSound), false, "Disable Spawn Sounds (Will only do something if \"HideAvatarsCompletely\" is on)");
             HideDistance = (MelonPreferences_Entry<float>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(HideDistance), 7.0f, "Distance (meters)");
 
