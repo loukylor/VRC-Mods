@@ -40,7 +40,7 @@ namespace PlayerList
             { 
                 RemovePlayerEntry(playerEntries[i]);
                 RemoveLeftPlayerEntry(leftSidePlayerEntries[i + 1]); // Skip first entry
-                Object.DestroyImmediate(Constants.playerListLayout.transform.GetChild(i + 3).gameObject);
+                Object.DestroyImmediate(playerEntries[i].gameObject);
             }
         }
         public static void OnInstanceChanged(ApiWorld world, ApiWorldInstance instance)
