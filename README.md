@@ -14,14 +14,15 @@ And in fact, only one of my mods could trigger any anticheat in any way (UserInf
 
 # Installation 
 1. Simply follow the instructions on the [MelonLoader wiki](https://melonwiki.xyz/#/) on installing MelonLoader **0.3.0** (MelonLoader is the mod loader which will allow my mods to run). 
-1a. Make sure you've installed version 0.3.0, as 0.2.7.4 will not function with VRChat.
-2. Then download the mod(s) you would like to install from the [releases](https://github.com/loukylor/VRC-Mods/releases) section of this repository.
-3. Allow the game to run once (this will set up a bunch of things MelonLoader uses)
-4. And finally, drag and drop the downloaded mod(s) into the newly created `Mods` folder in the `VRChat` folder and restart the game.
+2. Make sure you've installed version 0.3.0, as 0.2.7.4 will not function with VRChat.
+3. Then download the mod(s) you would like to install from the [releases](https://github.com/loukylor/VRC-Mods/releases) section of this repository.
+4. Allow the game to run once (this will set up a bunch of things MelonLoader uses)
+5. And finally, drag and drop the downloaded mod(s) into the newly created `Mods` folder in the `VRChat` folder and restart the game.
 More detailed instructions and more mods can be found in the [VRChat Modding Group Discord](https://discord.gg/rCqKSvR).
 
 # Mod List
 - [AskToPortal](#asktoportal)
+- [AvatarHider](#avatarhider)
 - [CloningBeGone](#cloningbegone)
 - [InstanceHistory](#instancehistory)
 - [PlayerList](#playerlist)
@@ -40,6 +41,39 @@ You can also toggle the mod on and off and auto accept portals from friends, you
 
 ## Picture of user prompt:
 ![Image of user prompt](https://i.imgur.com/uvUeUmL.png)
+
+# AvatarHider
+The following is the original README:
+
+This mod will automatically hide avatars based on the distance away from you.
+There's no real reason to render avatars that you don't even pay attention to, right?
+
+For the best experience, it is recommended to run this mod with UIExpansionKit.
+"Hide Distance" is customizable and can be changed in meters (default is 7 meters).
+Friend's avatars are ignored by default, but can be hidden by distance too if needed.
+"Exclude Shown Avatars" will ignore to hide a persons avatar if you are showing the avatar.
+"Disable Spawn Sounds" will only prevent a spawn sound from replaying when the avatar becomes visable again.
+
+Tip:
+If a friend is using an unoptimized avatar and you would like AvatarHider to hide it, disable "Ignore Friends" and enable "Exclude Shown Avatars".
+Then show your friends avatars that you would like to be ignored by AvatarHider.
+And set the friend with the unoptimized avatar to the "Use Safety Settings" in the QuickMenu.
+
+## Additions in my Version
+I spent lots of time to make sure the mod runs well, and also can be more snappy.
+There is no longer any delay to hide an avatar and also there should be less performance hit in general.
+
+Adding onto performance increases, is now an option to only disable renderers. This means it will lag less when you walk into a crowd of people and lots of avatar enable at once.
+The downside to this though, is that things like dynamic bones, final IK and other things will still calculate and take frametime. Just the avatar will be invisible.
+
+If you prefer to disable the entire avatar (like how AvatarHider worked before), things have mostly stayed the same. 
+The only difference is that the "Disable Spawn Sounds" setting will allow an avatar's spawn sounds to run once.
+
+The last addition is there is now an option to always include hidden avatars, even if they're a friend and you set AvatarHider to ignore friends.
+
+## Credits
+This is a revived version of the mod [AvatarHider](https://github.com/ImTiara/AvatarHider), originally made by [ImTiara](https://github.com/ImTiara) so huge credits to them!
+In the previous repository, both [dave-kun](https://github.com/dave-kun) and [Brycey92](https://github.com/Brycey92) were contributor so credits to them too.
 
 # CloningBeGone
 Turns off cloning when you join an instance.
