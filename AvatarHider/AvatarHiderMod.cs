@@ -37,9 +37,7 @@ namespace AvatarHider
         public override void OnUpdate()
         {
             // About 50-100 microseconds (0.05 - 0.1 milliseconds) per refresh in instance of ~20 people;
-            timer.Restart();
             RefreshManager.Refresh();
-            MelonLogger.Msg(((float)timer.ElapsedTicks / (Stopwatch.Frequency / 1000)).ToString("N5"));
         }
     }
 }
