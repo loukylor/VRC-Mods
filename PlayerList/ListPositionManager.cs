@@ -79,7 +79,7 @@ namespace PlayerList
 
             if (shouldMove)
             {
-                onComplete.Invoke(movingGameObject);
+                onComplete.SafeInvoke(movingGameObject);
             }
             else
             {

@@ -32,7 +32,7 @@ namespace PlayerList.Entries
             set 
             {
                 _worldAllowed = value;
-                OnWorldAllowedChanged?.Invoke();
+                OnWorldAllowedChanged?.SafeInvoke();
             }
         }
 

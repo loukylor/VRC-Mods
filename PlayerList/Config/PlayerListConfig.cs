@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using MelonLoader;
 using PlayerList.Entries;
+using PlayerList.Utilities;
 using UnityEngine;
 
 namespace PlayerList.Config
@@ -146,7 +147,7 @@ namespace PlayerList.Config
 
         public static void OnConfigChange(bool shouldSetHasConfigChanged = true)
         {
-            OnConfigChanged?.Invoke();
+            OnConfigChanged?.SafeInvoke();
             hasConfigChanged = shouldSetHasConfigChanged;
         }
     }

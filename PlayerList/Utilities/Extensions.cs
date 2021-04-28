@@ -1,4 +1,5 @@
 ﻿using System;
+using MelonLoader;
 using UnityEngine;
 
 namespace PlayerList.Utilities
@@ -36,6 +37,40 @@ namespace PlayerList.Utilities
         public static Vector2 RoundAmount(this Vector2 i, float lowestDecimal)
         {
             return new Vector2(i.x.RoundAmount(lowestDecimal), i.y.RoundAmount(lowestDecimal));
+        }
+
+        public static void SafeInvoke(this Action action)
+        {
+            try
+            {
+                action.Invoke();
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error("Error while invoking delegate:\n" + ex.ToString());
+            }
+        }
+        public static void SafeInvoke<T>(this Action<T> action, T arg1)
+        {
+            try
+            {
+                action.Invoke(arg1);
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error("Error while invoking delegate:\n" + ex.ToString());
+            }
+        }
+        public static void SafeInvoke<T1, T2>(this Action<T1, T2> action, T1 arg1, T2 arg2)
+        {
+            try
+            {
+                action.Invoke(arg1, arg2);
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error("Error while invoking delegate:\n" + ex.ToString());
+            }
         }
     }
 }

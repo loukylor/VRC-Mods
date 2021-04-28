@@ -168,8 +168,8 @@ namespace PlayerList.UI
                 prop.SetValue(QuickMenu.prop_QuickMenu_0, null);
             QuickMenu.prop_QuickMenu_0.field_Private_Int32_0 = -1;
         }
-        private static void OnQuickMenuOpen() => OnQuickMenuOpenEvent?.Invoke();
-        private static void OnQuickMenuClose() => OnQuickMenuCloseEvent?.Invoke();
+        private static void OnQuickMenuOpen() => OnQuickMenuOpenEvent?.SafeInvoke();
+        private static void OnQuickMenuClose() => OnQuickMenuCloseEvent?.SafeInvoke();
         public static void SetMenuIndex(int index) => setMenuIndex.Invoke(QuickMenu.prop_QuickMenu_0, new object[] { index });
         public static void SetTabTabIndex(GameObject tab, int index) => setTabTabIndexField.SetValue(tab.gameObject.GetComponent(tabDescriptorType), new Il2CppSystem.Int32 { m_value = index }.BoxIl2CppObject());
         public static void ShowTabContent(GameObject tab) => showTabContentMethod.Invoke(tab.gameObject.GetComponent(tabDescriptorType), null);

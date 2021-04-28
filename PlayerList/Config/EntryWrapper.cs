@@ -1,5 +1,6 @@
 ﻿using System;
 using MelonLoader;
+using PlayerList.Utilities;
 
 namespace PlayerList.Config 
 {
@@ -7,7 +8,7 @@ namespace PlayerList.Config
     {
         public event Action OnValueChangedUntyped;
 
-        protected void RunOnValueChangedUntyped() => OnValueChangedUntyped?.Invoke();
+        protected void RunOnValueChangedUntyped() => OnValueChangedUntyped?.SafeInvoke();
     }
     public class EntryWrapper<T> : EntryWrapper
     {
@@ -20,7 +21,7 @@ namespace PlayerList.Config
             {
                 if (!value.Equals(Value))
                 {
-                    OnValueChanged?.Invoke(pref.Value, value);
+                    OnValueChanged?.SafeInvoke(pref.Value, value);
                     pref.Value = value;
                     RunOnValueChangedUntyped();
                 }

@@ -20,20 +20,28 @@ namespace PlayerList.Utilities
 
         private static void OnInstanceChange(ApiWorld __0, ApiWorldInstance __1)
         {
-            OnInstanceChanged?.Invoke(__0, __1);
+            if (__0 == null || __1 == null) return;
+            
+            OnInstanceChanged?.SafeInvoke(__0, __1);
         }
         private static void OnMasterChange(Photon.Realtime.Player __0)
         {
-            OnMasterChanged?.Invoke(__0);
+            if (__0 == null) return;
+
+            OnMasterChanged?.SafeInvoke(__0);
         }
         private static void OnAvatarChange(ApiAvatar __0, VRCAvatarManager __instance)
         {
-            OnAvatarChanged?.Invoke(__0, __instance);
+            if (__0 == null || __instance == null) return;
+
+            OnAvatarChanged?.SafeInvoke(__0, __instance);
         }
         private static void OnAvatarInstantiate(VRCPlayer __instance, GameObject __0, bool __2)
         {
+            if (__instance == null || __0 == null) return;
+
             if (__2)
-                OnAvatarInstantiated?.Invoke(__instance, __0);
+                OnAvatarInstantiated?.SafeInvoke(__instance, __0);
         }
 
         public static void NetworkInit()
@@ -47,8 +55,8 @@ namespace PlayerList.Utilities
             PlayerListMod.Instance.Harmony.Patch(typeof(VRCAvatarManager).GetMethods().First(mi => mi.Name.StartsWith("Method_Public_Boolean_ApiAvatar_String_Single_")), null, new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnAvatarChange), BindingFlags.NonPublic | BindingFlags.Static)));
             PlayerListMod.Instance.Harmony.Patch(typeof(VRCPlayer).GetMethods().First(mi => mi.Name.StartsWith("Method_Private_Void_GameObject_VRC_AvatarDescriptor_Boolean_") && !Xref.CheckMethod(mi, "Avatar is Ready, Initializing")), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnAvatarInstantiate), BindingFlags.NonPublic | BindingFlags.Static)));
 
-            field0.field_Private_HashSet_1_UnityAction_1_T_0.Add(new Action<Player>((player) => { if (player != null) OnPlayerJoined?.Invoke(player); }));
-            field1.field_Private_HashSet_1_UnityAction_1_T_0.Add(new Action<Player>((player) => { if (player != null) OnPlayerLeft?.Invoke(player); }));
+            field0.field_Private_HashSet_1_UnityAction_1_T_0.Add(new Action<Player>((player) => { if (player != null) OnPlayerJoined?.SafeInvoke(player); }));
+            field1.field_Private_HashSet_1_UnityAction_1_T_0.Add(new Action<Player>((player) => { if (player != null) OnPlayerLeft?.SafeInvoke(player); }));
         }
     }
 }

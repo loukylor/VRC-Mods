@@ -1,4 +1,5 @@
 ﻿using System;
+using PlayerList.Utilities;
 using UnhollowerBaseLib.Attributes;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ namespace PlayerList.Components
         public event Action OnDisableEvent;
         public EnableDisableListener(IntPtr obj0) : base(obj0) { }
 
-        public void OnEnable() => OnEnableEvent?.Invoke();
-        public void OnDisable() => OnDisableEvent?.Invoke();
+        public void OnEnable() => OnEnableEvent?.SafeInvoke();
+        public void OnDisable() => OnDisableEvent?.SafeInvoke();
     }
 }
