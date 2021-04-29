@@ -75,7 +75,7 @@ namespace PlayerList.Entries
             PlayerListConfig.OnConfigChanged += OnStaticConfigChanged;
             UIManager.OnQuickMenuOpenEvent += () =>
             {
-                foreach (PlayerEntry entry in EntryManager.playerEntries)
+                foreach (PlayerEntry entry in EntryManager.sortedPlayerEntries)
                 {
                     entry.GetPlayerColor();
                     UpdateEntry(entry.player.prop_PlayerNet_0, entry);
