@@ -140,11 +140,21 @@ namespace AvatarHider.DataTypes
         private static readonly Action<PlayerProp> setActivePartlyDelegate = new Action<PlayerProp>((playerProp) =>
         {
             for (int i = 0; i < playerProp.avatarRenderers.Count; i++)
+            {
+                if (playerProp.avatarRenderers[i].renderer == null)
+                {
+                    playerProp.avatarRenderers.RemoveAt(i);
+                    i -= 1;
+                    continue;
+                }
+
                 playerProp.avatarRenderers[i].renderer.enabled = playerProp.avatarRenderers[i].wasActive;
+            }
         });
         private static readonly Action<PlayerProp> setActiveCompletelyDelegate = new Action<PlayerProp>((playerProp) =>
         {
-            playerProp.avatar.SetActive(true);
+            if (playerProp.avatar != null)
+                playerProp.avatar.SetActive(true);
         });
 
         public static event Action<PlayerProp> OnEnable;
