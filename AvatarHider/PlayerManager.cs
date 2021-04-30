@@ -27,7 +27,7 @@ namespace AvatarHider
         public static void Init()
         {
             NetworkEvents.OnPlayerJoined += OnPlayerJoin;
-            NetworkEvents.OnPlayerLeaved += OnPlayerLeave;
+            NetworkEvents.OnPlayerLeft += OnPlayerLeave;
             NetworkEvents.OnFriended += OnFriend;
             NetworkEvents.OnUnfriended += OnUnfriend;
             NetworkEvents.OnAvatarChanged += OnAvatarChanged;
@@ -218,9 +218,9 @@ namespace AvatarHider
             filteredPlayers = players.ToDictionary(entry => entry.Key, entry => entry.Value);
             foreach (KeyValuePair<int, PlayerProp> item in players)
             {
-                if ((excludeFlags.HasFlag(ExcludeFlags.Friends) && item.Value.isFriend) ||
-                    (excludeFlags.HasFlag(ExcludeFlags.Shown) && item.Value.isShown) ||
-                    (excludeFlags.HasFlag(ExcludeFlags.Hidden) && item.Value.isHidden))
+                if (((excludeFlags.HasFlag(ExcludeFlags.Friends) && item.Value.isFriend) ||
+                     (excludeFlags.HasFlag(ExcludeFlags.Shown) && item.Value.isShown)) &&
+                     !(excludeFlags.HasFlag(ExcludeFlags.Hidden) && item.Value.isHidden))
                 { 
                     filteredPlayers.Remove(item.Key);
                     removedPlayers.Add(item.Value);
