@@ -18,7 +18,7 @@ namespace AvatarHider
             Instance = this;
             Config.RegisterSettings();
             OnPreferencesSaved();
-            PlayerProp.Init();
+            AvatarHiderPlayer.Init();
             PlayerManager.Init();
             RefreshManager.Init();
             Config.OnConfigChange();

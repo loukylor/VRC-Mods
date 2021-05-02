@@ -7,9 +7,9 @@ namespace AvatarHider
 {
     public static class RefreshManager
     {
-        private static Action<PlayerProp, Vector3> refreshDelegate;
+        private static Action<AvatarHiderPlayer, Vector3> refreshDelegate;
 
-        private static readonly Action<PlayerProp, Vector3> normalRefreshDelegate = (playerProp, myPos) =>
+        private static readonly Action<AvatarHiderPlayer, Vector3> normalRefreshDelegate = (playerProp, myPos) =>
         {
             float distance = (playerProp.position - myPos).magnitude;
             if (distance > Config.HideDistance.Value)
@@ -27,7 +27,7 @@ namespace AvatarHider
         {
             refreshDelegate = null;
 
-            foreach (PlayerProp playerProp in PlayerManager.RefreshFilteredList())
+            foreach (AvatarHiderPlayer playerProp in PlayerManager.RefreshFilteredList())
                 PlayerManager.HideOrShowAvatar(playerProp);
 
             if (Config.HideAvatars.Value)
@@ -37,7 +37,7 @@ namespace AvatarHider
             else
             { 
                 refreshDelegate = null;
-                foreach (PlayerProp playerProp in PlayerManager.players.Values)
+                foreach (AvatarHiderPlayer playerProp in PlayerManager.players.Values)
                     playerProp.SetActive();
             }
         }
@@ -48,10 +48,10 @@ namespace AvatarHider
                 return;
 
             Vector3 myPos = Player.prop_Player_0.transform.position;
-            foreach (PlayerProp playerProp in PlayerManager.filteredPlayers.Values)
+            foreach (AvatarHiderPlayer playerProp in PlayerManager.filteredPlayers.Values)
                 RefreshPlayer(playerProp, myPos);
         }
-        public static void RefreshPlayer(PlayerProp playerProp, Vector3 myPos)
+        public static void RefreshPlayer(AvatarHiderPlayer playerProp, Vector3 myPos)
         {
             refreshDelegate?.Invoke(playerProp, myPos);
         }

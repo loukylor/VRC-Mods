@@ -17,8 +17,8 @@ namespace AvatarHider
 {
     public static class PlayerManager
     {
-        public static Dictionary<int, PlayerProp> players = new Dictionary<int, PlayerProp>();
-        public static Dictionary<int, PlayerProp> filteredPlayers = new Dictionary<int, PlayerProp>();
+        public static Dictionary<int, AvatarHiderPlayer> players = new Dictionary<int, AvatarHiderPlayer>();
+        public static Dictionary<int, AvatarHiderPlayer> filteredPlayers = new Dictionary<int, AvatarHiderPlayer>();
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr OnPlayerNetDecodeDelegate(IntPtr instancePointer, IntPtr objectsPointer, int objectIndex, float sendTime, IntPtr nativeMethodPointer);
@@ -103,7 +103,7 @@ namespace AvatarHider
 
             if (players.ContainsKey(photonId)) return;
 
-            PlayerProp playerProp = new PlayerProp()
+            AvatarHiderPlayer playerProp = new AvatarHiderPlayer()
             {
                 active = true,
                 photonId = photonId,
@@ -130,7 +130,7 @@ namespace AvatarHider
 
         private static void OnFriend(APIUser apiUser)
         {
-            foreach (PlayerProp playerProp in players.Values)
+            foreach (AvatarHiderPlayer playerProp in players.Values)
             {
                 if (playerProp.userId == apiUser.id)
                 {
@@ -142,7 +142,7 @@ namespace AvatarHider
         }
         private static void OnUnfriend(string userId)
         {
-            foreach (PlayerProp playerProp in players.Values)
+            foreach (AvatarHiderPlayer playerProp in players.Values)
             {
                 if (playerProp.userId == userId)
                 {
@@ -155,7 +155,7 @@ namespace AvatarHider
         {
             if (moderationType == ApiPlayerModeration.ModerationType.ShowAvatar)
             {
-                foreach (PlayerProp playerProp in players.Values)
+                foreach (AvatarHiderPlayer playerProp in players.Values)
                 {
                     if (playerProp.userId == userId)
                     {
@@ -167,7 +167,7 @@ namespace AvatarHider
             }
             else if (moderationType == ApiPlayerModeration.ModerationType.HideAvatar)
             {
-                foreach (PlayerProp playerProp in players.Values)
+                foreach (AvatarHiderPlayer playerProp in players.Values)
                 {
                     if (playerProp.userId == userId)
                     {
@@ -182,7 +182,7 @@ namespace AvatarHider
         {
             if (moderationType == ApiPlayerModeration.ModerationType.ShowAvatar)
             {
-                foreach (PlayerProp playerProp in players.Values)
+                foreach (AvatarHiderPlayer playerProp in players.Values)
                 {
                     if (playerProp.userId == userId)
                     {
@@ -193,7 +193,7 @@ namespace AvatarHider
             }
             else if (moderationType == ApiPlayerModeration.ModerationType.HideAvatar)
             {
-                foreach (PlayerProp playerProp in players.Values)
+                foreach (AvatarHiderPlayer playerProp in players.Values)
                 {
                     if (playerProp.userId == userId)
                     {
@@ -204,7 +204,7 @@ namespace AvatarHider
             }
         }
 
-        public static List<PlayerProp> RefreshFilteredList()
+        public static List<AvatarHiderPlayer> RefreshFilteredList()
         {
             ExcludeFlags excludeFlags = ExcludeFlags.None;
             if (Config.IgnoreFriends.Value)
@@ -214,9 +214,9 @@ namespace AvatarHider
             if (Config.IncludeHiddenAvatars.Value)
                 excludeFlags |= ExcludeFlags.Hidden;
 
-            List<PlayerProp> removedPlayers = new List<PlayerProp>();
+            List<AvatarHiderPlayer> removedPlayers = new List<AvatarHiderPlayer>();
             filteredPlayers = players.ToDictionary(entry => entry.Key, entry => entry.Value);
-            foreach (KeyValuePair<int, PlayerProp> item in players)
+            foreach (KeyValuePair<int, AvatarHiderPlayer> item in players)
             {
                 if (((excludeFlags.HasFlag(ExcludeFlags.Friends) && item.Value.isFriend) ||
                      (excludeFlags.HasFlag(ExcludeFlags.Shown) && item.Value.isShown)) &&
@@ -229,7 +229,7 @@ namespace AvatarHider
             return removedPlayers;
         }
 
-        public static void HideOrShowAvatar(PlayerProp playerProp)
+        public static void HideOrShowAvatar(AvatarHiderPlayer playerProp)
         {
             if (Config.IncludeHiddenAvatars.Value && playerProp.isHidden)
                 playerProp.SetInActive();

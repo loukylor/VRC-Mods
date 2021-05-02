@@ -5,19 +5,19 @@ using VRC;
 
 namespace AvatarHider.DataTypes
 {
-    public class PlayerProp
+    public class AvatarHiderPlayer
     {
         public override bool Equals(object obj)
         {
             if (obj == null)
                 return false;
-            PlayerProp objAsPlayerProp = (PlayerProp)obj;
+            AvatarHiderPlayer objAsPlayerProp = (AvatarHiderPlayer)obj;
             if (objAsPlayerProp == null)
                 return false;
             else
                 return Equals(objAsPlayerProp);
         }
-        public bool Equals(PlayerProp playerProp)
+        public bool Equals(AvatarHiderPlayer playerProp)
         {
             return playerProp.userId == userId;
         }
@@ -44,10 +44,16 @@ namespace AvatarHider.DataTypes
         public void SetActive()
         {
             setActiveDelegate(this);
+            if (!active)
+                OnEnable?.Invoke(this);
+            active = true;
         }
         public void SetInActive()
         {
             setInactiveDelegate(this);
+            if (active)
+                OnDisable?.Invoke(this);
+            active = false;
         }
 
         public void StopAudio()
@@ -92,8 +98,8 @@ namespace AvatarHider.DataTypes
             }
         }
 
-        private static Action<PlayerProp> setInactiveDelegate;
-        private static readonly Action<PlayerProp> setInactivePartlyDelegate = new Action<PlayerProp>((playerProp) =>
+        private static Action<AvatarHiderPlayer> setInactiveDelegate;
+        private static readonly Action<AvatarHiderPlayer> setInactivePartlyDelegate = new Action<AvatarHiderPlayer>((playerProp) =>
         {
             for (int i = 0; i < playerProp.avatarRenderers.Count; i++)
             {
@@ -114,7 +120,7 @@ namespace AvatarHider.DataTypes
                     playerProp.avatarRenderers[i].renderer.enabled = false;
             }
         });
-        private static readonly Action<PlayerProp> setInactiveCompletelyDelegate = new Action<PlayerProp>((playerProp) =>
+        private static readonly Action<AvatarHiderPlayer> setInactiveCompletelyDelegate = new Action<AvatarHiderPlayer>((playerProp) =>
         {
             for (int i = 0; i < playerProp.avatarRenderers.Count; i++)
             {
@@ -136,8 +142,8 @@ namespace AvatarHider.DataTypes
                 playerProp.avatar.SetActive(false);
         });
 
-        private static Action<PlayerProp> setActiveDelegate;
-        private static readonly Action<PlayerProp> setActivePartlyDelegate = new Action<PlayerProp>((playerProp) =>
+        private static Action<AvatarHiderPlayer> setActiveDelegate;
+        private static readonly Action<AvatarHiderPlayer> setActivePartlyDelegate = new Action<AvatarHiderPlayer>((playerProp) =>
         {
             for (int i = 0; i < playerProp.avatarRenderers.Count; i++)
             {
@@ -151,14 +157,14 @@ namespace AvatarHider.DataTypes
                 playerProp.avatarRenderers[i].renderer.enabled = playerProp.avatarRenderers[i].wasActive;
             }
         });
-        private static readonly Action<PlayerProp> setActiveCompletelyDelegate = new Action<PlayerProp>((playerProp) =>
+        private static readonly Action<AvatarHiderPlayer> setActiveCompletelyDelegate = new Action<AvatarHiderPlayer>((playerProp) =>
         {
             if (playerProp.avatar != null)
                 playerProp.avatar.SetActive(true);
         });
 
-        public static event Action<PlayerProp> OnEnable;
-        public static event Action<PlayerProp> OnDisable;
+        public static event Action<AvatarHiderPlayer> OnEnable;
+        public static event Action<AvatarHiderPlayer> OnDisable;
 
         public static void Init()
         {
@@ -174,7 +180,7 @@ namespace AvatarHider.DataTypes
             OnEnable = null;
             OnDisable = null;
 
-            foreach (PlayerProp playerProp in PlayerManager.filteredPlayers.Values)
+            foreach (AvatarHiderPlayer playerProp in PlayerManager.filteredPlayers.Values)
             {  
                 playerProp.SetActive();
                 playerProp.active = false; // Do this so avatar sounds run on the first time
@@ -183,18 +189,18 @@ namespace AvatarHider.DataTypes
             {
                 if (Config.DisableSpawnSound.Value)
                 {
-                    foreach (PlayerProp playerProp in PlayerManager.filteredPlayers.Values)
+                    foreach (AvatarHiderPlayer playerProp in PlayerManager.filteredPlayers.Values)
                         playerProp.hasLetAudioPlay = false;
 
-                    setActiveDelegate += setActiveCompletelyDelegate;
-                    setInactiveDelegate += setInactiveCompletelyDelegate;
+                    setActiveDelegate = setActiveCompletelyDelegate;
+                    setInactiveDelegate = setInactiveCompletelyDelegate;
 
-                    OnEnable += new Action<PlayerProp>((playerProp) =>
+                    OnEnable = new Action<AvatarHiderPlayer>((playerProp) =>
                     {
                         if (playerProp.hasLetAudioPlay)
                             playerProp.StopAudio();
                     });
-                    OnDisable += new Action<PlayerProp>((playerProp) =>
+                    OnDisable = new Action<AvatarHiderPlayer>((playerProp) =>
                     {
                         if (!playerProp.hasLetAudioPlay)
                             playerProp.hasLetAudioPlay = true;
@@ -211,19 +217,6 @@ namespace AvatarHider.DataTypes
                 setActiveDelegate = setActivePartlyDelegate;
                 setInactiveDelegate = setInactivePartlyDelegate;
             }
-
-            setActiveDelegate += new Action<PlayerProp>((playerProp) =>
-            {
-                if (!playerProp.active)
-                    OnEnable?.Invoke(playerProp);
-                playerProp.active = true;
-            });
-            setInactiveDelegate += new Action<PlayerProp>((playerProp) =>
-            {
-                if (playerProp.active)
-                    OnDisable?.Invoke(playerProp);
-                playerProp.active = false;
-            });
 
             RefreshManager.Refresh();
         }
