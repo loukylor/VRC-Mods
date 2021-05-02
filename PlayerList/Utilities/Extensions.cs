@@ -22,9 +22,10 @@ namespace PlayerList.Utilities
             foreach (var child in gameObject.transform)
                 SetLayerRecursive(child.Cast<Transform>().gameObject, layer);
         }
-        public static void SetZ(this Vector3 vector, float newZ)
+        public static Vector3 SetZ(this Vector3 vector, float newZ)
         {
             vector.Set(vector.x, vector.y, newZ);
+            return vector;
         }
         public static float RoundAmount(this float i, float lowestDecimal)
         {

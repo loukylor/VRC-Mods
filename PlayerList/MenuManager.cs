@@ -117,7 +117,7 @@ namespace PlayerList
             playerList.SetLayerRecursive(12);
             playerListRect = playerList.GetComponent<RectTransform>();
             playerListRect.anchoredPosition = PlayerListConfig.PlayerListPosition;
-            playerListRect.localPosition.SetZ(25); // Do this or else it looks off for whatever reason
+            playerListRect.localPosition = playerListRect.localPosition.SetZ(25); // Do this or else it looks off for whatever reason
             playerList.SetActive(false);
 
             shouldStayHidden = !PlayerListConfig.enabledOnStart.Value;
@@ -178,7 +178,7 @@ namespace PlayerList
             {
                 playerList.SetActive(false);
                 playerListRect.anchoredPosition = PlayerListConfig.PlayerListPosition;
-                playerListRect.localPosition.SetZ(25);
+                playerListRect.localPosition = playerListRect.localPosition.SetZ(25);
                 newElements.SetActive(true);
             });
         }
@@ -331,7 +331,7 @@ namespace PlayerList
             {
                 playerList.SetActive(false);
                 playerListRect.anchoredPosition = PlayerListConfig.PlayerListPosition;
-                playerListRect.localPosition.SetZ(25);
+                playerListRect.localPosition = playerListRect.localPosition.SetZ(25);
             });
         }
         public enum MenuButtonPositionEnum

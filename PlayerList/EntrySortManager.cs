@@ -204,7 +204,7 @@ namespace PlayerList
                     for (int i = 1; i < EntryManager.sortedPlayerEntries.Count; i++)
                     { 
                         EntryManager.sortedPlayerEntries[i].gameObject.transform.SetParent(Constants.playerListLayout.transform.GetChild(i + 2));
-                        EntryManager.sortedPlayerEntries[i].gameObject.transform.localPosition.SetZ(0);
+                        EntryManager.sortedPlayerEntries[i].gameObject.transform.localPosition = EntryManager.sortedPlayerEntries[i].gameObject.transform.localPosition.SetZ(0);
                     }
                 }
 
@@ -250,7 +250,7 @@ namespace PlayerList
             for (int i = 0; i < EntryManager.sortedPlayerEntries.Count; i++)
             {
                 EntryManager.sortedPlayerEntries[i].gameObject.transform.SetParent(Constants.playerListLayout.transform.GetChild(i + 2));
-                EntryManager.sortedPlayerEntries[i].gameObject.transform.localPosition.SetZ(0);
+                EntryManager.sortedPlayerEntries[i].gameObject.transform.localPosition = EntryManager.sortedPlayerEntries[i].gameObject.transform.localPosition.SetZ(0);
             }
         }
         public static void SortPlayer(PlayerEntry sortEntry)
@@ -284,7 +284,7 @@ namespace PlayerList
             for (int i = Math.Min(finalIndex, oldIndex); i < EntryManager.sortedPlayerEntries.Count; i++)
             { 
                 EntryManager.sortedPlayerEntries[i].gameObject.transform.SetParent(Constants.playerListLayout.transform.GetChild(i + 2));
-                EntryManager.sortedPlayerEntries[i].gameObject.transform.localPosition.SetZ(0);
+                EntryManager.sortedPlayerEntries[i].gameObject.transform.localPosition = EntryManager.sortedPlayerEntries[i].gameObject.transform.localPosition.SetZ(0);
             }
         }
 
