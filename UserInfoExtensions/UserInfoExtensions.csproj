@@ -4,11 +4,11 @@
     <TargetFramework>net472</TargetFramework>
     <VrcReferences>true</VrcReferences>
     <AssemblyVersion>0.2.7.1</AssemblyVersion>
-    <AssemblyName>UserInfoExtentions</AssemblyName>
-    <RootNamespace>UserInfoExtentions</RootNamespace>
+    <AssemblyName>UserInfoExtensions</AssemblyName>
+    <RootNamespace>UserInfoExtensions</RootNamespace>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
@@ -53,7 +53,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="move &quot;C:\Users\emem0\Source\Repos\VRC-Mods\UserInfoExtensions\bin\Debug\net472\UserInfoExtentions.dll&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\VRChat\Mods&quot;" />
+	  <Exec Command="move &quot;bin\Release\net472\UserInfoExtensions.dll&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\VRChat\Mods&quot;" />
   </Target>
 
 </Project>
