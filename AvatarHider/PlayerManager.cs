@@ -5,13 +5,11 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using AvatarHider.DataTypes;
 using AvatarHider.Utilities;
-using Harmony;
 using MelonLoader;
 using UnhollowerBaseLib;
 using UnityEngine;
 using VRC;
 using VRC.Core;
-using VRC.Management;
 
 namespace AvatarHider
 {
