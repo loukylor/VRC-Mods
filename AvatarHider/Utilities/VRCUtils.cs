@@ -8,42 +8,28 @@ namespace AvatarHider.Utilities
     {
         public static bool IsAvatarExplcitlyShown(APIUser user)
         {
-            if (typeof(ModerationManager).GetProperty("field_Private_List_1_ApiPlayerModeration_0") != null)
+            try
             {
-                foreach (ApiPlayerModeration moderation in (List<ApiPlayerModeration>)typeof(ModerationManager).GetProperty("field_Private_List_1_ApiPlayerModeration_0").GetValue(ModerationManager.prop_ModerationManager_0))
-                    if (moderation.id == user.id && moderation.moderationType == ApiPlayerModeration.ModerationType.ShowAvatar)
-                        return true;
-            }
-            else
-            {
-                try
-                {
-                    foreach (ApiPlayerModeration moderation in ((Dictionary<string, List<ApiPlayerModeration>>)typeof(ModerationManager).GetProperty("field_Private_Dictionary_2_String_List_1_ApiPlayerModeration_0").GetValue(ModerationManager.prop_ModerationManager_0))[user.id])
+                if (ModerationManager.prop_ModerationManager_0.field_Private_Dictionary_2_String_List_1_ApiPlayerModeration_0.ContainsKey(user.id))
+                    foreach (ApiPlayerModeration moderation in ModerationManager.prop_ModerationManager_0.field_Private_Dictionary_2_String_List_1_ApiPlayerModeration_0[user.id])
                         if (moderation.moderationType == ApiPlayerModeration.ModerationType.ShowAvatar)
                             return true;
-                }
-                catch (System.Collections.Generic.KeyNotFoundException) { }
             }
+            catch (System.Collections.Generic.KeyNotFoundException) { }
+
             return false;
         }
         public static bool IsAvatarExplcitlyHidden(APIUser user)
         {
-            if (typeof(ModerationManager).GetProperty("field_Private_List_1_ApiPlayerModeration_0") != null)
+            try
             {
-                foreach (ApiPlayerModeration moderation in (List<ApiPlayerModeration>)typeof(ModerationManager).GetProperty("field_Private_List_1_ApiPlayerModeration_0").GetValue(ModerationManager.prop_ModerationManager_0))
-                    if (moderation.id == user.id && moderation.moderationType == ApiPlayerModeration.ModerationType.HideAvatar)
-                        return true;
-            }
-            else
-            {
-                try
-                {
-                    foreach (ApiPlayerModeration moderation in ((Dictionary<string, List<ApiPlayerModeration>>)typeof(ModerationManager).GetProperty("field_Private_Dictionary_2_String_List_1_ApiPlayerModeration_0").GetValue(ModerationManager.prop_ModerationManager_0))[user.id])
+                if (ModerationManager.prop_ModerationManager_0.field_Private_Dictionary_2_String_List_1_ApiPlayerModeration_0.ContainsKey(user.id))
+                    foreach (ApiPlayerModeration moderation in ModerationManager.prop_ModerationManager_0.field_Private_Dictionary_2_String_List_1_ApiPlayerModeration_0[user.id])
                         if (moderation.moderationType == ApiPlayerModeration.ModerationType.HideAvatar)
                             return true;
-                }
-                catch (System.Collections.Generic.KeyNotFoundException) { }
             }
+            catch (System.Collections.Generic.KeyNotFoundException) { }
+
             return false;
         }
     }

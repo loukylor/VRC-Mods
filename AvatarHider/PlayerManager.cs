@@ -113,7 +113,7 @@ namespace AvatarHider
                 avatar = player.prop_VRCPlayer_0.prop_VRCAvatarManager_0.prop_GameObject_0,
                 isFriend = APIUser.IsFriendsWith(player.prop_APIUser_0.id),
                 isShown = VRCUtils.IsAvatarExplcitlyShown(player.prop_APIUser_0),
-                isHidden = VRCUtils.IsAvatarExplcitlyShown(player.prop_APIUser_0)
+                isHidden = VRCUtils.IsAvatarExplcitlyHidden(player.prop_APIUser_0)
             };
 
             players.Add(playerProp.photonId, playerProp);
