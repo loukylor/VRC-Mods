@@ -32,7 +32,6 @@ namespace PlayerList.Config
         public static EntryWrapper<bool> photonIdToggle;
         public static EntryWrapper<bool> displayNameToggle;
         private static EntryWrapper<string> displayNameColorMode;
-        public static EntryWrapper<bool> freezeDetectionToggle;
 
         public static PlayerEntry.DisplayNameColorMode DisplayNameColorMode
         {
@@ -74,10 +73,10 @@ namespace PlayerList.Config
         private static EntryWrapper<float> _playerListPositionY;
         public static Vector2 PlayerListPosition
         {
-            get { return Utilities.Converters.ConvertToUnityUnits(new Vector2(_playerListPositionX.Value, _playerListPositionY.Value)); }
+            get { return Converters.ConvertToUnityUnits(new Vector2(_playerListPositionX.Value, _playerListPositionY.Value)); }
             set 
             {
-                Vector2 convertedVector = Utilities.Converters.ConvertToMenuUnits(value);
+                Vector2 convertedVector = Converters.ConvertToMenuUnits(value);
                 _playerListPositionX.Value = convertedVector.x;
                 _playerListPositionY.Value = convertedVector.y;
             }
@@ -102,7 +101,6 @@ namespace PlayerList.Config
             photonIdToggle = CreateEntry(categoryIdentifier, nameof(photonIdToggle), false, is_hidden: true);
             displayNameToggle = CreateEntry(categoryIdentifier, nameof(displayNameToggle), true, is_hidden: true);
             displayNameColorMode = CreateEntry(categoryIdentifier, nameof(displayNameColorMode), "TrustAndFriends", is_hidden: true);
-            freezeDetectionToggle = CreateEntry(categoryIdentifier, nameof(freezeDetectionToggle), false, is_hidden: true);
 
             reverseBaseSort = CreateEntry(categoryIdentifier, nameof(reverseBaseSort), false, is_hidden: true);
             currentBaseSort = CreateEntry(categoryIdentifier, nameof(currentBaseSort), "None", is_hidden: true);

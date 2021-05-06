@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Harmony;
 using MelonLoader;
 using PlayerList.Config;
@@ -17,7 +18,7 @@ namespace PlayerList.Entries
         // " - <color={pingcolor}>{ping}ms</color> | <color={fpscolor}>{fps}</color> | {platform} | <color={perfcolor}>{perf}</color> | {relationship} | <color={rankcolor}>{displayname}</color>"
         public override string Name { get { return "Local Player"; } }
 
-        public new delegate void UpdateEntryDelegate(Player player, LocalPlayerEntry entry, ref string tempString);
+        public new delegate void UpdateEntryDelegate(Player player, LocalPlayerEntry entry, ref StringBuilder tempString);
         public static new UpdateEntryDelegate updateDelegate;
         public static new void EntryInit()
         {
@@ -39,9 +40,6 @@ namespace PlayerList.Entries
             // Join event runs after avatar instantiation event so perf calculations *should* be finished (also not sure if this will throw null refs so gonna release without a check and hope for the best)
             perf = player.prop_VRCPlayer_0.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall];
             perfString = "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, perf)) + ">" + PlayerUtils.ParsePerformanceText(perf) + "</color>";
-
-            pingAddingDelegate = DefaultPingAdding;
-            fpsAddingDelegate = DefaultFpsAdding;
 
             NetworkEvents.OnPlayerJoined += new Action<Player>((player) =>
             {
@@ -104,13 +102,12 @@ namespace PlayerList.Entries
                 }
             }
             */
-            string tempString = "";
+            StringBuilder tempString = new StringBuilder();
 
             player = Player.prop_Player_0;
             updateDelegate?.Invoke(player, this, ref tempString);
 
-            if (tempString != textComponent.text)
-                textComponent.text = TrimExtra(tempString);
+            textComponent.text = TrimExtra(tempString.ToString());
         }
         public override void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
         {
@@ -120,45 +117,45 @@ namespace PlayerList.Entries
                 MelonCoroutines.Start(VRCUtils.CheckWorld(world));
         }
 
-        private static void AddPing(Player player, LocalPlayerEntry entry, ref string tempString)
+        private static void AddPing(Player player, LocalPlayerEntry entry, ref StringBuilder tempString)
         {
             entry.ping = (short)Photon.Pun.PhotonNetwork.field_Public_Static_LoadBalancingClient_0.prop_LoadBalancingPeer_0.RoundTripTime;
-            tempString += "<color=" + PlayerUtils.GetPingColor(entry.ping) + ">";
+            tempString.Append("<color=" + PlayerUtils.GetPingColor(entry.ping) + ">");
             if (entry.ping < 9999 && entry.ping > -999)
-                tempString += entry.ping.ToString().PadRight(4) + "ms</color>";
+                tempString.Append(entry.ping.ToString().PadRight(4) + "ms</color>");
             else
-                tempString += ((double)(entry.ping / 1000)).ToString("N1").PadRight(5) + "s</color>";
-            tempString += separator;
+                tempString.Append(((double)(entry.ping / 1000)).ToString("N1").PadRight(5) + "s</color>");
+            tempString.Append(separator);
         }
-        private static void AddFps(Player player, LocalPlayerEntry entry, ref string tempString)
+        private static void AddFps(Player player, LocalPlayerEntry entry, ref StringBuilder tempString)
         {
-            if (entry.timer.ElapsedMilliseconds >= 250)
+            if (entry.timeSinceLastUpdate.ElapsedMilliseconds >= 250)
             { 
                 entry.fps = Mathf.Clamp((int)(1f / Time.deltaTime), -99, 999); // Clamp between -99 and 999
-                entry.timer.Restart();
+                entry.timeSinceLastUpdate.Restart();
             }
 
-            tempString += "<color=" + PlayerUtils.GetFpsColor(entry.fps) + ">" + entry.fps.ToString().PadRight(3) + "</color>" + separator;
+            tempString.Append("<color=" + PlayerUtils.GetFpsColor(entry.fps) + ">" + entry.fps.ToString().PadRight(3) + "</color>" + separator);
         }
-        private static void AddPlatform(Player player, LocalPlayerEntry entry, ref string tempString)
+        private static void AddPlatform(Player player, LocalPlayerEntry entry, ref StringBuilder tempString)
         {
-            tempString += entry.platform + separator;
+            tempString.Append(entry.platform + separator);
         }
-        private static void AddPerf(Player player, LocalPlayerEntry entry, ref string tempString)
+        private static void AddPerf(Player player, LocalPlayerEntry entry, ref StringBuilder tempString)
         {
-            tempString += entry.perfString + separator;
+            tempString.Append(entry.perfString + separator);
         }
-        private static void AddDistance(Player player, LocalPlayerEntry entry, ref string tempString)
+        private static void AddDistance(Player player, LocalPlayerEntry entry, ref StringBuilder tempString)
         {
-            tempString += "0.0 m" + separator;
+            tempString.Append("0.0 m" + separator);
         }
-        private static void AddPhotonId(Player player, LocalPlayerEntry entry, ref string tempString)
+        private static void AddPhotonId(Player player, LocalPlayerEntry entry, ref StringBuilder tempString)
         {
-            tempString += player.prop_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0.ToString().PadRight(highestPhotonIdLength) + separator;
+            tempString.Append(player.prop_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0.ToString().PadRight(highestPhotonIdLength) + separator);
         }
-        private static void AddDisplayName(Player player, LocalPlayerEntry entry, ref string tempString)
+        private static void AddDisplayName(Player player, LocalPlayerEntry entry, ref StringBuilder tempString)
         {
-            tempString += "<color=" + entry.playerColor + ">" + player.field_Private_APIUser_0.displayName + "</color>" + separator;
+            tempString.Append("<color=" + entry.playerColor + ">" + player.field_Private_APIUser_0.displayName + "</color>" + separator);
         }
 
         private static void OnShowSocialRankChange()

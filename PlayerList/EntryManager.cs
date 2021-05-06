@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using MelonLoader;
 using PlayerList.Config;
 using PlayerList.Entries;
@@ -29,6 +30,24 @@ namespace PlayerList
             NetworkEvents.OnInstanceChanged += OnInstanceChanged;
             NetworkEvents.OnAvatarChanged += OnAvatarChanged;
             NetworkEvents.OnAvatarInstantiated += OnAvatarInstantiated;
+
+            MelonCoroutines.Start(EntryRefreshEnumerator());
+        }
+        private static IEnumerator EntryRefreshEnumerator()
+        {
+            IEnumerator<PlayerEntry> enumerator = playerEntries.GetEnumerator();
+            while (true)
+            {
+                if (!enumerator.MoveNext())
+                {
+                    enumerator = playerEntries.GetEnumerator();
+                    enumerator.MoveNext();
+                }
+                if (enumerator.Current.timeSinceLastUpdate.ElapsedMilliseconds > 100)
+                    PlayerEntry.UpdateEntry(enumerator.Current.player.prop_PlayerNet_0, enumerator.Current);
+
+                yield return null;
+            }
         }
         public static void OnUpdate()
         {
@@ -209,16 +228,8 @@ namespace PlayerList
             foreach (EntryBase entry in generalInfoEntries)
                 entry.Refresh();
         }
-        public static void CheckEntriesForFreeze()
-        {
-            foreach (PlayerEntry entry in playerEntries)
-                entry.CheckFreeze();
-        }
         public static void RefreshAllEntries()
-        {
-            if (PlayerListConfig.freezeDetectionToggle.Value)
-                CheckEntriesForFreeze();
-            
+        {            
             // Dont refresh if the local player gameobject has been deleted or if the playerlist is hidden
             if (RoomManager.field_Internal_Static_ApiWorld_0 == null || Player.prop_Player_0 == null || !MenuManager.playerList.active) return;
             
