@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using AvatarHider.DataTypes;
 using AvatarHider.Utilities;
-using MelonLoader;
-using UnhollowerBaseLib;
 using UnityEngine;
 using VRC;
 using VRC.Core;
@@ -18,10 +13,6 @@ namespace AvatarHider
         public static Dictionary<int, AvatarHiderPlayer> players = new Dictionary<int, AvatarHiderPlayer>();
         public static Dictionary<int, AvatarHiderPlayer> filteredPlayers = new Dictionary<int, AvatarHiderPlayer>();
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate IntPtr OnPlayerNetDecodeDelegate(IntPtr instancePointer, IntPtr objectsPointer, int objectIndex, float sendTime, IntPtr nativeMethodPointer);
-        private static readonly List<OnPlayerNetDecodeDelegate> dontGarbageCollectDelegates = new List<OnPlayerNetDecodeDelegate>();
-
         public static void Init()
         {
             NetworkEvents.OnPlayerJoined += OnPlayerJoin;
@@ -31,25 +22,6 @@ namespace AvatarHider
             NetworkEvents.OnAvatarChanged += OnAvatarChanged;
             NetworkEvents.OnPlayerModerationSent += OnPlayerModerationSent;
             NetworkEvents.OnPlayerModerationRemoved += OnPlayerModerationRemoved;
-            
-            // Definitely not stolen code from our lord and savior knah (https://github.com/knah/VRCMods/blob/master/AdvancedSafety/AdvancedSafetyMod.cs) because im not a skid
-            foreach (MethodInfo method in typeof(PlayerNet).GetMethods().Where(mi => mi.GetParameters().Length == 3 && mi.Name.StartsWith("Method_Public_Virtual_Final_New_Void_ValueTypePublicSealed")))
-            {
-                unsafe
-                {
-                    var originalMethodPointer = *(IntPtr*)(IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(method).GetValue(null);
-
-                    OnPlayerNetDecodeDelegate originalDecodeDelegate = null;
-
-                    OnPlayerNetDecodeDelegate replacement = (instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer) => OnPlayerNetPatch(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer, originalDecodeDelegate);
-
-                    dontGarbageCollectDelegates.Add(replacement); // Add to list to prevent from being garbage collected
-
-                    MelonUtils.NativeHookAttach((IntPtr)(&originalMethodPointer), Marshal.GetFunctionPointerForDelegate(replacement));
-
-                    originalDecodeDelegate = Marshal.GetDelegateForFunctionPointer<OnPlayerNetDecodeDelegate>(originalMethodPointer);
-                }
-            }
         }
         public static void OnSceneWasLoaded()
         {
@@ -72,27 +44,7 @@ namespace AvatarHider
                 if (Config.IncludeHiddenAvatars.Value && players[photonId].isHidden)
                 players[photonId].SetInActive();
         }
-        private static IntPtr OnPlayerNetPatch(IntPtr instancePointer, IntPtr objectsPointer, int objectIndex, float sendTime, IntPtr nativeMethodPointer, OnPlayerNetDecodeDelegate originalDecodeDelegate)
-        {
-            if (instancePointer == IntPtr.Zero)
-                return originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
 
-            PlayerNet playerNet = new Il2CppSystem.Object(instancePointer).TryCast<PlayerNet>();
-            if (playerNet == null)
-                return originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
-
-            IntPtr result = originalDecodeDelegate(instancePointer, objectsPointer, objectIndex, sendTime, nativeMethodPointer);
-            if (result == IntPtr.Zero)
-                return result;
-
-            try
-            {
-                players[playerNet.field_Private_PhotonView_0.field_Private_Int32_0].position = playerNet.transform.position;
-            }
-            catch { }
-
-            return result;
-        }
         private static void OnPlayerJoin(Player player)
         {
             if (player == null || player.prop_APIUser_0.id == APIUser.CurrentUser.id) return;
@@ -106,7 +58,6 @@ namespace AvatarHider
                 active = true,
                 photonId = photonId,
                 userId = player.prop_APIUser_0.id,
-                position = player.transform.position,
                 player = player,
                 avatar = player.prop_VRCPlayer_0.prop_VRCAvatarManager_0.prop_GameObject_0,
                 isFriend = APIUser.IsFriendsWith(player.prop_APIUser_0.id),
@@ -229,6 +180,8 @@ namespace AvatarHider
 
         public static void HideOrShowAvatar(AvatarHiderPlayer playerProp)
         {
+            if (playerProp.userId == APIUser.CurrentUser.id)
+                return;
             if (Config.IncludeHiddenAvatars.Value && playerProp.isHidden)
                 playerProp.SetInActive();
             else if ((Config.IgnoreFriends.Value && playerProp.isFriend) ||

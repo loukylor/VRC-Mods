@@ -11,7 +11,7 @@ namespace AvatarHider
 
         private static readonly Action<AvatarHiderPlayer, Vector3> normalRefreshDelegate = (playerProp, myPos) =>
         {
-            float distance = (playerProp.position - myPos).magnitude;
+            float distance = (playerProp.Position - myPos).magnitude;
             if (distance > Config.HideDistance.Value)
                 playerProp.SetInActive();
             else

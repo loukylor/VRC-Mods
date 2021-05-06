@@ -30,7 +30,7 @@ namespace AvatarHider.DataTypes
 
         public int photonId;
         public string userId;
-        public Vector3 position;
+        public Vector3 Position => player.transform.position;
         public Player player;
         public GameObject avatar;
         public List<RendererObject> avatarRenderers = new List<RendererObject>();
