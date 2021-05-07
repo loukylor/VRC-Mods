@@ -35,16 +35,18 @@ namespace PlayerList
         }
         private static IEnumerator EntryRefreshEnumerator()
         {
-            IEnumerator<PlayerEntry> enumerator = playerEntries.GetEnumerator();
+            while (playerEntries.Count == 0)
+                yield return null;
+
+            int i = -1;
             while (true)
             {
-                if (!enumerator.MoveNext())
-                {
-                    enumerator = playerEntries.GetEnumerator();
-                    enumerator.MoveNext();
-                }
-                if (enumerator.Current.timeSinceLastUpdate.ElapsedMilliseconds > 100)
-                    PlayerEntry.UpdateEntry(enumerator.Current.player.prop_PlayerNet_0, enumerator.Current);
+                i += 1;
+                if (i >= playerEntries.Count)
+                    i = 0;
+
+                if (playerEntries[i].timeSinceLastUpdate.ElapsedMilliseconds > 100)
+                    PlayerEntry.UpdateEntry(playerEntries[i].player.prop_PlayerNet_0, playerEntries[i]);
 
                 yield return null;
             }

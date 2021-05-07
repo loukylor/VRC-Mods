@@ -72,8 +72,12 @@ namespace PlayerList.Entries
             {
                 foreach (PlayerEntry entry in EntryManager.sortedPlayerEntries)
                 {
-                    entry.GetPlayerColor();
-                    UpdateEntry(entry.player.prop_PlayerNet_0, entry);
+                    try
+                    {
+                        entry.GetPlayerColor();
+                        UpdateEntry(entry.player.prop_PlayerNet_0, entry);
+                    }
+                    catch { }
                 }
             }; // OGT fork compatibility 
                     
