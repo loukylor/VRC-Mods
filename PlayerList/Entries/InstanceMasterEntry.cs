@@ -41,9 +41,25 @@ namespace PlayerList.Entries
                 yield return null;
             }
         }
+
         private void OnMasterChanged(Player player)
         {
-            textComponent.text = OriginalText.Replace("{instancemaster}", player.field_Public_Player_0.field_Private_APIUser_0.displayName);
+            MelonCoroutines.Start(GetOnMasterChanged(player));
+        }
+        private IEnumerator GetOnMasterChanged(Player player)
+        {
+            // Sometimes something is null and I really cant be bothered to find what it is
+            while (true)
+            {
+                try
+                {
+                    textComponent.text = OriginalText.Replace("{instancemaster}", player.field_Public_Player_0.field_Private_APIUser_0.displayName);
+                    yield break;
+                }
+                catch { }
+
+                yield return null;
+            }
         }
     }
 }
