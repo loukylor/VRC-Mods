@@ -43,10 +43,32 @@ namespace PlayerList
             {
                 i += 1;
                 if (i >= playerEntries.Count)
+                {
                     i = 0;
+                    if (playerEntries.Count == 0)
+                    {
+                        yield return null;
+                        continue;
+                    }
+                }
 
-                if (playerEntries[i].timeSinceLastUpdate.ElapsedMilliseconds > 100)
-                    PlayerEntry.UpdateEntry(playerEntries[i].player.prop_PlayerNet_0, playerEntries[i]);
+                try
+                {
+                    if (playerEntries[i].player == null)
+                    {
+                        Object.DestroyImmediate(playerEntries[i].gameObject.transform.parent.gameObject);
+                        RemovePlayerEntry(playerEntries[i]);
+                        RemoveLeftPlayerEntry(leftSidePlayerEntries[i + 1]); // Skip first entry
+                        continue;
+                    }
+
+                    if (playerEntries[i].timeSinceLastUpdate.ElapsedMilliseconds > 100)
+                        PlayerEntry.UpdateEntry(playerEntries[i].player.prop_PlayerNet_0, playerEntries[i]);
+                }
+                catch (System.Exception ex)
+                {
+                    MelonLogger.Error(ex.ToString());
+                }
 
                 yield return null;
             }
