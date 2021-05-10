@@ -172,7 +172,7 @@ namespace PlayerList.Entries
         // So apparently if you don't want to name an enum directly in a harmony patch you have to use int as the type... good to know
         private static void OnVRCPlayerDataReceived(VRCPlayer __instance, int __result)
         {
-            if (__result == 64)
+            if (__result == 64 && __instance != null)
             {
                 EntryManager.GetEntryFromPlayer(EntryManager.sortedPlayerEntries, __instance.prop_Player_0, out PlayerEntry entry);
                 entry.GetPlayerColor();
