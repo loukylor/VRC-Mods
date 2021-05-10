@@ -141,6 +141,8 @@ namespace PlayerList
         }
         public static void OnPlayerLeft(Player player)
         {
+            if (player.prop_APIUser_0.id == APIUser.CurrentUser.id) return;
+
             int index = GetEntryFromPlayerWithIndex(sortedPlayerEntries, player, out PlayerEntry entry);
             if (index < 0) return;
 
