@@ -133,7 +133,7 @@ Oh yea, also report any errors to me. You can make an issue or ping/DM me.
 - Frostbyte for being a big meanie and telling me how to optimize things
 
 ## Picture of List
-![Picture of List](https://i.imgur.com/Tt6ZYqB.png)
+![Picture of List](https://i.imgur.com/jvfytTc.png)
 
 # PreviewScroller
 A mod that let's you sort of scroll the avatar preview so you can control where it's facing
