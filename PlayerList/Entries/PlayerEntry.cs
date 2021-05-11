@@ -67,26 +67,22 @@ namespace PlayerList.Entries
 
         public static void EntryInit()
         {
-            PlayerListConfig.OnConfigChanged += OnStaticConfigChanged;
-            UIManager.OnQuickMenuOpenEvent += () =>
+            UIManager.OnQuickMenuOpenEvent += new Action(() =>
             {
                 foreach (PlayerEntry entry in EntryManager.sortedPlayerEntries)
-                {
-                    try
-                    {
-                        entry.GetPlayerColor();
-                        UpdateEntry(entry.player.prop_PlayerNet_0, entry);
-                    }
-                    catch { }
-                }
-            }; // OGT fork compatibility 
+                    entry.GetPlayerColor();
+                EntrySortManager.SortAllPlayers();
+                EntryManager.RefreshPlayerEntries();
+            });
+
+            PlayerListConfig.OnConfigChanged += OnStaticConfigChanged;
                     
             PlayerListMod.Instance.Harmony.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend), BindingFlags.NonPublic | BindingFlags.Static)));
             PlayerListMod.Instance.Harmony.Patch(typeof(APIUser).GetMethod("LocalAddFriend"), null, new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnFriend), BindingFlags.NonPublic | BindingFlags.Static)));
             PlayerListMod.Instance.Harmony.Patch(typeof(APIUser).GetMethod("UnfriendUser"), null, new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnUnfriend), BindingFlags.NonPublic | BindingFlags.Static)));
             
             MethodInfo onVRCPlayerDataReceivedMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.ReturnType.IsEnum && mi.GetParameters().Length == 1 && mi.GetParameters()[0].ParameterType == typeof(Il2CppSystem.Collections.Hashtable) && Xref.CheckMethod(mi, "Failed to read showSocialRank for {0}"));
-            PlayerListMod.Instance.Harmony.Patch(onVRCPlayerDataReceivedMethod, null, new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnVRCPlayerDataReceived), BindingFlags.NonPublic | BindingFlags.Static)));
+            PlayerListMod.Instance.Harmony.Patch(onVRCPlayerDataReceivedMethod, null, new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnSetUpFlags), BindingFlags.NonPublic | BindingFlags.Static)));
         }
         public override void Init(object[] parameters)
         {
@@ -170,9 +166,9 @@ namespace PlayerList.Entries
         }
 
         // So apparently if you don't want to name an enum directly in a harmony patch you have to use int as the type... good to know
-        private static void OnVRCPlayerDataReceived(VRCPlayer __instance, int __result)
+        private static void OnSetUpFlags(VRCPlayer __instance, int __result)
         {
-            if (__result == 64 && __instance != null)
+            if (__result == 64)
             {
                 EntryManager.GetEntryFromPlayer(EntryManager.sortedPlayerEntries, __instance.prop_Player_0, out PlayerEntry entry);
                 entry.GetPlayerColor();

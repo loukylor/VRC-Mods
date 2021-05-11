@@ -10,36 +10,16 @@ namespace PlayerList.Entries
     {
         public override string Name { get { return "Instance Master"; } }
 
-        private object currentCoroutine;
-
         public override void Init(object[] parameters = null)
         {
+            NetworkEvents.OnPlayerJoined += OnPlayerJoined;
             NetworkEvents.OnMasterChanged += OnMasterChanged;
         }
-        public override void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
+        public void OnPlayerJoined(VRC.Player player)
         {
-            if (currentCoroutine != null)
-                MelonCoroutines.Stop(currentCoroutine);
-            currentCoroutine = MelonCoroutines.Start(GetMasterOnInstanceChange());
-        }
-        public IEnumerator GetMasterOnInstanceChange()
-        {
-            while (true)
-            {
-                try
-                {
-                    foreach (VRC.Player player in VRC.PlayerManager.field_Private_Static_PlayerManager_0.field_Private_List_1_Player_0)
-                    { 
-                        if (player.prop_VRCPlayerApi_0.isMaster)
-                        { 
-                            textComponent.text = OriginalText.Replace("{instancemaster}", player.field_Private_APIUser_0.displayName);
-                            yield break;
-                        }
-                    }
-                }
-                catch { }
-                yield return null;
-            }
+            // This will handle getting the master on instance join
+            if (player.prop_VRCPlayerApi_0.isMaster)
+                textComponent.text = OriginalText.Replace("{instancemaster}", player.field_Private_APIUser_0.displayName);
         }
 
         private void OnMasterChanged(Player player)
@@ -48,18 +28,11 @@ namespace PlayerList.Entries
         }
         private IEnumerator GetOnMasterChanged(Player player)
         {
-            // Sometimes something is null and I really cant be bothered to find what it is
-            while (true)
-            {
-                try
-                {
-                    textComponent.text = OriginalText.Replace("{instancemaster}", player.field_Public_Player_0.field_Private_APIUser_0.displayName);
-                    yield break;
-                }
-                catch { }
-
+            while (player.field_Public_Player_0 == null)
                 yield return null;
-            }
+
+            textComponent.text = OriginalText.Replace("{instancemaster}", player.field_Public_Player_0.field_Private_APIUser_0.displayName);
+            yield break;
         }
     }
 }

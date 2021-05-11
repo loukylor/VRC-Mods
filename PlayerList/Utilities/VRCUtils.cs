@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using Il2CppSystem.Collections.Generic;
-using PlayerList.Config;
 using PlayerList.Entries;
 using MelonLoader;
 using UnityEngine;

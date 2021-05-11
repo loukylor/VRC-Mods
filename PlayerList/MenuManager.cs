@@ -171,7 +171,6 @@ namespace PlayerList
             {
                 playerList.SetActive(!shouldStayHidden);
                 playerListRect.anchoredPosition = Converters.ConvertToUnityUnits(new Vector3(2.5f, 3.5f));
-                EntrySortManager.SortAllPlayers();
                 newElements.SetActive(false);
             });
             playerListMenuListener.OnDisableEvent += new Action(() =>
