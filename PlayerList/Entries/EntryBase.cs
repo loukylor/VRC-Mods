@@ -84,6 +84,10 @@ namespace PlayerList.Entries
         {
         }
 
+        public virtual void OnAvatarDownloadProgressed(AvatarLoadingBar loadingBar, float downloadPercentage, long fileSize)
+        {
+        }
+
         public virtual void Remove()
         {
             Object.DestroyImmediate(gameObject);

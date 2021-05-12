@@ -30,6 +30,7 @@ namespace PlayerList
             NetworkEvents.OnInstanceChanged += OnInstanceChanged;
             NetworkEvents.OnAvatarChanged += OnAvatarChanged;
             NetworkEvents.OnAvatarInstantiated += OnAvatarInstantiated;
+            NetworkEvents.OnAvatarDownloadProgressed += OnAvatarDownloadProgressed;
 
             MelonCoroutines.Start(EntryRefreshEnumerator());
         }
@@ -109,6 +110,12 @@ namespace PlayerList
             foreach (EntryBase entry in playerEntries)
                 entry.OnAvatarInstantiated(player, avatar);
             localPlayerEntry?.OnAvatarInstantiated(player, avatar);
+        }
+        public static void OnAvatarDownloadProgressed(AvatarLoadingBar loadingBar, float downloadPercent, long fileSize)
+        {
+            foreach (EntryBase entry in playerEntries)
+                entry.OnAvatarDownloadProgressed(loadingBar, downloadPercent, fileSize);
+            localPlayerEntry?.OnAvatarDownloadProgressed(loadingBar, downloadPercent, fileSize);
         }
 
         public static void OnPlayerJoined(Player player)

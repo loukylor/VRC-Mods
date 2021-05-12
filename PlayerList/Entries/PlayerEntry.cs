@@ -76,13 +76,11 @@ namespace PlayerList.Entries
             });
 
             PlayerListConfig.OnConfigChanged += OnStaticConfigChanged;
-                    
-            PlayerListMod.Instance.Harmony.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend), BindingFlags.NonPublic | BindingFlags.Static)));
-            PlayerListMod.Instance.Harmony.Patch(typeof(APIUser).GetMethod("LocalAddFriend"), null, new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnFriend), BindingFlags.NonPublic | BindingFlags.Static)));
-            PlayerListMod.Instance.Harmony.Patch(typeof(APIUser).GetMethod("UnfriendUser"), null, new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnUnfriend), BindingFlags.NonPublic | BindingFlags.Static)));
-            
-            MethodInfo onVRCPlayerDataReceivedMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.ReturnType.IsEnum && mi.GetParameters().Length == 1 && mi.GetParameters()[0].ParameterType == typeof(Il2CppSystem.Collections.Hashtable) && Xref.CheckMethod(mi, "Failed to read showSocialRank for {0}"));
-            PlayerListMod.Instance.Harmony.Patch(onVRCPlayerDataReceivedMethod, null, new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnSetUpFlags), BindingFlags.NonPublic | BindingFlags.Static)));
+            NetworkEvents.OnFriended += OnFriended;
+            NetworkEvents.OnUnFriended += OnUnfriended;
+            NetworkEvents.OnSetupFlagsReceived += OnSetupFlagsReceived;
+
+            PlayerListMod.Instance.Harmony.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend), BindingFlags.NonPublic | BindingFlags.Static)));        
         }
         public override void Init(object[] parameters)
         {
@@ -150,7 +148,7 @@ namespace PlayerList.Entries
         }
         public override void OnAvatarInstantiated(VRCPlayer vrcPlayer, GameObject avatar)
         {
-            apiUser = player.field_Private_APIUser_0;
+            apiUser = player.prop_APIUser_0;
             userId = apiUser.id;
             if (vrcPlayer.prop_Player_0.field_Private_APIUser_0?.id != userId)
                 return;
@@ -164,13 +162,23 @@ namespace PlayerList.Entries
             if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.AvatarPerf))
                 EntrySortManager.SortPlayer(this);
         }
+        public override void OnAvatarDownloadProgressed(AvatarLoadingBar loadingBar, float downloadPercentage, long fileSize)
+        {
+            if (loadingBar.field_Public_PlayerNameplate_0.field_Private_VRCPlayer_0.prop_Player_0.prop_APIUser_0?.id != userId)
+                return;
+
+            if (downloadPercentage < 1)
+                perfString = ((downloadPercentage * 100).ToString("N1") + "%").PadRight(5);
+            else
+                perfString = "100% ";
+        }
 
         // So apparently if you don't want to name an enum directly in a harmony patch you have to use int as the type... good to know
-        private static void OnSetUpFlags(VRCPlayer __instance, int __result)
+        private static void OnSetupFlagsReceived(VRCPlayer vrcPlayer, int SetupFlagType)
         {
-            if (__result == 64)
+            if (SetupFlagType == 64)
             {
-                EntryManager.GetEntryFromPlayer(EntryManager.sortedPlayerEntries, __instance.prop_Player_0, out PlayerEntry entry);
+                EntryManager.GetEntryFromPlayer(EntryManager.sortedPlayerEntries, vrcPlayer.prop_Player_0, out PlayerEntry entry);
                 entry.GetPlayerColor();
             }
         }
@@ -267,16 +275,16 @@ namespace PlayerList.Entries
             tempString.Append("<color=" + entry.playerColor + ">" + entry.apiUser.displayName + "</color>" + separator);
         }
 
-        private static void OnFriend(APIUser __0)
+        private static void OnFriended(APIUser user)
         {
             foreach (PlayerEntry entry in EntryManager.playerEntries)
-                if (entry.userId == __0.id)
+                if (entry.userId == user.id)
                     entry.isFriend = true;
         }
-        private static void OnUnfriend(string __0)
+        private static void OnUnfriended(string userId)
         {
             foreach (PlayerEntry entry in EntryManager.playerEntries)
-                if (entry.userId == __0)
+                if (entry.userId == userId)
                     entry.isFriend = false;
         }
 

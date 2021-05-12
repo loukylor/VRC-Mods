@@ -73,5 +73,16 @@ namespace PlayerList.Utilities
                 MelonLogger.Error("Error while invoking delegate:\n" + ex.ToString());
             }
         }
+        public static void SafeInvoke<T1, T2, T3>(this Action<T1, T2, T3> action, T1 arg1, T2 arg2, T3 arg3)
+        {
+            try
+            {
+                action.Invoke(arg1, arg2, arg3);
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error("Error while invoking delegate:\n" + ex.ToString());
+            }
+        }
     }
 }
