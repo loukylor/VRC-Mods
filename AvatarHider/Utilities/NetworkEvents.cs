@@ -43,8 +43,6 @@ namespace AvatarHider.Utilities
 
         public static void NetworkInit()
         {
-            if (NetworkManager.field_Internal_Static_NetworkManager_0 == null) return;
-
             var field0 = NetworkManager.field_Internal_Static_NetworkManager_0.field_Internal_VRCEventDelegate_1_Player_0;
             var field1 = NetworkManager.field_Internal_Static_NetworkManager_0.field_Internal_VRCEventDelegate_1_Player_1;
 
@@ -57,8 +55,7 @@ namespace AvatarHider.Utilities
             AvatarHiderMod.Instance.Harmony.Patch(typeof(ModerationManager).GetMethod("Method_Private_Void_String_ModerationType_Action_1_ApiPlayerModeration_Action_1_String_0"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnPlayerModerationSend), BindingFlags.NonPublic | BindingFlags.Static)));
             AvatarHiderMod.Instance.Harmony.Patch(typeof(ModerationManager).GetMethod("Method_Private_Void_String_ModerationType_0"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnPlayerModerationRemove), BindingFlags.NonPublic | BindingFlags.Static)));
             
-            Assembly assemblyCSharp = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(assembly => assembly.GetName().Name == "Assembly-CSharp");
-            foreach (Type type in assemblyCSharp.GetTypes())
+            foreach (Type type in typeof(ModerationManager).Assembly.GetTypes())
             {
                 int counter = 0;
                 foreach (PropertyInfo pi in type.GetProperties())
@@ -67,7 +64,7 @@ namespace AvatarHider.Utilities
                 if (counter == 3)
                 {
                     AvatarHiderMod.Instance.Harmony.Patch(type.GetMethod("Method_Private_Void_String_0"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnUnfriend), BindingFlags.NonPublic | BindingFlags.Static)));
-                    return;
+                    break;
                 }
             }
         }
