@@ -73,6 +73,8 @@ namespace UserInfoExtensions
             }
             public UserInfoExtensionsAPIUser(Il2CppSystem.Object jsonObject)
             {
+                if (jsonObject == null) return;
+
                 Il2CppSystem.Collections.Generic.Dictionary<string, Il2CppSystem.Object> jsonDictionary = jsonObject.Cast<Il2CppSystem.Collections.Generic.Dictionary<string, Il2CppSystem.Object>>();
                 if (jsonDictionary.ContainsKey("id"))
                     Id = jsonDictionary["id"].ToString();

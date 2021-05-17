@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
-    <VrcReferences>true</VrcReferences>
-    <AssemblyVersion>0.2.7.1</AssemblyVersion>
     <AssemblyName>UserInfoExtensions</AssemblyName>
     <RootNamespace>UserInfoExtensions</RootNamespace>
   </PropertyGroup>
