@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using UnhollowerRuntimeLib.XrefScans;
 
 namespace PlayerList.Utilities
 {
@@ -11,8 +12,8 @@ namespace PlayerList.Utilities
         {
             try
             {
-                return UnhollowerRuntimeLib.XrefScans.XrefScanner.XrefScan(method)
-                    .Where(instance => instance.Type == UnhollowerRuntimeLib.XrefScans.XrefType.Global && instance.ReadAsObject().ToString().Contains(match)).Any();
+                return XrefScanner.XrefScan(method)
+                    .Where(instance => instance.Type == XrefType.Global && instance.ReadAsObject().ToString().Contains(match)).Any();
             }
             catch { }
             return false;
@@ -21,7 +22,7 @@ namespace PlayerList.Utilities
         {
             try
             {
-                return UnhollowerRuntimeLib.XrefScans.XrefScanner.UsedBy(method)
+                return XrefScanner.UsedBy(method)
                     .Where(instance => instance.TryResolve() != null && instance.TryResolve().Name.Contains(methodName)).Any();
             }
             catch { }
@@ -29,8 +30,8 @@ namespace PlayerList.Utilities
         }
         public static bool CheckUsing(MethodInfo method, string match, Type type)
         {
-            foreach (UnhollowerRuntimeLib.XrefScans.XrefInstance instance in UnhollowerRuntimeLib.XrefScans.XrefScanner.XrefScan(method))
-                if (instance.Type == UnhollowerRuntimeLib.XrefScans.XrefType.Method)
+            foreach (XrefInstance instance in XrefScanner.XrefScan(method))
+                if (instance.Type == XrefType.Method)
                     try
                     {
                         if (instance.TryResolve().DeclaringType == type && instance.TryResolve().Name.Contains(match))
