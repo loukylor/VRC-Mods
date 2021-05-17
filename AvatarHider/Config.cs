@@ -25,7 +25,7 @@ namespace AvatarHider
         {
             MelonPreferences.CreateCategory(categoryIdentifier, "Avatar Hider");
 
-            HideAvatars = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(HideAvatars), false, "Hide Avatars");
+            HideAvatars = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(HideAvatars), true, "Hide Avatars");
             HideAvatarsCompletely = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(HideAvatarsCompletely), false, "Completely Hide Avatars Rather Than Just Renderers (Lags on avatar show, better avg framerate)");
             IgnoreFriends = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(IgnoreFriends), true, "Ignore Friends");
             ExcludeShownAvatars = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(ExcludeShownAvatars), true, "Exclude Shown Avatars");
