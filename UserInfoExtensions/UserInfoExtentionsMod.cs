@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -20,9 +21,12 @@ namespace UserInfoExtensions
 
         internal static List<ModuleBase> modules = new List<ModuleBase>();
 
+        public static UserInfoExtensionsMod Instance { private set; get; }
+
         public override void OnApplicationStart()
         {
-
+            Instance = this;
+            CacheManager.Init();
             VRCUtils.Init();
 
             foreach (MethodInfo method in typeof(MenuController).GetMethods().Where(mi => mi.Name.StartsWith("Method_Public_Void_APIUser_") && !mi.Name.Contains("_PDM_")))
@@ -45,7 +49,7 @@ namespace UserInfoExtensions
                 HideAllPopups();
                 menu.Show();
                 foreach (ModuleBase module in modules)
-                    module.OnUIEMenuOpen();
+                    module.OnUIXMenuOpen();
             });
 
             AddModule(new QuickMenuFromSocial());

@@ -18,7 +18,7 @@
         {
         }
 
-        public virtual void OnUIEMenuOpen()
+        public virtual void OnUIXMenuOpen()
         {
         }
     }

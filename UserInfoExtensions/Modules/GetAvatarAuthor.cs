@@ -24,7 +24,6 @@ namespace UserInfoExtentions.Modules
         public static GameObject authorFromAvatarMenuButtonGameObject;
 
         public static Il2CppSystem.Uri avatarLink;
-        public static bool canGet = true;
 
         public static PageAvatar avatarPage;
         public static bool isFromSocialPage = false;
@@ -78,19 +77,14 @@ namespace UserInfoExtentions.Modules
         {
             UserInfoExtensionsMod.HideAllPopups();
 
-            if (!canGet)
-            {
-                VRCUtils.OpenPopupV2("Slow down!", "Please wait a little in between button presses", "Close", new Action(VRCUtils.ClosePopup));
-                return;
-            }
-
             if (avatarLink == null)
             {
                 VRCUtils.OpenPopupV2("Error!", "Something went wrong and the avatar author could not be retreived. Please try again", "Close", new Action(VRCUtils.ClosePopup));
                 return;
             }
 
-            MelonCoroutines.Start(StartTimer());
+            if (!VRCUtils.StartRequestTimer())
+                return;
 
             HttpWebRequest request = WebRequest.CreateHttp(avatarLink.OriginalString);
 
@@ -122,31 +116,11 @@ namespace UserInfoExtentions.Modules
         {
             UserInfoExtensionsMod.HideAllPopups();
 
-            if (!canGet)
-            {
-                VRCUtils.OpenPopupV2("Slow down!", "Please wait a little in between button presses", "Close", new Action(VRCUtils.ClosePopup));
+            if (!VRCUtils.StartRequestTimer())
                 return;
-            }
-
-            MelonCoroutines.Start(StartTimer());
 
             isFromSocialPage = false;
             OpenUserInSocialMenu(avatarPage.field_Public_SimpleAvatarPedestal_0.field_Internal_ApiAvatar_0.authorId);
-        }
-
-        public static IEnumerator StartTimer()
-        {
-            canGet = false;
-
-            float endTime = Time.time + 3.5f;
-
-            while (Time.time < endTime)
-            {
-                yield return null;
-            }
-
-            canGet = true;
-            yield break;
         }
 
         public static void OpenUserInSocialMenu(string userId) => APIUser.FetchUser(userId, new Action<APIUser>(OnUserFetched), new Action<string>((thing) => { VRCUtils.OpenPopupV2("Error!", "Something went wrong and the author could not be retreived.", "Close", new Action(VRCUtils.ClosePopup)); }));

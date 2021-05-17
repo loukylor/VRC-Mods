@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Reflection;
+using MelonLoader;
 using UnityEngine;
+using UserInfoExtensions;
 using VRC.Core;
 using VRC.UI;
 
@@ -9,6 +12,8 @@ namespace UserInfoExtentions.Utilities
 {
     class VRCUtils
     {
+        public static bool canMakeRequest = true;
+
         private static MethodInfo popupV2;
         private static MethodInfo popupV1;
 
@@ -19,6 +24,10 @@ namespace UserInfoExtentions.Utilities
         public static APIUser ActiveUser
         {
             get { return menuController.activeUser; }
+        }
+        public static CacheManager.UserInfoExtensionsAPIUser ActiveUIEUser
+        {
+            get { return CacheManager.cachedUsers[ActiveUser.id]; }
         }
 
         public static void Init()
@@ -47,6 +56,38 @@ namespace UserInfoExtentions.Utilities
         public static void ClosePopup()
         {
             VRCUiManager.prop_VRCUiManager_0.HideScreen("POPUP");
+        }
+
+        public static bool StartRequestTimer(Action tooQuickCallback = null, Action canMakeRequestCallback = null)
+        {
+            if (canMakeRequest) // This bool can double as a check for if the coroutine is running
+            {
+                MelonCoroutines.Start(GetStartTimerCoroutine(canMakeRequestCallback));
+                return true;
+            }
+            else
+            {
+                if (tooQuickCallback == null)
+                    OpenPopupV2("Slow down!", "Please wait a little in between button presses", "Close", new Action(ClosePopup));
+                else
+                    tooQuickCallback.Invoke();
+                return false;
+            }
+        }
+        private static IEnumerator GetStartTimerCoroutine(Action canMakeRequestCallback)
+        {
+            canMakeRequest = false;
+
+            float endTime = Time.time + 3.5f;
+
+            while (Time.time < endTime)
+            {
+                yield return null;
+            }
+
+            canMakeRequest = true;
+            canMakeRequestCallback?.Invoke();
+            yield break;
         }
     }
 }
