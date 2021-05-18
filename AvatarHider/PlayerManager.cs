@@ -33,7 +33,7 @@ namespace AvatarHider
         {
             if (manager.field_Private_VRCPlayer_0 == null) return;
             
-            int photonId = manager.field_Private_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0;
+            int photonId = manager.field_Private_VRCPlayer_0.prop_PlayerNet_0.prop_PhotonView_0.field_Private_Int32_0;
 
             if (!players.ContainsKey(photonId)) return;
 
@@ -42,15 +42,16 @@ namespace AvatarHider
                 RefreshManager.RefreshPlayer(players[photonId], Player.prop_Player_0.transform.position);
             else
                 if (Config.IncludeHiddenAvatars.Value && players[photonId].isHidden)
-                players[photonId].SetInActive();
+                    players[photonId].SetInActive();
+
         }
 
         private static void OnPlayerJoin(Player player)
         {
             if (player == null || player.prop_APIUser_0.id == APIUser.CurrentUser.id) return;
 
-            int photonId = player.prop_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0;
-
+            int photonId = player.prop_VRCPlayer_0.prop_PlayerNet_0.prop_PhotonView_0.field_Private_Int32_0;
+            
             if (players.ContainsKey(photonId)) return;
 
             AvatarHiderPlayer playerProp = new AvatarHiderPlayer()
@@ -71,10 +72,11 @@ namespace AvatarHider
         }
         private static void OnPlayerLeave(Player player)
         {
-            int photonId = player.prop_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0;
-
-            players.Remove(photonId);
-            filteredPlayers.Remove(photonId);
+            if (TryGetPlayerFromId(player.prop_APIUser_0.id, out AvatarHiderPlayer avatarHiderPlayer))
+            {
+                players.Remove(avatarHiderPlayer.photonId);
+                filteredPlayers.Remove(avatarHiderPlayer.photonId);
+            }
         }
 
         private static void OnFriend(APIUser apiUser)
@@ -178,15 +180,30 @@ namespace AvatarHider
             return removedPlayers;
         }
 
-        public static void HideOrShowAvatar(AvatarHiderPlayer playerProp)
+        public static void HideOrShowAvatar(AvatarHiderPlayer avatarHiderPlayer)
         {
-            if (playerProp.userId == APIUser.CurrentUser.id)
+            if (avatarHiderPlayer.userId == APIUser.CurrentUser.id)
                 return;
-            if (Config.IncludeHiddenAvatars.Value && playerProp.isHidden)
-                playerProp.SetInActive();
-            else if ((Config.IgnoreFriends.Value && playerProp.isFriend) ||
-                (Config.ExcludeShownAvatars.Value && playerProp.isShown))
-                playerProp.SetActive();
+            if (Config.IncludeHiddenAvatars.Value && avatarHiderPlayer.isHidden)
+                avatarHiderPlayer.SetInActive();
+            else if ((Config.IgnoreFriends.Value && avatarHiderPlayer.isFriend) ||
+                (Config.ExcludeShownAvatars.Value && avatarHiderPlayer.isShown))
+                avatarHiderPlayer.SetActive();
+        }
+
+        public static bool TryGetPlayerFromId(string userId, out AvatarHiderPlayer avatarHiderPlayer)
+        {
+            foreach (AvatarHiderPlayer loopedAvatarHiderPlayer in players.Values)
+            {
+                if (loopedAvatarHiderPlayer.userId == userId)
+                {
+                    avatarHiderPlayer = loopedAvatarHiderPlayer;
+                    return true;
+                }
+            }
+
+            avatarHiderPlayer = null;
+            return false;
         }
     }
 }
