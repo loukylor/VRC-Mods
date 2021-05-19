@@ -22,12 +22,14 @@ More detailed instructions and more mods can be found in the [VRChat Modding Gro
 
 # Mod List
 - [AskToPortal](#asktoportal)
+- [AvatarDownloadPriority](#avatardownloadpriority)
 - [AvatarHider](#avatarhider)
 - [CloningBeGone](#cloningbegone)
 - [InstanceHistory](#instancehistory)
 - [PlayerList](#playerlist)
 - [PreviewScroller](#previewscroller)
 - [ReloadAvatars](#reloadavatars)
+- [SelectYourself](#selectyourself)
 - [UserInfoExtensions](#userinfoextensions)
 
 # AskToPortal
@@ -41,6 +43,22 @@ You can also toggle the mod on and off and auto accept portals from friends, you
 
 ## Picture of user prompt:
 ![Image of user prompt](https://i.imgur.com/uvUeUmL.png)
+
+# AvatarDownloadPriority
+A mod that allows you to prioritize certain downloads and limit the number of avatars downloading at once.
+
+## Features
+There are 3 settings that allow you to customize how avatar download priority is handled.
+The first prioritizing friends' avatars downloads over other avatars.
+The other setting would prioritize favorited friends' avatars over both friends and others' avatars. It will also still prioritize friends over regular users.
+The last setting will prioritize your avatar over everyones.
+
+You can also limit the max amount of avatars that can download at once.
+
+Note: This will only limit the number of avatars downloading, so it won't limit the number of avatars loading at the same time
+
+## Important
+If you have any issues, reloading the world you are in should fix them.
 
 # AvatarHider
 The following is the original README:
@@ -143,6 +161,15 @@ Adds buttons to reload a single user's avatar or all users' avatar.
 
 ## Features
 The buttons can each be toggled on and off using UIX
+
+## Requirements
+ - [UIExpansionKit](https://github.com/knah/VRCMods/)
+
+# SelectYourself
+Adds a button that allows you to select yourself
+
+## Features
+The button can be toggled on and off using UIX
 
 ## Requirements
  - [UIExpansionKit](https://github.com/knah/VRCMods/)
