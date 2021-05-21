@@ -9,21 +9,17 @@ using UnityEngine;
 using VRC.Core;
 using VRC.SDKBase;
 
-[assembly: MelonInfo(typeof(AvatarPriorityDownloading.AvatarDownloadPriorityMod), "AvatarPriorityDownloading", "1.0.0", "loukylor", "https://github.com/loukylor/ButtonMover")]
+[assembly: MelonInfo(typeof(AvatarDownloadPriority.AvatarDownloadPriorityMod), "AvatarPriorityDownloading", "1.0.1", "loukylor", "https://github.com/loukylor/ButtonMover")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
-namespace AvatarPriorityDownloading
+namespace AvatarDownloadPriority
 {
     public class AvatarDownloadPriorityMod : MelonMod
     {
         public static readonly List<AvatarDownload> avatarDownloadQueue = new List<AvatarDownload>();
-        public static MelonPreferences_Entry<int> maxDownloadingAvatarsAtOnce;
-        public static MelonPreferences_Entry<bool> prioritizeSelf;
-        public static MelonPreferences_Entry<bool> prioritizeFavoriteFriends;
-        public static MelonPreferences_Entry<bool> prioritizeFriends;
 
-        private static Comparison<AvatarDownload> sortComparison;
-        private static readonly Comparison<AvatarDownload> prioritizeFavoriteFriendsSortComparison = (lDownload, rDownload) =>
+        internal static Comparison<AvatarDownload> sortComparison;
+        internal static readonly Comparison<AvatarDownload> prioritizeFavoriteFriendsSortComparison = (lDownload, rDownload) =>
         {
             int result = prioritizeFriendsSortComparison(lDownload, rDownload);
             if (result == 0)
@@ -39,7 +35,7 @@ namespace AvatarPriorityDownloading
             }
             return result;
         };
-        private static readonly Comparison<AvatarDownload> prioritizeFriendsSortComparison = (lDownload, rDownload) =>
+        internal static readonly Comparison<AvatarDownload> prioritizeFriendsSortComparison = (lDownload, rDownload) =>
         {
             bool lFriend = APIUser.IsFriendsWith(lDownload.Id);
             bool rFriend = APIUser.IsFriendsWith(rDownload.Id);
@@ -54,20 +50,11 @@ namespace AvatarPriorityDownloading
         private static MethodInfo downloadAvatarMethod;
 
         private static AvatarDownload currentDownload = null;
+        private static readonly List<AvatarDownload> currentlyDownloadingAvatars = new List<AvatarDownload>();
         private static bool downloadNextAvatar = false;
-        private static int currentlyDownloadingAvatars;
         public override void OnApplicationStart()
         {
-            MelonPreferences.CreateCategory("AvatarPriorityDownloadingConfig", "AvatarPriorityDownloading Config");
-            maxDownloadingAvatarsAtOnce = (MelonPreferences_Entry<int>)MelonPreferences.CreateEntry("AvatarPriorityDownloadingConfig", nameof(maxDownloadingAvatarsAtOnce), 5, "Max number of avatars downloading at once");
-            maxDownloadingAvatarsAtOnce.OnValueChanged += OnMaxDownloadingAvatarsAtOnceChange;
-            prioritizeSelf = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("AvatarPriorityDownloadingConfig", nameof(prioritizeSelf), true, "Prioritize downloading your own avatar");
-            prioritizeSelf.OnValueChanged += OnSortConfigChange;
-            prioritizeFavoriteFriends = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("AvatarPriorityDownloadingConfig", nameof(prioritizeFavoriteFriends), true, "Prioritize downloading favorite friends' avatars");
-            prioritizeFavoriteFriends.OnValueChanged += OnSortConfigChange;
-            prioritizeFriends = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("AvatarPriorityDownloadingConfig", nameof(prioritizeFriends), true, "Prioritize downloading friends' avatars");
-            prioritizeFriends.OnValueChanged += OnSortConfigChange;
-            OnSortConfigChange(true, false);
+            Config.Init();
 
             downloadAvatarMethod = typeof(VRCAvatarManager).GetMethods().First(mb => mb.Name.StartsWith("Method_Private_Void_ApiAvatar_Single_MulticastDelegateNPublic")
                 && mb.GetParameters().Count() == 4 && mb.GetParameters()[3].ParameterType == typeof(ApiAvatar));
@@ -79,45 +66,34 @@ namespace AvatarPriorityDownloading
                     break;
                 }
             }
+
+            Harmony.Patch(typeof(MonoBehaviour).GetMethod("StopCoroutine", new Type[1] { typeof(Coroutine) }), new HarmonyMethod(typeof(AvatarDownloadPriorityMod).GetMethod(nameof(OnCoroutineStop))));
+
+            MethodInfo attachAvatarEnumeratorMethod = typeof(VRCAvatarManager).GetMethods().First(mb =>
+                mb.GetParameters().Length == 7
+                && mb.GetParameters()[0].ParameterType == typeof(UnityEngine.Object)
+                && mb.GetParameters()[1].ParameterType == typeof(string));
+            Harmony.Patch(attachAvatarEnumeratorMethod, new HarmonyMethod(typeof(AvatarDownloadPriorityMod).GetMethod(nameof(OnAttachAvatarEnumerator))));
+            Harmony.Patch(typeof(VRCAvatarManager).GetMethod("OnDestroy"), new HarmonyMethod(typeof(AvatarDownloadPriorityMod).GetMethod(nameof(OnDestroy))));
             Harmony.Patch(downloadAvatarMethod, new HarmonyMethod(typeof(AvatarDownloadPriorityMod).GetMethod(nameof(OnAvatarDownload))));
             Harmony.Patch(typeof(NetworkManager).GetMethod("OnLeftRoom"), new HarmonyMethod(typeof(AvatarDownloadPriorityMod).GetMethod(nameof(OnLeftRoom))));
         }
         public override void OnUpdate()
         {
-            if (currentlyDownloadingAvatars == 0 && avatarDownloadQueue.Count > 0)
+            // Here just as a fail safe. I haven't seen it actually run in testing
+            if (currentlyDownloadingAvatars.Count == 0 && avatarDownloadQueue.Count > 0)
                 DownloadNextAvatar();
-        }
-
-        public static void OnMaxDownloadingAvatarsAtOnceChange(int oldValue, int newValue)
-        {
-            if (oldValue == newValue)
-                return;
-
-            if (maxDownloadingAvatarsAtOnce.Value <= 0)
-                maxDownloadingAvatarsAtOnce.Value = 1;
-        }
-        public static void OnSortConfigChange(bool oldValue, bool newValue)
-        {
-            if (oldValue == newValue)
-                return;
-
-            sortComparison = null;
-            if (prioritizeFavoriteFriends.Value)
-                sortComparison = prioritizeFavoriteFriendsSortComparison;
-            else if (prioritizeFriends.Value)
-                sortComparison = prioritizeFriendsSortComparison;
         }
 
         public static void OnLeftRoom()
         {
             avatarDownloadQueue.Clear();
-            currentlyDownloadingAvatars = 0;
+            currentlyDownloadingAvatars.Clear();
             currentDownload = null;
             downloadNextAvatar = false;
         }
-        public static bool OnAvatarDownload(VRCAvatarManager __instance, ApiAvatar __0, float __1, Il2CppSystem.Action<GameObject, VRC_AvatarDescriptor, bool> __2, ApiAvatar __3)
+        public static bool OnAvatarDownload(VRCAvatarManager __instance, ApiAvatar __0, float __1, Il2CppSystem.Action<GameObject, VRC_AvatarDescriptor, bool> __2, ApiAvatar __3) // When an avatar download has been requested
         {
-
             if (downloadNextAvatar)
             {
                 return true;
@@ -131,7 +107,7 @@ namespace AvatarPriorityDownloading
 
                 if (sortComparison != null)
                     avatarDownloadQueue.Sort(sortComparison);
-                if (prioritizeSelf.Value)
+                if (Config.prioritizeSelf.Value)
                 {
                     download = avatarDownloadQueue.FirstOrDefault(searchDownload => searchDownload.Id == APIUser.CurrentUser.id);
                     if (download != null)
@@ -141,70 +117,62 @@ namespace AvatarPriorityDownloading
                     }
                 }
 
-                if (currentlyDownloadingAvatars <= maxDownloadingAvatarsAtOnce.Value - 1)
+                if (currentlyDownloadingAvatars.Count <= Config.maxDownloadingAvatarsAtOnce.Value - 1)
                     DownloadNextAvatar();
                 return false;
             }
         }
-        public static bool OnAssetBundleDownload(ref object __2, ref object __3) // This will call when OnAvatarDownload calls
+        public static void OnAssetBundleDownload(ref object __3) // This will call when OnAvatarDownload calls (inside the method body of it)
         {
             if (downloadNextAvatar)
             {
                 downloadNextAvatar = false;
-                __2 = ((Il2CppSystem.Delegate)__2).CombineImpl((Il2CppSystem.Action<AssetBundleDownload>)new Action<AssetBundleDownload>((bundle) => OnDownloadStop()));
-                __3 = ((Il2CppSystem.Delegate)__3).CombineImpl((Il2CppSystem.Action<string, string, LoadErrorReason>)new Action<string, string, LoadErrorReason>((string1, string2, errorReason) => OnDownloadStop()));
+                // Only patching onError as OnAttachAvatarEnumerator will handle when it succeeds
+                __3 = ((Il2CppSystem.Delegate)__3).CombineImpl((Il2CppSystem.Action<string, string, LoadErrorReason>)new Action<string, string, LoadErrorReason>((string1, string2, errorReason) => OnDownloadStop(new AvatarDownload() { manager = currentDownload.manager })));
             }
-
-            return true;
         }
-        public static void OnDownloadStop() 
+        public static void OnAttachAvatarEnumerator(VRCAvatarManager __instance, ref Il2CppSystem.Action<GameObject> __5, ref Il2CppSystem.Action __6) // Calls when the gameobject has been created and avatar processing has started
         {
-            currentlyDownloadingAvatars--;
+            __5 = __5.CombineImpl((Il2CppSystem.Action<GameObject>)new Action<GameObject>((gameObject) => OnDownloadStop(__instance))).Cast<Il2CppSystem.Action<GameObject>>(); // onSuccess
+            __6 = __6.CombineImpl((Il2CppSystem.Action)new Action(() => OnDownloadStop(__instance))).Cast<Il2CppSystem.Action>(); // onError
+        }
+        public static void OnCoroutineStop(MonoBehaviour __instance) // If the coroutine is canceled and someone is turned into any prefab avatar
+        {
+            VRCAvatarManager manager = __instance.TryCast<VRCAvatarManager>();
+            if (manager == null)
+                return;
+
+            OnDownloadStop(manager);
+        }
+        public static void OnDestroy(VRCAvatarManager __instance) // If someone leaves
+        {
+            OnDownloadStop(__instance);
+        }
+
+        public static void OnDownloadStop(VRCAvatarManager manager) 
+        {
+            int index = currentlyDownloadingAvatars.IndexOf(new AvatarDownload() { manager = manager });
+            if (index >= 0)
+            {
+                currentlyDownloadingAvatars.RemoveAt(index);
+                if (avatarDownloadQueue.Count > 0)
+                    DownloadNextAvatar();
+            }
+        }
+        public static void OnDownloadStop(AvatarDownload download)
+        {
+            currentlyDownloadingAvatars.Remove(download);
             if (avatarDownloadQueue.Count > 0)
-                DownloadNextAvatar();   
+                DownloadNextAvatar();
         }
 
         public static void DownloadNextAvatar()
         {
-            currentlyDownloadingAvatars++;
             currentDownload = avatarDownloadQueue[0];
+            currentlyDownloadingAvatars.Add(currentDownload);
             avatarDownloadQueue.RemoveAt(0);
             downloadNextAvatar = true;
             downloadAvatarMethod.Invoke(currentDownload.manager, currentDownload.downloadMethodParams);
-        }
-
-        public class AvatarDownload
-        {
-            public VRCAvatarManager manager;
-            public object[] downloadMethodParams;
-            public string Id => manager.field_Private_VRCPlayer_0.prop_Player_0.prop_APIUser_0.id;
-
-            public override bool Equals(object obj)
-            {
-                if (obj == null)
-                    return false;
-                AvatarDownload objAsDownload = obj as AvatarDownload;
-                if (objAsDownload == null)
-                    return false;
-                else
-                    return Equals(objAsDownload);
-            }
-            public bool Equals(AvatarDownload download)
-            {
-                if (download == null)
-                    return false;
-                return download.Id == Id;
-            }
-            public override int GetHashCode()
-            {
-                return base.GetHashCode();
-            }
-
-            public AvatarDownload(VRCAvatarManager manager, object[] downloadMethodParams)
-            {
-                this.manager = manager;
-                this.downloadMethodParams = downloadMethodParams;
-            }
         }
     }
 }

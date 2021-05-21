@@ -53,9 +53,7 @@ The first prioritizing friends' avatars downloads over other avatars.
 The other setting would prioritize favorited friends' avatars over both friends and others' avatars. It will also still prioritize friends over regular users.
 The last setting will prioritize your avatar over everyones.
 
-You can also limit the max amount of avatars that can download at once.
-
-Note: This will only limit the number of avatars downloading, so it won't limit the number of avatars loading at the same time
+You can also limit the max amount of avatars that can download/load at once.
 
 ## Important
 If you have any issues, reloading the world you are in should fix them.
