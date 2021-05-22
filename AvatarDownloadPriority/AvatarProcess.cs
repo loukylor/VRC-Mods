@@ -1,40 +1,41 @@
 ﻿namespace AvatarDownloadPriority
 {
-    public class AvatarDownload
+    public class AvatarProcess
     {
         public VRCAvatarManager manager;
-        public object[] downloadMethodParams;
+        public object[] methodParams;
         public string Id => manager.field_Private_VRCPlayer_0.prop_Player_0.prop_APIUser_0.id;
+        public string DisplayName => manager.field_Private_VRCPlayer_0.prop_Player_0.prop_APIUser_0.displayName;
 
         public override bool Equals(object obj)
         {
             if (obj == null)
                 return false;
-            AvatarDownload objAsDownload = obj as AvatarDownload;
+            AvatarProcess objAsDownload = obj as AvatarProcess;
             if (objAsDownload == null)
                 return false;
             else
                 return Equals(objAsDownload);
         }
-        public bool Equals(AvatarDownload download)
+        public bool Equals(AvatarProcess download)
         {
             if (download == null)
                 return false;
-            return download.manager.GetInstanceID() == manager.GetInstanceID();
+            return download.Id == Id;
         }
         public override int GetHashCode()
         {
             return base.GetHashCode();
         }
 
-        public AvatarDownload()
+        public AvatarProcess()
         {
 
         }
-        public AvatarDownload(VRCAvatarManager manager, object[] downloadMethodParams)
+        public AvatarProcess(VRCAvatarManager manager, object[] downloadMethodParams)
         {
             this.manager = manager;
-            this.downloadMethodParams = downloadMethodParams;
+            this.methodParams = downloadMethodParams;
         }
     }
 }
