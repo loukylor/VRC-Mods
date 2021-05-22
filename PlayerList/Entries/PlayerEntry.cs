@@ -268,7 +268,7 @@ namespace PlayerList.Entries
         }
         private static void AddPhotonId(PlayerNet playerNet, PlayerEntry entry, ref StringBuilder tempString)
         {
-            tempString.Append(entry.player.prop_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0.ToString().PadRight(highestPhotonIdLength) + separator);
+            tempString.Append(entry.player.prop_VRCPlayer_0.prop_PhotonView_0.field_Private_Int32_0.ToString().PadRight(highestPhotonIdLength) + separator);
         }
         private static void AddDisplayName(PlayerNet playerNet, PlayerEntry entry, ref StringBuilder tempString)
         {
