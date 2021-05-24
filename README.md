@@ -29,6 +29,7 @@ More detailed instructions and more mods can be found in the [VRChat Modding Gro
 - [PlayerList](#playerlist)
 - [PreviewScroller](#previewscroller)
 - [ReloadAvatars](#reloadavatars)
+- [RememberMe](#rememberme)
 - [SelectYourself](#selectyourself)
 - [UserInfoExtensions](#userinfoextensions)
 
@@ -162,6 +163,19 @@ The buttons can each be toggled on and off using UIX
 
 ## Requirements
  - [UIExpansionKit](https://github.com/knah/VRCMods/)
+
+# RememberMe
+Mod for VRChat using MelonLoader
+
+Adds a "Remember Me" check-box to the Login screen.
+When "Remember Me" is checked off it will auto-fill the last saved VRChat Credentials.
+
+## Disclaimer
+I have not made any changes to this mod. All code is not my own, and I have received permission for this.
+
+## Credits
+- The original author of the mod, [HerpDerpinstine](https://github.com/HerpDerpinstine)
+- A contributor on the original repository, [dave-kun](https://github.com/dave-kun)
 
 # SelectYourself
 Adds a button that allows you to select yourself
