@@ -48,11 +48,11 @@ namespace PlayerList
         private static readonly Comparison<PlayerEntry> friendsSort = (lEntry, rEntry) =>
         {
             if (!lEntry.isFriend && rEntry.isFriend)
-                return -1;
+                return 1;
             else if (lEntry.isFriend == rEntry.isFriend)
                 return 0;
             else
-                return 1;
+                return -1;
         };
         private static readonly Comparison<PlayerEntry> nameColorSort = (lEntry, rEntry) =>
         {
