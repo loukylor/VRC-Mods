@@ -20,7 +20,18 @@ namespace PlayerList
         public static List<EntryBase> generalInfoEntries = new List<EntryBase>();
         public static List<EntryBase> entries = new List<EntryBase>();
 
-        public static System.Diagnostics.Stopwatch timer = System.Diagnostics.Stopwatch.StartNew();
+        public static event System.Action OnWorldAllowedChanged;
+        private static bool _worldAllowed = false;
+        public static bool WorldAllowed
+        {
+            get { return _worldAllowed; }
+            set
+            {
+                _worldAllowed = value;
+                OnWorldAllowedChanged?.SafeInvoke();
+            }
+        }
+
         public static void Init()
         {
             PlayerListConfig.fontSize.OnValueChanged += (oldValue, newValue) => SetFontSize(newValue);
@@ -89,6 +100,10 @@ namespace PlayerList
         }
         public static void OnInstanceChanged(ApiWorld world, ApiWorldInstance instance)
         {
+            WorldAllowed = false;
+            if (world != null)
+                MelonCoroutines.Start(VRCUtils.CheckWorld(world));
+
             foreach (EntryBase entry in entries)
                 entry.OnInstanceChange(world, instance);
             RefreshLeftPlayerEntries(0, 0, true);
@@ -173,6 +188,7 @@ namespace PlayerList
             AddGeneralInfoEntry(EntryBase.CreateInstance<WorldAuthorEntry>(Constants.generalInfoLayout.transform.Find("WorldAuthor").gameObject, includeConfig: true));
             AddGeneralInfoEntry(EntryBase.CreateInstance<InstanceMasterEntry>(Constants.generalInfoLayout.transform.Find("InstanceMaster").gameObject, includeConfig: true));
             AddGeneralInfoEntry(EntryBase.CreateInstance<InstanceCreatorEntry>(Constants.generalInfoLayout.transform.Find("InstanceCreator").gameObject, includeConfig: true));
+            AddGeneralInfoEntry(EntryBase.CreateInstance<RiskyFuncAllowedEntry>(Constants.generalInfoLayout.transform.Find("RiskyFuncAllowed").gameObject, includeConfig: true));
         }
         public static int GetEntryFromPlayerWithIndex(List<PlayerEntry> list, Player player, out PlayerEntry entry)
         {

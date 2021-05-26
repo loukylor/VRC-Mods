@@ -25,18 +25,6 @@ namespace PlayerList.Entries
 
         public bool isSelf = false;
 
-        public static event Action OnWorldAllowedChanged;
-        private static bool _worldAllowed = false;
-        public static bool WorldAllowed
-        {
-            get { return _worldAllowed; }
-            set 
-            {
-                _worldAllowed = value;
-                OnWorldAllowedChanged?.SafeInvoke();
-            }
-        }
-
         public Player player;
         public APIUser apiUser;
         public string userId;
@@ -240,7 +228,7 @@ namespace PlayerList.Entries
         }
         private static void AddDistance(PlayerNet playerNet, PlayerEntry entry, ref StringBuilder tempString)
         {
-            if (WorldAllowed)
+            if (EntryManager.WorldAllowed)
             {
                 if (entry.distance < 100)
                 {

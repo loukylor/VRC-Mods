@@ -2,7 +2,6 @@
 using MelonLoader;
 using Photon.Realtime;
 using PlayerList.Utilities;
-using VRC.Core;
 
 namespace PlayerList.Entries
 {

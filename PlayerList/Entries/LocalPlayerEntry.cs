@@ -109,13 +109,6 @@ namespace PlayerList.Entries
 
             textComponent.text = TrimExtra(tempString.ToString());
         }
-        public override void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
-        {
-            // poggers - loukylor 2021
-            WorldAllowed = false;
-            if (world != null)
-                MelonCoroutines.Start(VRCUtils.CheckWorld(world));
-        }
 
         private static void AddPing(Player player, LocalPlayerEntry entry, ref StringBuilder tempString)
         {

@@ -26,12 +26,12 @@ namespace PlayerList.Utilities
                 {
                     case "allowed":
                         MelonLogger.Msg("World allowed to show player distance");
-                        PlayerEntry.WorldAllowed = true;
+                        EntryManager.WorldAllowed = true;
                         yield break;
 
                     case "denied":
                         MelonLogger.Msg("World NOT allowed to show player distance");
-                        PlayerEntry.WorldAllowed = false;
+                        EntryManager.WorldAllowed = false;
                         yield break;
                 }
             }
@@ -51,13 +51,13 @@ namespace PlayerList.Utilities
                                 if (worldTag.IndexOf("game", StringComparison.OrdinalIgnoreCase) >= 0)
                                 {
                                     MelonLogger.Msg("World NOT allowed to show player distance");
-                                    PlayerEntry.WorldAllowed = false;
+                                    EntryManager.WorldAllowed = false;
                                     return;
                                 }
                             }
 
                             MelonLogger.Msg("World allowed to show player distance");
-                            PlayerEntry.WorldAllowed = true;
+                            EntryManager.WorldAllowed = true;
                             return;
                         }
                         else

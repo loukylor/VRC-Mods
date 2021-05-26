@@ -83,7 +83,7 @@ namespace PlayerList
             highestComparisonProperty = typeof(PlayerListConfig).GetProperty(nameof(PlayerListConfig.CurrentHighestSortType));
 
             PlayerListConfig.OnConfigChanged += OnStaticConfigChange;
-            PlayerEntry.OnWorldAllowedChanged += OnWorldAllowedChanged;
+            EntryManager.OnWorldAllowedChanged += OnWorldAllowedChanged;
         }
         private static void OnStaticConfigChange()
         {
@@ -99,7 +99,7 @@ namespace PlayerList
                     currentBaseComparison = avatarPerfSort;
                     break;
                 case SortType.Distance:
-                    if (PlayerEntry.WorldAllowed)
+                    if (EntryManager.WorldAllowed)
                         currentBaseComparison = distanceSort;
                     else
                         currentBaseComparison = noneSort;
@@ -130,7 +130,7 @@ namespace PlayerList
                     currentUpperComparison = avatarPerfSort;
                     break;
                 case SortType.Distance:
-                    if (PlayerEntry.WorldAllowed)
+                    if (EntryManager.WorldAllowed)
                         currentUpperComparison = distanceSort;
                     else
                         currentUpperComparison = noneSort;
@@ -161,7 +161,7 @@ namespace PlayerList
                     currentHighestComparison = avatarPerfSort;
                     break;
                 case SortType.Distance:
-                    if (PlayerEntry.WorldAllowed)
+                    if (EntryManager.WorldAllowed)
                         currentHighestComparison = distanceSort;
                     else
                         currentHighestComparison = noneSort;
@@ -219,7 +219,7 @@ namespace PlayerList
         }
         private static void OnWorldAllowedChanged()
         {
-            if (PlayerEntry.WorldAllowed)
+            if (EntryManager.WorldAllowed)
             { 
                 if (PlayerListConfig.CurrentBaseSortType == SortType.Distance)
                     currentBaseComparison = distanceSort;
