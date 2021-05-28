@@ -9,7 +9,7 @@ using UnityEngine;
 using VRC.Core;
 using VRC.SDKBase;
 
-[assembly: MelonInfo(typeof(AvatarDownloadPriority.AvatarDownloadPriorityMod), "AvatarPriorityDownloading", "1.0.2", "loukylor", "https://github.com/loukylor/ButtonMover")]
+[assembly: MelonInfo(typeof(AvatarDownloadPriority.AvatarDownloadPriorityMod), "AvatarPriorityDownloading", "1.0.3", "loukylor", "https://github.com/loukylor/ButtonMover")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace AvatarDownloadPriority
@@ -168,6 +168,7 @@ namespace AvatarDownloadPriority
             {
                 __2 = ((Il2CppSystem.Delegate)__2).CombineImpl((Il2CppSystem.Action<AssetBundleDownload>)new Action<AssetBundleDownload>((assetBundle) => OnDownloadStop(new AvatarProcess() { manager = currentDownload.manager })));
                 __3 = ((Il2CppSystem.Delegate)__3).CombineImpl((Il2CppSystem.Action<string, string, LoadErrorReason>)new Action<string, string, LoadErrorReason>((string1, string2, errorReason) => OnDownloadStop(new AvatarProcess() { manager = currentDownload.manager })));
+                shouldDownloadNextAvatar = false;
             }
         }
 
