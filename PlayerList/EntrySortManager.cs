@@ -35,7 +35,7 @@ namespace PlayerList
         };
         private static readonly Comparison<PlayerEntry> defaultSort = (lEntry, rEntry) =>
         {
-            return lEntry.player.prop_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0.CompareTo(rEntry.player.prop_VRCPlayer_0.field_Private_PhotonView_0.field_Private_Int32_0);
+            return lEntry.player.prop_PlayerNet_0.prop_PhotonView_0.field_Private_Int32_0.CompareTo(rEntry.player.prop_PlayerNet_0.prop_VRCPlayer_0.prop_PhotonView_0.field_Private_Int32_0);
         };
         internal static readonly Comparison<PlayerEntry> distanceSort = (lEntry, rEntry) =>
         {
@@ -195,7 +195,7 @@ namespace PlayerList
             else
                 reverseHighest = 1;
 
-            if (PlayerListConfig.ShowSelfAtTop.Value)
+            if (PlayerListConfig.showSelfAtTop.Value)
             {
                 if (EntryManager.localPlayerEntry != null)
                 { 
@@ -243,7 +243,7 @@ namespace PlayerList
         {
             EntryManager.sortedPlayerEntries.Sort(sort);
 
-            if (PlayerListConfig.ShowSelfAtTop.Value)
+            if (PlayerListConfig.showSelfAtTop.Value)
                 if (EntryManager.sortedPlayerEntries.Remove(EntryManager.localPlayerEntry))
                     EntryManager.sortedPlayerEntries.Insert(0, EntryManager.localPlayerEntry);
 

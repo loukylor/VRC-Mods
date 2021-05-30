@@ -60,7 +60,7 @@ namespace PlayerList.Config
             get { return (EntrySortManager.SortType)Enum.Parse(typeof(EntrySortManager.SortType), currentHighestSort.Value); }
             set { currentHighestSort.Value = value.ToString(); }
         }
-        public static EntryWrapper<bool> ShowSelfAtTop;
+        public static EntryWrapper<bool> showSelfAtTop;
 
         private static EntryWrapper<string> menuButtonPosition;
         public static MenuManager.MenuButtonPositionEnum MenuButtonPosition
@@ -108,7 +108,7 @@ namespace PlayerList.Config
             currentUpperSort = CreateEntry(categoryIdentifier, nameof(currentUpperSort), "None", is_hidden: true);
             reverseHighestSort = CreateEntry(categoryIdentifier, nameof(reverseHighestSort), false, is_hidden: true);
             currentHighestSort = CreateEntry(categoryIdentifier, nameof(currentHighestSort), "None", is_hidden: true);
-            ShowSelfAtTop = CreateEntry(categoryIdentifier, nameof(ShowSelfAtTop), true, is_hidden: true);
+            showSelfAtTop = CreateEntry(categoryIdentifier, nameof(showSelfAtTop), true, is_hidden: true);
 
             menuButtonPosition = CreateEntry(categoryIdentifier, nameof(menuButtonPosition), "TopRight", is_hidden: true);
 
