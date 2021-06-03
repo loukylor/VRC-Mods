@@ -15,6 +15,7 @@ namespace InstanceHistory.UI
         private static MethodInfo openQuickMenu;
         private static MethodInfo closeQuickMenu;
         private static MethodInfo setMenuIndex;
+        private static PropertyInfo quickMenuEnumProperty;
 
         public static event Action OnQuickMenuOpenEvent;
         public static event Action OnQuickMenuCloseEvent;
@@ -49,21 +50,24 @@ namespace InstanceHistory.UI
         public static void Init()
         {
             closeQuickMenu = typeof(QuickMenu).GetMethods()
-                .Where(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM") && Xref.CheckUsed(mb, "Method_Public_Void_Int32_Boolean_")).First();
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM") && Xref.CheckUsed(mb, "Method_Private_Void_String_String_LoadErrorReason_"));
 
             openQuickMenu = typeof(QuickMenu).GetMethods()
-                 .Where(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && mb.GetParameters().Any(pi => pi.HasDefaultValue == false)).First();
+                 .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM") && Xref.CheckUsing(mb, "Method_Public_Static_Boolean_byref_Boolean_0", typeof(VRCInputManager)));
 
+            List<Type> quickMenuNestedEnums = typeof(QuickMenu).GetNestedTypes().Where(type => type.Name.StartsWith("Enum")).ToList();
+            quickMenuEnumProperty = typeof(QuickMenu).GetProperties()
+                .First(pi => pi.PropertyType.IsEnum && quickMenuNestedEnums.Contains(pi.PropertyType));
             setMenuIndex = typeof(QuickMenu).GetMethods()
-                .Where(mb => mb.Name.StartsWith("Method_Public_Void_Int32_") && mb.Name.Length <= 27 && Xref.CheckUsed(mb, "Method_Public_Void_Boolean_")).First();
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Enum") && mb.GetParameters()[0].ParameterType == quickMenuEnumProperty.PropertyType);
 
             QuickMenuContextualDisplayEnum = typeof(QuickMenuContextualDisplay).GetNestedTypes()
-                .Where(type => type.Name.StartsWith("Enum")).First();
+                .First(type => type.Name.StartsWith("Enum"));
 
             QuickMenuContexualDisplayMethod = typeof(QuickMenuContextualDisplay).GetMethod($"Method_Public_Void_{QuickMenuContextualDisplayEnum.Name}_0");
 
-            InstanceHistoryMod.Instance.Harmony.Patch(openQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuOpen))));
-            InstanceHistoryMod.Instance.Harmony.Patch(closeQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuClose))));
+            InstanceHistoryMod.Instance.Harmony.Patch(openQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuOpen), BindingFlags.NonPublic | BindingFlags.Static)));
+            InstanceHistoryMod.Instance.Harmony.Patch(closeQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuClose), BindingFlags.NonPublic | BindingFlags.Static)));
         }
         public static void OnSceneWasLoaded()
         {
@@ -109,7 +113,7 @@ namespace InstanceHistory.UI
             // Set to null as to not change values unexpectedly 
             foreach (PropertyInfo prop in possibleProps)
                 prop.SetValue(QuickMenu.prop_QuickMenu_0, null);
-            QuickMenu.prop_QuickMenu_0.field_Private_Int32_0 = -1;
+            quickMenuEnumProperty.SetValue(QuickMenu.prop_QuickMenu_0, -1);
         }
         public static void OnQuickMenuOpen() => OnQuickMenuOpenEvent?.Invoke();
         public static void OnQuickMenuClose() => OnQuickMenuCloseEvent?.Invoke();
@@ -131,7 +135,7 @@ namespace InstanceHistory.UI
             }
             else
             {
-                QuickMenu.prop_QuickMenu_0.field_Private_Int32_0 = -1;
+                quickMenuEnumProperty.SetValue(QuickMenu.prop_QuickMenu_0, -1);
                 CurrentMenu = pageGameObject;
             }
 

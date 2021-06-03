@@ -17,6 +17,7 @@ namespace PlayerList.UI
         private static MethodInfo openQuickMenu;
         private static MethodInfo closeQuickMenu;
         private static MethodInfo setMenuIndex;
+        private static PropertyInfo quickMenuEnumProperty;
 
         private static Il2CppSystem.Reflection.MethodInfo showTabContentMethod;
         private static Il2CppSystem.Reflection.FieldInfo setTabTabIndexField;
@@ -66,13 +67,16 @@ namespace PlayerList.UI
         public static void Init()
         {
             closeQuickMenu = typeof(QuickMenu).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM") && Xref.CheckUsed(mb, "Method_Public_Void_Int32_Boolean_"));
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM") && Xref.CheckUsed(mb, "Method_Private_Void_String_String_LoadErrorReason_"));
 
             openQuickMenu = typeof(QuickMenu).GetMethods()
-                 .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && mb.GetParameters().Any(pi => pi.HasDefaultValue == false));
+                 .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM") && Xref.CheckUsing(mb, "Method_Public_Static_Boolean_byref_Boolean_0", typeof(VRCInputManager)));
 
+            List<Type> quickMenuNestedEnums = typeof(QuickMenu).GetNestedTypes().Where(type => type.Name.StartsWith("Enum")).ToList();
+            quickMenuEnumProperty = typeof(QuickMenu).GetProperties()
+                .First(pi => pi.PropertyType.IsEnum && quickMenuNestedEnums.Contains(pi.PropertyType));
             setMenuIndex = typeof(QuickMenu).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_Int32_") && mb.Name.Length <= 27 && Xref.CheckUsed(mb, "Method_Public_Void_Boolean_"));
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Enum") && mb.GetParameters()[0].ParameterType == quickMenuEnumProperty.PropertyType);
 
             QuickMenuContextualDisplayEnum = typeof(QuickMenuContextualDisplay).GetNestedTypes()
                 .First(type => type.Name.StartsWith("Enum"));
@@ -166,11 +170,11 @@ namespace PlayerList.UI
             // Set to null as to not change values unexpectedly 
             foreach (PropertyInfo prop in possibleProps)
                 prop.SetValue(QuickMenu.prop_QuickMenu_0, null);
-            QuickMenu.prop_QuickMenu_0.field_Private_Int32_0 = -1;
+            quickMenuEnumProperty.SetValue(QuickMenu.prop_QuickMenu_0, -1);
         }
         private static void OnQuickMenuOpen() => OnQuickMenuOpenEvent?.SafeInvoke();
         private static void OnQuickMenuClose() => OnQuickMenuCloseEvent?.SafeInvoke();
-        public static void SetMenuIndex(int index) => setMenuIndex.Invoke(QuickMenu.prop_QuickMenu_0, new object[] { index });
+        public static void SetMenuIndex(int index) => setMenuIndex.Invoke(QuickMenu.prop_QuickMenu_0, new object[1] { index });
         public static void SetTabTabIndex(GameObject tab, int index) => setTabTabIndexField.SetValue(tab.gameObject.GetComponent(tabDescriptorType), new Il2CppSystem.Int32 { m_value = index }.BoxIl2CppObject());
         public static void ShowTabContent(GameObject tab) => showTabContentMethod.Invoke(tab.gameObject.GetComponent(tabDescriptorType), null);
         public static void SetTabIndex(int index) => setTabIndexField.SetValue(tabContainerComponent, new Il2CppSystem.Int32 { m_value = index }.BoxIl2CppObject());
@@ -193,8 +197,8 @@ namespace PlayerList.UI
                 SetTabIndex(0);
             }
             else
-            { 
-                QuickMenu.prop_QuickMenu_0.field_Private_Int32_0 = -1;
+            {
+                quickMenuEnumProperty.SetValue(QuickMenu.prop_QuickMenu_0, -1);
             }
 
             if (setCurrentMenu)

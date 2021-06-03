@@ -68,7 +68,7 @@ namespace PlayerList.Utilities
         private static void OnSetupFlagsReceive(VRCPlayer __instance, int __result)
         {
             if (__instance == null) return;
-
+            
             OnSetupFlagsReceived?.SafeInvoke(__instance, __result);
         }
 
