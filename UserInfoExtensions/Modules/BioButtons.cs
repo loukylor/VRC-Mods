@@ -12,11 +12,9 @@ namespace UserInfoExtentions.Modules
 {
     public class BioButtons : ModuleBase
     {
-        public static GameObject bioButtonGameObject;
         public static GameObject bioLinksButtonGameObject;
         public static GameObject bioLanguagesButtonGameObject;
 
-        public static MelonPreferences_Entry<bool> BioButton;
         public static MelonPreferences_Entry<bool> BioLinksButton;
         public static MelonPreferences_Entry<bool> BioLanguagesButton;
 
@@ -58,18 +56,16 @@ namespace UserInfoExtentions.Modules
 
         public override void Init()
         {
-            BioButton = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(BioButton), false, "Show \"Bio\" button");
             BioLinksButton = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(BioLinksButton), false, "Show \"Bio Links\" button");
             BioLanguagesButton = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(BioLanguagesButton), false, "Show \"Bio Languages\" button");
 
-            UserInfoExtensionsMod.userDetailsMenu.AddSimpleButton("Bio", GetBio, new Action<GameObject>((gameObject) => { bioButtonGameObject = gameObject; gameObject.SetActive(BioButton.Value); }));
             UserInfoExtensionsMod.userDetailsMenu.AddSimpleButton("Bio Links", ShowBioLinksPopup, new Action<GameObject>((gameObject) => { bioLinksButtonGameObject = gameObject; gameObject.SetActive(BioLinksButton.Value); }));
             UserInfoExtensionsMod.userDetailsMenu.AddSimpleButton("Bio Languages", ShowBioLanguagesPopup, new Action<GameObject>((gameObject) => { bioLanguagesButtonGameObject = gameObject; gameObject.SetActive(BioLanguagesButton.Value); }));
 
             UserInfoExtensionsMod.menu.AddLabel("Bio Related Things");
             UserInfoExtensionsMod.menu.AddSpacer();
             UserInfoExtensionsMod.menu.AddSpacer();
-            UserInfoExtensionsMod.menu.AddSimpleButton("Bio", GetBio);
+            UserInfoExtensionsMod.menu.AddSpacer();
             UserInfoExtensionsMod.menu.AddSimpleButton("Bio Links", ShowBioLinksPopup);
             UserInfoExtensionsMod.menu.AddSimpleButton("Bio Languages", ShowBioLanguagesPopup);
         }
@@ -188,7 +184,6 @@ namespace UserInfoExtentions.Modules
         }
         public override void OnPreferencesSaved()
         {
-            bioButtonGameObject?.SetActive(BioButton.Value);
             bioLinksButtonGameObject?.SetActive(BioLinksButton.Value);
             bioLanguagesButtonGameObject?.SetActive(BioLanguagesButton.Value); 
         }
@@ -201,19 +196,6 @@ namespace UserInfoExtentions.Modules
             }
         }
 
-        public static void GetBio()
-        {
-            UserInfoExtensionsMod.HideAllPopups();
-
-            if (VRCUtils.ActiveUser.bio != null && VRCUtils.ActiveUser.bio.Length >= 300)
-            {
-                VRCUtils.OpenPopupV1("Bio:", VRCUtils.ActiveUser.bio, "Close", new Action(VRCUtils.ClosePopup));
-            }
-            else
-            {
-                VRCUtils.OpenPopupV2("Bio:", VRCUtils.ActiveUser.bio, "Close", new Action(VRCUtils.ClosePopup));
-            }
-        }
         public static void ShowBioLinksPopup()
         {
             UserInfoExtensionsMod.HideAllPopups();
