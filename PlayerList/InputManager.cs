@@ -1,12 +1,11 @@
-﻿using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
+using PlayerList.UI;
 using UnityEngine;
 
 namespace PlayerList
 {
     class InputManager
     {
-        public static MethodInfo clickMethod;
         public static VRCUiCursor CurrentCursor
         {
             get { return VRCUiCursorManager.Method_Public_Static_VRCUiCursor_0(); }
@@ -31,10 +30,8 @@ namespace PlayerList
 
         public static void SelectPlayer(VRCPlayer player)
         {
-            if (clickMethod == null)
-                clickMethod = typeof(VRCUiCursor).GetMethods().First(mi => mi.Name.StartsWith("Method_Public_Void_VRCPlayer_") && mi.GetParameters().Any(pi => pi.ParameterType == typeof(VRCPlayer)));
-
-            clickMethod.Invoke(CurrentCursor, new object[] { player });
+            QuickMenu.prop_QuickMenu_0.prop_APIUser_0 = player.prop_Player_0.field_Private_APIUser_0;
+            UIManager.SetMenuIndex(3);
         }
     }
 }
