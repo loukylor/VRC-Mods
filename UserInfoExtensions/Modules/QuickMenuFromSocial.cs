@@ -29,7 +29,7 @@ namespace UserInfoExtentions.Modules
                 .Where(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_Boolean_") && !mb.Name.Contains("_PDM_"))
                 .OrderBy(mb => UnhollowerSupport.GetIl2CppMethodCallerCount(mb)).Last();
             openQuickMenu = typeof(QuickMenu).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && mb.GetParameters().Any(pi => pi.HasDefaultValue == false));
+                 .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM") && Xref.CheckUsing(mb, "Method_Public_Static_Boolean_byref_Boolean_0", typeof(VRCInputManager)));
             clickMethod = typeof(VRCUiCursor).GetMethods()
                 .First(mi => mi.Name.StartsWith("Method_Public_Void_VRCPlayer_") && mi.GetParameters().Any(pi => pi.ParameterType == typeof(VRCPlayer)));
         }

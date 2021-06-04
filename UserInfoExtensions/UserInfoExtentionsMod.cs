@@ -60,10 +60,6 @@ namespace UserInfoExtensions
 
             MelonLogger.Msg("Initialized!");
         }
-        public static void Print(MethodInfo __originalMethod)
-        {
-            MelonLogger.Msg(__originalMethod.Name);
-        }
         public override void VRChat_OnUiManagerInit()
         {
             VRCUtils.UiInit();
