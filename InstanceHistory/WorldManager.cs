@@ -23,7 +23,7 @@ namespace InstanceHistory
                 .ToList().ForEach(m => InstanceHistoryMod.Instance.Harmony.Patch(m, prefix: new HarmonyMethod(typeof(WorldManager).GetMethod(nameof(OnEnterWorld), BindingFlags.Public | BindingFlags.Static))));
 
             transitionInfoEnum = typeof(WorldTransitionInfo).GetNestedTypes().First();
-            enterWorldMethod = typeof(VRCFlowManager).GetMethod("Method_Public_Void_String_WorldTransitionInfo_Action_1_String_Boolean_0");
+            enterWorldMethod = typeof(VRCFlowManager).GetMethod("Method_Public_Void_String_String_WorldTransitionInfo_Action_1_String_Boolean_0");
         }
 
         public static void OnEnterWorld(ApiWorld __0, ApiWorldInstance __1)
@@ -41,7 +41,7 @@ namespace InstanceHistory
         {
             object currentPortalInfo = Activator.CreateInstance(typeof(WorldTransitionInfo), new object[2] { Enum.Parse(transitionInfoEnum, "Menu"), "WorldInfo_Go" });
             currentPortalInfo.GetType().GetProperty($"field_Public_{transitionInfoEnum.Name}_0").SetValue(currentPortalInfo, transitionInfoEnum.GetEnumValues().GetValue(3)); //I hate reflection
-            enterWorldMethod.Invoke(VRCFlowManager.prop_VRCFlowManager_0, new object[4] { roomId, currentPortalInfo, (Il2CppSystem.Action<string>)new Action<string>((str) => VRCUtils.OpenPopupV2("Alert", "Cannot Join World", "Close", new Action(VRCUtils.ClosePopup))), false }); //Just kill me
+            enterWorldMethod.Invoke(VRCFlowManager.prop_VRCFlowManager_0, new object[5] { roomId.Split(':')[0], roomId.Split(':')[1], currentPortalInfo, (Il2CppSystem.Action<string>)new Action<string>((str) => VRCUtils.OpenPopupV2("Alert", "Cannot Join World", "Close", new Action(VRCUtils.ClosePopup))), false }); //Just kill me
         }
     }
 }
