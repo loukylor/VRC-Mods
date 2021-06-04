@@ -10,7 +10,7 @@ using UnityEngine;
 using VRC;
 using VRC.Core;
 
-[assembly: MelonInfo(typeof(AskToPortal.AskToPortalMod), "AskToPortal", "2.1.2", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(AskToPortal.AskToPortalMod), "AskToPortal", "2.1.3", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 [assembly: MelonIncompatibleAssemblies(new string[1] { "Portal Confirmation" })]
 
