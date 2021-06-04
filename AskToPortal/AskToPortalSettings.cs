@@ -13,7 +13,7 @@ namespace AskToPortal
         public static MelonPreferences_Entry<bool> autoAcceptHome;
         public static MelonPreferences_Entry<bool> autoAcceptSelf;
         public static MelonPreferences_Entry<bool> onlyPortalDrop;
-        //public static MelonPreferences_Entry<bool> startOnDetailed;
+        public static MelonPreferences_Entry<bool> startOnDetailed;
 
         public static void RegisterSettings()
         {
@@ -25,7 +25,7 @@ namespace AskToPortal
             autoAcceptHome = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(catagory, nameof(autoAcceptHome), false, "Automatically enter home portals");
             autoAcceptSelf = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(catagory, nameof(autoAcceptSelf), true, "Automatically enter your own portals");
             onlyPortalDrop = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(catagory, nameof(onlyPortalDrop), false, "Only ask if a portal dropper is detected");
-            //startOnDetailed = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(catagory, nameof(startOnDetailed), false, "Only ask if a portal dropper is detected");
+            startOnDetailed = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(catagory, nameof(startOnDetailed), false, "Only ask if a portal dropper is detected");
         }
     }
 }

@@ -10,14 +10,14 @@ using UnityEngine;
 using VRC;
 using VRC.Core;
 
-[assembly: MelonInfo(typeof(AskToPortal.AskToPortalMod), "AskToPortal", "2.1.2", "loukylor", "https://github.com/loukylor/AskToPortal")]
+[assembly: MelonInfo(typeof(AskToPortal.AskToPortalMod), "AskToPortal", "2.1.2", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
+[assembly: MelonIncompatibleAssemblies(new string[1] { "Portal Confirmation" })]
 
 namespace AskToPortal
 {
     class AskToPortalMod : MelonMod
     {
-        private static bool hasPortalConfirmation = false;
         public static bool hasTriggered = false;
         public static List<string> blacklistedUserIds = new List<string>();
 
@@ -34,7 +34,6 @@ namespace AskToPortal
             AskToPortalSettings.RegisterSettings();
             if (MelonHandler.Mods.Any(mod => mod.Info.Name == "Portal Confirmation"))
             {
-                hasPortalConfirmation = true;
                 MelonLogger.Warning("Use of Portal Confirmation by 404 was detected! AskToPortal is NOT Portal Confirmation. AskToPortal is simply a replacement for Portal Confirmation as 404 was BANNED from the VRChat Modding Group. If you wish to use this mod please DELETE Portal Confirmation.");
             }
             else
@@ -55,6 +54,10 @@ namespace AskToPortal
 
                 MelonLogger.Msg("Initialized!");
             }
+        }
+        public override void VRChat_OnUiManagerInit()
+        {
+            //MenuManager.LoadAssetBundle();
         }
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
@@ -105,6 +108,9 @@ namespace AskToPortal
                 //If portal dropper is not owner of private instance but still dropped the portal or world id is the public ban world or if the population is in the negatives or is above 80
                 if ((roomInfo.ownerId != "" && roomInfo.ownerId != dropper.id && !roomInfo.instanceType.Contains("Friend")) || worldId == "wrld_5b89c79e-c340-4510-be1b-476e9fcdedcc" || roomPop < 0 || roomPop > 80) roomInfo.isPortalDropper = true;
 
+                //MenuManager.OnPortalEnter(roomInfo, __instance, dropper, worldId, roomId);
+                //return false;
+                
                 if (roomInfo.isPortalDropper && !(AskToPortalSettings.autoAcceptSelf.Value && dropper.IsSelf))
                 {
                     VRCUtils.OpenPopup("Portal Dropper Detected!!!",
