@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -27,8 +28,9 @@ namespace UserInfoExtentions.Modules
         public static PageAvatar avatarPage;
         public static bool isFromSocialPage = false;
 
-        public static Type genericType;
-        public static PropertyInfo screenStackProp;
+        private static PropertyInfo screenStackProp;
+
+        private static MethodInfo setBigMenuEnum;
 
         public override void Init()
         {
@@ -40,6 +42,9 @@ namespace UserInfoExtentions.Modules
             UserInfoExtensionsMod.menu.AddSimpleButton("Avatar Author", FromSocial);
 
             screenStackProp = typeof(VRCUiManager).GetProperties().Where(pi => pi.Name.Contains("field_Internal_List_1_") && !pi.Name.Contains("String")).First();
+
+            List<Type> quickMenuNestedEnums = typeof(QuickMenu).GetNestedTypes().Where(type => type.IsEnum).ToList();
+            setBigMenuEnum = typeof(QuickMenu).GetMethods().First(mb => mb.Name.StartsWith("Method_Public_Void_Enum") && mb.GetParameters().Length == 2 && quickMenuNestedEnums.Contains(mb.GetParameters()[0].ParameterType) && mb.GetParameters()[1].ParameterType == typeof(bool));
         }
         public override void UiInit()
         {
@@ -132,7 +137,7 @@ namespace UserInfoExtentions.Modules
             }
 
             QuickMenu.prop_QuickMenu_0.field_Private_APIUser_0 = user;
-            QuickMenu.prop_QuickMenu_0.Method_Public_Void_Int32_Boolean_0(4, false);
+            setBigMenuEnum.Invoke(QuickMenu.prop_QuickMenu_0, new object[] { 4, false });
             if (isFromSocialPage)
             {
                 // For some reason when called from the Social Menu the screen stack adds the UserInfo page twice (making the user have to hit the back button twice to leave the page), so I'm just getting the screen stack using Reflection (as the name doesn't seem static) and removing the 2nd to last entry

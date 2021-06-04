@@ -23,7 +23,7 @@ namespace UserInfoExtensions
         public static UserInfoExtensionsMod Instance { private set; get; }
 
         public override void OnApplicationStart()
-        {
+        {            
             Instance = this;
             CacheManager.Init();
             VRCUtils.Init();
@@ -59,6 +59,10 @@ namespace UserInfoExtensions
             AddModule(new UserInformation());
 
             MelonLogger.Msg("Initialized!");
+        }
+        public static void Print(MethodInfo __originalMethod)
+        {
+            MelonLogger.Msg(__originalMethod.Name);
         }
         public override void VRChat_OnUiManagerInit()
         {
