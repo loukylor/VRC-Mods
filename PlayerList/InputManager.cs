@@ -1,6 +1,6 @@
-﻿using System.Reflection;
-using PlayerList.UI;
+﻿using PlayerList.UI;
 using UnityEngine;
+using VRC;
 
 namespace PlayerList
 {
@@ -28,9 +28,10 @@ namespace PlayerList
             }
         }
 
-        public static void SelectPlayer(VRCPlayer player)
+        public static void SelectPlayer(Player player)
         {
-            QuickMenu.prop_QuickMenu_0.prop_APIUser_0 = player.prop_Player_0.prop_APIUser_0;
+            QuickMenu.prop_QuickMenu_0.field_Private_Player_0 = player;
+            QuickMenu.prop_QuickMenu_0.prop_APIUser_0 = player.prop_APIUser_0;
             UIManager.SetMenuIndex(3);
         }
     }

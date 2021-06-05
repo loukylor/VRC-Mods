@@ -5,6 +5,7 @@ using System.Reflection;
 using MelonLoader;
 using UIExpansionKit.API;
 using UnityEngine;
+using VRC;
 using VRC.Core;
 
 [assembly: MelonInfo(typeof(SelectYourself.SelectYourselfMod), "SelectYourself", "1.0.1", "loukylor", "https://github.com/loukylor/VRC-Mods")]
@@ -29,6 +30,7 @@ namespace SelectYourself
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.QuickMenu).AddSimpleButton("Select Yourself",
                 new Action(() => 
                 {
+                    QuickMenu.prop_QuickMenu_0.field_Private_Player_0 = Player.prop_Player_0;
                     QuickMenu.prop_QuickMenu_0.prop_APIUser_0 = APIUser.CurrentUser;
                     setMenuIndex.Invoke(QuickMenu.prop_QuickMenu_0, new object[1] { 3 });
                 }),

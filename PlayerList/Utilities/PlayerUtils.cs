@@ -18,7 +18,7 @@ namespace PlayerList.Utilities
 
         public static void OpenPlayerInQuickMenu(Player player)
         {
-            InputManager.SelectPlayer(player.prop_VRCPlayer_0);
+            InputManager.SelectPlayer(player);
             QuickMenuContextualDisplay.Method_Public_Static_Void_VRCPlayer_0(player.prop_VRCPlayer_0);
         }
 

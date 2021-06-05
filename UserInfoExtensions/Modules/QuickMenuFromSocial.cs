@@ -87,6 +87,7 @@ namespace UserInfoExtentions.Modules
                     closeMenu.Invoke(VRCUiManager.prop_VRCUiManager_0, new object[] { true, false }); //Closes Big Menu
                     openQuickMenu.Invoke(QuickMenu.prop_QuickMenu_0, new object[] { true }); //Opens Quick Menu
 
+                    QuickMenu.prop_QuickMenu_0.field_Private_Player_0 = player;
                     QuickMenu.prop_QuickMenu_0.prop_APIUser_0 = player.prop_APIUser_0;
                     setMenuIndex.Invoke(QuickMenu.prop_QuickMenu_0, new object[1] { 3 });
 
