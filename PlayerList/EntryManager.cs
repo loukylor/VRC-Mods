@@ -139,7 +139,7 @@ namespace PlayerList
 
             GameObject template;
 
-            if (player.field_Private_APIUser_0.IsSelf)
+            if (player.prop_APIUser_0.IsSelf)
             {
                 if (localPlayerEntry != null) return;
 
@@ -192,13 +192,13 @@ namespace PlayerList
         }
         public static int GetEntryFromPlayerWithIndex(List<PlayerEntry> list, Player player, out PlayerEntry entry)
         {
-            if (player == null || player.field_Private_APIUser_0 == null)
+            if (player == null || player.prop_APIUser_0 == null)
             {
                 entry = null;
                 return -1;
             }
 
-            string playerId = player.field_Private_APIUser_0.id;
+            string playerId = player.prop_APIUser_0.id;
             for (int i = 0; i < list.Count; i++)
             {
                 if (playerId == list[i].userId)

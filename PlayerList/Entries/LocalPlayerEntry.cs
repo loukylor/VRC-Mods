@@ -148,7 +148,7 @@ namespace PlayerList.Entries
         }
         private static void AddDisplayName(Player player, LocalPlayerEntry entry, ref StringBuilder tempString)
         {
-            tempString.Append("<color=" + entry.playerColor + ">" + player.field_Private_APIUser_0.displayName + "</color>" + separator);
+            tempString.Append("<color=" + entry.playerColor + ">" + player.prop_APIUser_0.displayName + "</color>" + separator);
         }
 
         private static void OnShowSocialRankChange()

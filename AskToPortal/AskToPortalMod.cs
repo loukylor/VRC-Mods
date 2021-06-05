@@ -86,7 +86,7 @@ namespace AskToPortal
                 }
                 else
                 {
-                    dropper = cachedDroppers[__instance.GetInstanceID()].field_Private_APIUser_0; // Get cached user because the photon object before gets the owner and can be spoofed
+                    dropper = cachedDroppers[__instance.GetInstanceID()].prop_APIUser_0; // Get cached user because the photon object before gets the owner and can be spoofed
                 }
 
                 if (blacklistedUserIds.Contains(dropper.id)) return false;

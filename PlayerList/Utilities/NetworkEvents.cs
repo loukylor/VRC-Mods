@@ -5,6 +5,7 @@ using Harmony;
 using UnityEngine;
 using VRC;
 using VRC.Core;
+using VRC.UI;
 
 namespace PlayerList.Utilities
 {
@@ -86,18 +87,8 @@ namespace PlayerList.Utilities
             foreach (MethodInfo method in typeof(AvatarLoadingBar).GetMethods().Where(mb => mb.Name.Contains("Method_Public_Void_Single_Int64_PDM_")))
                 PlayerListMod.Instance.Harmony.Patch(method, new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnAvatarDownloadProgress), BindingFlags.NonPublic | BindingFlags.Static)));
 
-            foreach (Type type in typeof(VRCPlayer).Assembly.GetTypes())
-            {
-                int counter = 0;
-                foreach (PropertyInfo pi in type.GetProperties())
-                    if (pi.Name.Contains("_Dictionary_2_String_APIUser_"))
-                        counter += 1;
-                if (counter == 3)
-                {
-                    PlayerListMod.Instance.Harmony.Patch(type.GetMethod("Method_Private_Void_String_0"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnUnfriend), BindingFlags.NonPublic | BindingFlags.Static)));
-                    break;
-                }
-            }
+            PlayerListMod.Instance.Harmony.Patch(typeof(FriendsListManager).GetMethod("Method_Private_Void_String_0"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnUnfriend), BindingFlags.NonPublic | BindingFlags.Static)));
+
 
             MethodInfo onSetupFlagsReceivedMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.ReturnType.IsEnum && mi.GetParameters().Length == 1 && mi.GetParameters()[0].ParameterType == typeof(Il2CppSystem.Collections.Hashtable) && Xref.CheckMethod(mi, "Failed to read showSocialRank for {0}"));
             PlayerListMod.Instance.Harmony.Patch(onSetupFlagsReceivedMethod, null, new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnSetupFlagsReceive), BindingFlags.NonPublic | BindingFlags.Static)));

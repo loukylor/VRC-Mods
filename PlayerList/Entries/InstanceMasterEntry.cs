@@ -18,7 +18,7 @@ namespace PlayerList.Entries
         {
             // This will handle getting the master on instance join
             if (player.prop_VRCPlayerApi_0.isMaster)
-                textComponent.text = OriginalText.Replace("{instancemaster}", player.field_Private_APIUser_0.displayName);
+                textComponent.text = OriginalText.Replace("{instancemaster}", player.prop_APIUser_0.displayName);
         }
 
         private void OnMasterChanged(Player player)
@@ -30,7 +30,7 @@ namespace PlayerList.Entries
             while (player.field_Public_Player_0 == null)
                 yield return null;
 
-            textComponent.text = OriginalText.Replace("{instancemaster}", player.field_Public_Player_0.field_Private_APIUser_0.displayName);
+            textComponent.text = OriginalText.Replace("{instancemaster}", player.field_Public_Player_0.prop_APIUser_0.displayName);
             yield break;
         }
     }

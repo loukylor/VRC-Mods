@@ -30,7 +30,7 @@ namespace PlayerList
 
         public static void SelectPlayer(VRCPlayer player)
         {
-            QuickMenu.prop_QuickMenu_0.prop_APIUser_0 = player.prop_Player_0.field_Private_APIUser_0;
+            QuickMenu.prop_QuickMenu_0.prop_APIUser_0 = player.prop_Player_0.prop_APIUser_0;
             UIManager.SetMenuIndex(3);
         }
     }

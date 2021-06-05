@@ -7,7 +7,7 @@ namespace PlayerList.Utilities
     {
         public static string GetPlatform(Player player)
         {
-            if (player.field_Private_APIUser_0.last_platform == "standalonewindows")
+            if (player.prop_APIUser_0.last_platform == "standalonewindows")
                 if (player.prop_VRCPlayerApi_0.IsUserInVR())
                     return "VR".PadRight(2);
                 else

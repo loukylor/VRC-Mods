@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Harmony;
 using InstanceHistory.Utilities;
+using UnhollowerRuntimeLib.XrefScans;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -49,17 +50,45 @@ namespace InstanceHistory.UI
 
         public static void Init()
         {
-            closeQuickMenu = typeof(QuickMenu).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM") && Xref.CheckUsed(mb, "Method_Private_Void_String_String_LoadErrorReason_"));
+            foreach (MethodInfo method in typeof(QuickMenu).GetMethods().Where(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM")))
+            {
+                MethodBase[] possibleMethods = null;
+                try
+                {
+                    possibleMethods = XrefScanner.UsedBy(method)
+                        .Where(instance => instance.Type == XrefType.Method && instance.TryResolve() != null && instance.TryResolve().Name.StartsWith("Method_Public_Void_") && !instance.TryResolve().Name.Contains("_PDM_") && instance.TryResolve().GetParameters().Length == 0)
+                        .Select(instance => instance.TryResolve())
+                        .ToArray();
+                }
+                catch (InvalidOperationException)
+                {
+                    continue;
+                }
 
-            openQuickMenu = typeof(QuickMenu).GetMethods()
-                 .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM") && Xref.CheckUsing(mb, "Method_Public_Static_Boolean_byref_Boolean_0", typeof(VRCInputManager)));
+                if (possibleMethods.Length == 0)
+                    continue;
 
-            List<Type> quickMenuNestedEnums = typeof(QuickMenu).GetNestedTypes().Where(type => type.Name.StartsWith("Enum")).ToList();
+                foreach (MethodInfo possibleMethod in possibleMethods)
+                {
+                    if (XrefScanner.UsedBy(possibleMethod).Any(instance => instance.Type == XrefType.Method && instance.TryResolve() != null && instance.TryResolve().Name.Contains("OpenQuickMenu")))
+                    {
+                        openQuickMenu = method;
+                        break;
+                    }
+                }
+
+                if (openQuickMenu != null)
+                    break;
+            }
+
+            List<Type> quickMenuNestedEnums = typeof(QuickMenu).GetNestedTypes().Where(type => type.IsEnum).ToList();
             quickMenuEnumProperty = typeof(QuickMenu).GetProperties()
                 .First(pi => pi.PropertyType.IsEnum && quickMenuNestedEnums.Contains(pi.PropertyType));
             setMenuIndex = typeof(QuickMenu).GetMethods()
                 .First(mb => mb.Name.StartsWith("Method_Public_Void_Enum") && mb.GetParameters()[0].ParameterType == quickMenuEnumProperty.PropertyType);
+
+            closeQuickMenu = typeof(QuickMenu).GetMethods()
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && Xref.CheckUsed(mb, setMenuIndex.Name));
 
             QuickMenuContextualDisplayEnum = typeof(QuickMenuContextualDisplay).GetNestedTypes()
                 .First(type => type.Name.StartsWith("Enum"));

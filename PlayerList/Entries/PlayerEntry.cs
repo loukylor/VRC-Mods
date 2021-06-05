@@ -73,7 +73,7 @@ namespace PlayerList.Entries
         public override void Init(object[] parameters)
         {
             player = (Player)parameters[0];
-            apiUser = player.field_Private_APIUser_0;
+            apiUser = player.prop_APIUser_0;
             userId = apiUser.id;
             
             platform = platform = PlayerUtils.GetPlatform(player).PadRight(2);
@@ -122,7 +122,7 @@ namespace PlayerList.Entries
         }
         public override void OnAvatarChanged(ApiAvatar avatar, VRCAvatarManager manager)
         {
-            if (manager.field_Private_VRCPlayer_0.prop_Player_0.field_Private_APIUser_0.id != userId)
+            if (manager.field_Private_VRCPlayer_0.prop_Player_0.prop_APIUser_0.id != userId)
                 return;
             
             perf = PerformanceRating.None;
@@ -138,7 +138,7 @@ namespace PlayerList.Entries
         {
             apiUser = player.prop_APIUser_0;
             userId = apiUser.id;
-            if (vrcPlayer.prop_Player_0.field_Private_APIUser_0?.id != userId)
+            if (vrcPlayer.prop_Player_0.prop_APIUser_0?.id != userId)
                 return;
 
             perf = vrcPlayer.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall];

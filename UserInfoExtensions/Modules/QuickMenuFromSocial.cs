@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using MelonLoader;
+using UnhollowerRuntimeLib.XrefScans;
 using UnityEngine;
 using UserInfoExtensions;
 using UserInfoExtentions.Utilities;
@@ -15,9 +17,9 @@ namespace UserInfoExtentions.Modules
 
         public static GameObject quickMenuFromSocialButtonGameObject;
 
-        public static MethodInfo closeMenu;
-        public static MethodInfo openQuickMenu;
-        public static MethodInfo clickMethod;
+        private static MethodInfo closeMenu;
+        private static MethodInfo openQuickMenu;
+        private static MethodInfo setMenuIndex;
 
         public override void Init()
         {
@@ -28,10 +30,46 @@ namespace UserInfoExtentions.Modules
             closeMenu = typeof(VRCUiManager).GetMethods()
                 .Where(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_Boolean_") && !mb.Name.Contains("_PDM_"))
                 .OrderBy(mb => UnhollowerSupport.GetIl2CppMethodCallerCount(mb)).Last();
-            openQuickMenu = typeof(QuickMenu).GetMethods()
-                 .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM") && Xref.CheckUsing(mb, "Method_Public_Static_Boolean_byref_Boolean_0", typeof(VRCInputManager)));
-            clickMethod = typeof(VRCUiCursor).GetMethods()
-                .First(mi => mi.Name.StartsWith("Method_Public_Void_VRCPlayer_") && mi.GetParameters().Any(pi => pi.ParameterType == typeof(VRCPlayer)));
+
+            foreach (MethodInfo method in typeof(QuickMenu).GetMethods().Where(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM")))
+            {
+                MethodBase[] possibleMethods = null;
+                try
+                {
+                    possibleMethods = XrefScanner.UsedBy(method)
+                        .Where(instance => instance.Type == XrefType.Method && instance.TryResolve() != null && instance.TryResolve().Name.StartsWith("Method_Public_Void_") && !instance.TryResolve().Name.Contains("_PDM_") && instance.TryResolve().GetParameters().Length == 0)
+                        .Select(instance => instance.TryResolve())
+                        .ToArray();
+                }
+                catch (InvalidOperationException)
+                {
+                    continue;
+                }
+
+                if (possibleMethods.Length == 0)
+                    continue;
+
+                foreach (MethodInfo possibleMethod in possibleMethods)
+                { 
+                    if (XrefScanner.UsedBy(possibleMethod).Any(instance => instance.Type == XrefType.Method && instance.TryResolve() != null && instance.TryResolve().Name.Contains("OpenQuickMenu")))
+                    {
+                        openQuickMenu = method;
+                        break;
+                    }
+                }
+
+                if (openQuickMenu != null)
+                    break;
+            }
+
+            if (openQuickMenu == null)
+                throw new InvalidOperationException("The fact that this fucking fat ass of an xref broke is going to drive me insane");
+
+            List<Type> quickMenuNestedEnums = typeof(QuickMenu).GetNestedTypes().Where(type => type.IsEnum).ToList();
+            PropertyInfo quickMenuEnumProperty = typeof(QuickMenu).GetProperties()
+                .First(pi => pi.PropertyType.IsEnum && quickMenuNestedEnums.Contains(pi.PropertyType));
+            setMenuIndex = typeof(QuickMenu).GetMethods()
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Enum") && mb.GetParameters()[0].ParameterType == quickMenuEnumProperty.PropertyType);
         }
         public override void OnPreferencesSaved()
         {
@@ -43,15 +81,14 @@ namespace UserInfoExtentions.Modules
 
             foreach (Player player in PlayerManager.prop_PlayerManager_0.field_Private_List_1_Player_0)
             {
-                if (player.field_Private_APIUser_0 == null) continue;
-                if (player.field_Private_APIUser_0.id == VRCUtils.ActiveUser.id)
+                if (player.prop_APIUser_0 == null) continue;
+                if (player.prop_APIUser_0.id == VRCUtils.ActiveUser.id)
                 {
                     closeMenu.Invoke(VRCUiManager.prop_VRCUiManager_0, new object[] { true, false }); //Closes Big Menu
                     openQuickMenu.Invoke(QuickMenu.prop_QuickMenu_0, new object[] { true }); //Opens Quick Menu
 
-                    if (VRCUiCursorManager.Method_Public_Static_VRCUiCursor_0().gameObject.activeSelf) clickMethod.Invoke(VRCUiCursorManager.Method_Public_Static_VRCUiCursor_0(), new object[] { player.prop_VRCPlayer_0 });
-
-                    QuickMenu.prop_QuickMenu_0.Method_Public_Void_Player_0(player); //Does the rest lmao
+                    QuickMenu.prop_QuickMenu_0.prop_APIUser_0 = player.prop_APIUser_0;
+                    setMenuIndex.Invoke(QuickMenu.prop_QuickMenu_0, new object[1] { 3 });
 
                     return;
                 }

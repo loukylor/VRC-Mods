@@ -23,7 +23,7 @@ namespace PlayerList
         public static int reverseHighest = 1;
         private static readonly Comparison<PlayerEntry> alphabeticalSort = (lEntry, rEntry) =>
         {
-            return lEntry.player.field_Private_APIUser_0.displayName.CompareTo(rEntry.player.field_Private_APIUser_0.displayName);
+            return lEntry.player.prop_APIUser_0.displayName.CompareTo(rEntry.player.prop_APIUser_0.displayName);
         };
         private static readonly Comparison<PlayerEntry> avatarPerfSort = (lEntry, rEntry) =>
         {

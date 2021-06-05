@@ -6,6 +6,7 @@ using Harmony;
 using MelonLoader;
 using PlayerList.Utilities;
 using UnhollowerBaseLib;
+using UnhollowerRuntimeLib.XrefScans;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -66,17 +67,45 @@ namespace PlayerList.UI
 
         public static void Init()
         {
-            closeQuickMenu = typeof(QuickMenu).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM") && Xref.CheckUsed(mb, "Method_Private_Void_String_String_LoadErrorReason_"));
-
-            openQuickMenu = typeof(QuickMenu).GetMethods()
-                 .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM") && Xref.CheckUsing(mb, "Method_Public_Static_Boolean_byref_Boolean_0", typeof(VRCInputManager)));
-
             List<Type> quickMenuNestedEnums = typeof(QuickMenu).GetNestedTypes().Where(type => type.IsEnum).ToList();
             quickMenuEnumProperty = typeof(QuickMenu).GetProperties()
                 .First(pi => pi.PropertyType.IsEnum && quickMenuNestedEnums.Contains(pi.PropertyType));
             setMenuIndex = typeof(QuickMenu).GetMethods()
                 .First(mb => mb.Name.StartsWith("Method_Public_Void_Enum") && mb.GetParameters()[0].ParameterType == quickMenuEnumProperty.PropertyType);
+
+            closeQuickMenu = typeof(QuickMenu).GetMethods()
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && Xref.CheckUsed(mb, setMenuIndex.Name));
+
+            foreach (MethodInfo method in typeof(QuickMenu).GetMethods().Where(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM")))
+            {
+                MethodBase[] possibleMethods = null;
+                try
+                {
+                    possibleMethods = XrefScanner.UsedBy(method)
+                        .Where(instance => instance.Type == XrefType.Method && instance.TryResolve() != null && instance.TryResolve().Name.StartsWith("Method_Public_Void_") && !instance.TryResolve().Name.Contains("_PDM_") && instance.TryResolve().GetParameters().Length == 0)
+                        .Select(instance => instance.TryResolve())
+                        .ToArray();
+                }
+                catch (InvalidOperationException)
+                {
+                    continue;
+                }
+
+                if (possibleMethods.Length == 0)
+                    continue;
+
+                foreach (MethodInfo possibleMethod in possibleMethods)
+                {
+                    if (XrefScanner.UsedBy(possibleMethod).Any(instance => instance.Type == XrefType.Method && instance.TryResolve() != null && instance.TryResolve().Name.Contains("OpenQuickMenu")))
+                    {
+                        openQuickMenu = method;
+                        break;
+                    }
+                }
+
+                if (openQuickMenu != null)
+                    break;
+            }
 
             QuickMenuContextualDisplayEnum = typeof(QuickMenuContextualDisplay).GetNestedTypes()
                 .First(type => type.Name.StartsWith("Enum"));
@@ -85,6 +114,10 @@ namespace PlayerList.UI
 
             PlayerListMod.Instance.Harmony.Patch(openQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuOpen), BindingFlags.NonPublic | BindingFlags.Static)));
             PlayerListMod.Instance.Harmony.Patch(closeQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuClose), BindingFlags.NonPublic | BindingFlags.Static)));
+        }
+        public static void Print(MethodInfo __originalMethod)
+        {
+            MelonLogger.Msg(__originalMethod.Name);
         }
         public static void UIInit()
         {
