@@ -61,21 +61,19 @@ namespace PlayerList
 
         private static readonly Comparison<PlayerEntry> sort = (lEntry, rEntry) =>
         {
-            int comparison = 0;
+            int currentComparison = 0;
             if (currentHighestComparison != null)
-                comparison = currentHighestComparison(lEntry, rEntry) * reverseHighest;
+                currentComparison = currentHighestComparison(lEntry, rEntry) * reverseHighest;
 
-            if (comparison == 0)
+            if (currentComparison == 0)
             {
-                int upperComparison = 0;
                 if (currentUpperComparison != null)
-                    upperComparison = currentUpperComparison(lEntry, rEntry) * reverseUpper;
+                    currentComparison = currentUpperComparison(lEntry, rEntry) * reverseUpper;
 
-                if (upperComparison == 0)
+                if (currentComparison == 0 && currentBaseComparison != null)
                     return currentBaseComparison(lEntry, rEntry) * reverseBase;
-                return upperComparison;
             }
-            return comparison;
+            return currentComparison;
         };
 
         public static void Init()

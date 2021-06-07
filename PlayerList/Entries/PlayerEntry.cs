@@ -58,7 +58,7 @@ namespace PlayerList.Entries
             UIManager.OnQuickMenuOpenEvent += new Action(() =>
             {
                 foreach (PlayerEntry entry in EntryManager.sortedPlayerEntries)
-                    entry.GetPlayerColor();
+                    entry.GetPlayerColor(false);
                 EntrySortManager.SortAllPlayers();
                 EntryManager.RefreshPlayerEntries();
             });
