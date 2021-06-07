@@ -85,7 +85,7 @@ namespace PlayerList.Config
         public static void RegisterSettings()
         {
             useTabMenu = CreateEntry(categoryIdentifier, nameof(useTabMenu), false, is_hidden: true);
-            enabledOnStart = CreateEntry(categoryIdentifier, nameof(enabledOnStart), false, is_hidden: true);
+            enabledOnStart = CreateEntry(categoryIdentifier, nameof(enabledOnStart), true, is_hidden: true);
             onlyEnabledInConfig = CreateEntry(categoryIdentifier, nameof(onlyEnabledInConfig), false, is_hidden: true);
 
             condensedText = CreateEntry(categoryIdentifier, nameof(condensedText), false, is_hidden: true);
