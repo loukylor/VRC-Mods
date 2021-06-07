@@ -139,7 +139,7 @@ namespace PlayerList
 
             GameObject template;
 
-            if (player.prop_APIUser_0.IsSelf)
+            if (player.prop_APIUser_0 == null || player.prop_APIUser_0.IsSelf) // The apiuser in player will only be null on the first join of the first instance of the client, and only occasionally. So it can be garunteed to be local player
             {
                 if (localPlayerEntry != null) return;
 
