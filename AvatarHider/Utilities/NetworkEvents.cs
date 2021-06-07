@@ -5,6 +5,7 @@ using UnityEngine;
 using VRC;
 using VRC.Core;
 using VRC.Management;
+using VRC.UI;
 
 namespace AvatarHider.Utilities
 {
@@ -53,19 +54,7 @@ namespace AvatarHider.Utilities
             AvatarHiderMod.Instance.Harmony.Patch(typeof(VRCAvatarManager).GetMethod("Method_Private_Boolean_GameObject_String_Single_String_PDM_0"), null, new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnAvatarChange), BindingFlags.NonPublic | BindingFlags.Static)));
             AvatarHiderMod.Instance.Harmony.Patch(typeof(ModerationManager).GetMethod("Method_Private_Void_String_ModerationType_Action_1_ApiPlayerModeration_Action_1_String_0"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnPlayerModerationSend), BindingFlags.NonPublic | BindingFlags.Static)));
             AvatarHiderMod.Instance.Harmony.Patch(typeof(ModerationManager).GetMethod("Method_Private_Void_String_ModerationType_0"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnPlayerModerationRemove), BindingFlags.NonPublic | BindingFlags.Static)));
-            
-            foreach (Type type in typeof(ModerationManager).Assembly.GetTypes())
-            {
-                int counter = 0;
-                foreach (PropertyInfo pi in type.GetProperties())
-                    if (pi.Name.Contains("_Dictionary_2_String_APIUser_"))
-                        counter += 1;
-                if (counter == 3)
-                {
-                    AvatarHiderMod.Instance.Harmony.Patch(type.GetMethod("Method_Private_Void_String_0"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnUnfriend), BindingFlags.NonPublic | BindingFlags.Static)));
-                    break;
-                }
-            }
+            AvatarHiderMod.Instance.Harmony.Patch(typeof(FriendsListManager).GetMethod("Method_Private_Void_String_0"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnUnfriend), BindingFlags.NonPublic | BindingFlags.Static)));
         }
     }
 }
