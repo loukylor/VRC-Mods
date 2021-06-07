@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Harmony;
 using MelonLoader;
+using UnhollowerBaseLib;
 using UnhollowerRuntimeLib.XrefScans;
 using UnityEngine;
 using VRC.Core;
@@ -239,7 +240,17 @@ namespace AvatarDownloadPriority
 
         public static void OnLoadStop(VRCAvatarManager manager)
         {
-            int index = currentlyLoadingAvatars.IndexOf(new AvatarProcess() { manager = manager });
+            int index;
+            try
+            {
+                index = currentlyLoadingAvatars.IndexOf(new AvatarProcess() { manager = manager });
+            }
+            catch (NullReferenceException) // This null ref happens after getting the DownloadFix bug, a little after joining an instance. It seems to work fine logic wise to just return here
+            {
+                AssetBundleDownloadManager.prop_AssetBundleDownloadManager_0.field_Private_Boolean_0 = false;
+                return;
+            }
+
             if (index >= 0)
             {
                 currentlyLoadingAvatars.RemoveAt(index);
@@ -253,7 +264,17 @@ namespace AvatarDownloadPriority
             currentlyLoadingAvatars.Remove(currentLoadingAvatar);
             currentlyLoadingAvatars.Add(currentLoadingAvatar);
             avatarLoadQueue.RemoveAt(0);
-            startCoroutineMethod.Invoke(currentLoadingAvatar.manager, currentLoadingAvatar.methodParams);
+            try
+            {
+                startCoroutineMethod.Invoke(currentLoadingAvatar.manager, currentLoadingAvatar.methodParams);
+            }
+            catch (TargetInvocationException ex) // I consistently get an NRE here while getting the DownloadFix glitch (also credit to gompo (https://github.com/gompocp/VRChatMods) for this fix)
+            {
+                if (ex.InnerException is Il2CppException && ex.InnerException.Message.StartsWith("System.NullReferenceException:"))
+                    AssetBundleDownloadManager.prop_AssetBundleDownloadManager_0.field_Private_Boolean_0 = false;
+                else
+                    MelonLogger.Error(ex.ToString());
+            }
         }
     }
 }
