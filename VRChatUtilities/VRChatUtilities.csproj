@@ -13,7 +13,7 @@
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="move &quot;bin\Release\net472\VRChatUtilities.dll&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\VRChat - test copy\Plugins&quot;" />
+		<Exec Command="move &quot;bin\Release\net472\VRChatUtilities.dll&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\VRChat\Mods&quot;" />
 	</Target>
 
 </Project>
