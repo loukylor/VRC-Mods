@@ -32,6 +32,8 @@ namespace PlayerList
             }
         }
 
+        private static string localUserId;
+
         public static void Init()
         {
             PlayerListConfig.fontSize.OnValueChanged += (oldValue, newValue) => SetFontSize(newValue);
@@ -143,6 +145,8 @@ namespace PlayerList
             {
                 if (localPlayerEntry != null) return;
 
+                localUserId = APIUser.CurrentUser.id;
+
                 template = Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform);
                 template.SetActive(true);
                 
@@ -163,7 +167,7 @@ namespace PlayerList
         }
         public static void OnPlayerLeft(Player player)
         {
-            if (player.prop_APIUser_0.id == APIUser.CurrentUser.id) return;
+            if (player.prop_APIUser_0.id == localUserId) return;
 
             int index = GetEntryFromPlayerWithIndex(sortedPlayerEntries, player, out PlayerEntry entry);
             if (index < 0) return;
