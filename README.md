@@ -190,7 +190,7 @@ The button can be toggled on and off using UIX
 A mod that adds buttons to the to make VRChat more convenient
 
 ## Features
-It adds individually toggleable buttons that allow you to:
+Adding individually toggleable buttons that allow you to:
  - Select a user in the Quick Menu from the Social Menu page.
  - Find the avatar's author from the Social Menu and Avatar Menu pages.
  - Selects the world instance of the selected user in the World Menu (if you can join their world).
@@ -202,10 +202,11 @@ It adds individually toggleable buttons that allow you to:
 
 The buttons can always be accessed in a popup attached to the User Details Page.
 
-Within the popup, you can see the user's:
+Additionally, in the popup you can see the user's:
  - username (what the person logs in with)
  - platform (Quest or PC)
- - last login (literal login, not starting the game) 
+ - last login (literal login, not starting the game)
+ - date joined (date original unmerged account created)
 
 ## Requirements
  - [UIExpansionKit](https://github.com/knah/VRCMods/)
@@ -213,3 +214,9 @@ Within the popup, you can see the user's:
 ## Credits
  - [Ben](https://github.com/BenjaminZehowlt) as I referenced his code a lot to implement Xref Scanning
  - [knah](https://github.com/knah) as he helped me a ton with Async stuff
+
+# VRChatUtilities
+A mod that adds compatibility to MelonLoader 0.3.0 mods to MelonLoader 0.4.0+.
+
+End users *should* install this mod, however they need not worry about its features 
+as only modders will be affected by it.
