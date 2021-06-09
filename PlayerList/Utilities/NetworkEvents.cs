@@ -66,11 +66,11 @@ namespace PlayerList.Utilities
 
             OnAvatarDownloadProgressed?.SafeInvoke(__instance, __0, __1);
         }
-        private static void OnSetupFlagsReceive(VRCPlayer __instance, int __result)
+        private static void OnSetupFlagsReceive(VRCPlayer __instance, object __result)
         {
             if (__instance == null) return;
             
-            OnSetupFlagsReceived?.SafeInvoke(__instance, __result);
+            OnSetupFlagsReceived?.SafeInvoke(__instance, (int)__result);
         }
 
         public static void NetworkInit()

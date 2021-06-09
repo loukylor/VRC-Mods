@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Reflection;
 using MelonLoader;
 using UnhollowerRuntimeLib.XrefScans;
 using UnityEngine;
 using UnityEngine.UI;
+
+[assembly: MelonInfo(typeof(RememberMe.RememberMe), RememberMe.BuildInfo.Name, RememberMe.BuildInfo.Version, RememberMe.BuildInfo.Author, RememberMe.BuildInfo.DownloadLink)]
+[assembly: MelonGame("VRChat", "VRChat")]
+[assembly: MelonOptionalDependencies("UIExpansionKit")]
 
 namespace RememberMe
 {
@@ -27,7 +32,26 @@ namespace RememberMe
         private static string UserKey = "RememberMe_User";
         private static string PassKey = "RememberMe_Pass";
 
-        public override void VRChat_OnUiManagerInit()
+        public static RememberMe Instance { get; private set; }
+        public static bool HasUIX => MelonHandler.Mods.Any(x => x.Info.Name.Equals("UI Expansion Kit"));
+
+        public override void OnApplicationStart()
+        {
+            Instance = this;
+
+            if (HasUIX)
+                typeof(UIXManager).GetMethod("AddMethodToUIInit").Invoke(null, null);
+            else
+                MelonCoroutines.Start(StartUiManagerInitIEnumerator());
+        }
+        private IEnumerator StartUiManagerInitIEnumerator()
+        {
+            while (VRCUiManager.prop_VRCUiManager_0 == null)
+                yield return null;
+
+            OnUiManagerInit();
+        }
+        public void OnUiManagerInit()
         {
             VRCUiPageAuthentication authPage = GetAuthPage();
 

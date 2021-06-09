@@ -146,7 +146,7 @@ namespace PlayerList
         public static void AddMenuListeners()
         {
             // Add listeners
-            if (MelonHandler.Mods.Any(x => x.Info.Name.Equals("UI Expansion Kit")))
+            if (PlayerListMod.HasUIX)
             {
                 typeof(UIXManager).GetMethod("AddListenerToShortcutMenu").Invoke(null, new object[2]
                 {

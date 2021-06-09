@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Harmony;
 using MelonLoader;
+using UIExpansionKit.API;
 using UserInfoExtentions.Modules;
 using UserInfoExtentions.Utilities;
 using VRC.UI;
@@ -58,9 +59,11 @@ namespace UserInfoExtensions
             AddModule(new OpenInBrowser());
             AddModule(new UserInformation());
 
+            ExpansionKitApi.OnUiManagerInit += OnUiManagerInit;
+
             MelonLogger.Msg("Initialized!");
         }
-        public override void VRChat_OnUiManagerInit()
+        public void OnUiManagerInit()
         {
             VRCUtils.UiInit();
             foreach (ModuleBase module in modules)

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Linq;
 using InstanceHistory.UI;
 using InstanceHistory.Utilities;
 using MelonLoader;
@@ -21,9 +22,22 @@ namespace InstanceHistory
             UIManager.Init();
             WorldManager.Init();
             InstanceManager.Init();
+
+            if (HasUIX)
+                typeof(UIXManager).GetMethod("AddMethodToUIInit").Invoke(null, null);
+            else
+                MelonCoroutines.Start(StartUiManagerInitIEnumerator());
         }
 
-        public override void VRChat_OnUiManagerInit()
+        private IEnumerator StartUiManagerInitIEnumerator()
+        {
+            while (VRCUiManager.prop_VRCUiManager_0 == null)
+                yield return null;
+
+            OnUiManagerInit();
+        }
+
+        public void OnUiManagerInit()
         {
             MenuManager.UiInit();
         }

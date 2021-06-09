@@ -144,8 +144,8 @@ namespace InstanceHistory.UI
                 prop.SetValue(QuickMenu.prop_QuickMenu_0, null);
             quickMenuEnumProperty.SetValue(QuickMenu.prop_QuickMenu_0, -1);
         }
-        public static void OnQuickMenuOpen() => OnQuickMenuOpenEvent?.Invoke();
-        public static void OnQuickMenuClose() => OnQuickMenuCloseEvent?.Invoke();
+        private static void OnQuickMenuOpen() => OnQuickMenuOpenEvent?.Invoke();
+        private static void OnQuickMenuClose() => OnQuickMenuCloseEvent?.Invoke();
         public static void SetMenuIndex(int index) => setMenuIndex.Invoke(QuickMenu.prop_QuickMenu_0, new object[] { index });
         public static void OpenPage(string page, bool setCurrentTab = true)
         {

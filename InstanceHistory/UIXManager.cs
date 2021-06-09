@@ -6,6 +6,11 @@ namespace InstanceHistory
 {
     class UIXManager
     {
+        public static void AddMethodToUIInit()
+        {
+            ExpansionKitApi.OnUiManagerInit += InstanceHistoryMod.Instance.OnUiManagerInit;
+        }
+
         private static GameObject openButton;
 
         public static void AddOpenButtonToUIX()

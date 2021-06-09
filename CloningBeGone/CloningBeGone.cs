@@ -32,10 +32,6 @@ namespace CloningBeGone
             Harmony.Patch(typeof(RoomManager).GetMethod("Method_Public_Static_Boolean_ApiWorld_ApiWorldInstance_String_Int32_0"), new HarmonyMethod(typeof(CloningBeGoneMod).GetMethod(nameof(OnInstanceChange))));
             Harmony.Patch(typeof(NetworkManager).GetMethod("OnJoinedRoom"), new HarmonyMethod(typeof(CloningBeGoneMod).GetMethod(nameof(OnJoinedRoom))));
         }
-        public override void VRChat_OnUiManagerInit()
-        {
-            cloningSetting = GameObject.Find("UserInterface/MenuContent/Screens/Settings/OtherOptionsPanel/AllowAvatarCopyingToggle").GetComponent<UiSettingConfig>();
-        }
         public override void OnPreferencesSaved()
         {
             if (RoomManager.field_Internal_Static_ApiWorldInstance_0 != null) CheckAccessType(RoomManager.field_Internal_Static_ApiWorldInstance_0.InstanceType);
@@ -77,6 +73,9 @@ namespace CloningBeGone
         }
         public static void SetCloning(bool value)
         {
+            if (cloningSetting == null)
+                cloningSetting = GameObject.Find("UserInterface/MenuContent/Screens/Settings/OtherOptionsPanel/AllowAvatarCopyingToggle").GetComponent<UiSettingConfig>();
+
             if (Photon.Pun.PhotonNetwork.field_Public_Static_LoadBalancingClient_0.prop_Room_0 != null && !isClosing)
                 cloningSetting.SetEnable(value);
         }

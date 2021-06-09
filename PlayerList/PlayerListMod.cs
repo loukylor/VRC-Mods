@@ -1,4 +1,6 @@
-﻿using MelonLoader;
+﻿using System.Collections;
+using System.Linq;
+using MelonLoader;
 using PlayerList.Config;
 using PlayerList.Components;
 using PlayerList.Entries;
@@ -9,13 +11,15 @@ using UnityEngine;
 
 [assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.5.2", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
-[assembly: MelonOptionalDependencies(new string[1] { "UIExpansionKit" })]
+[assembly: MelonOptionalDependencies("UIExpansionKit")]
 
 namespace PlayerList
 {
     public class PlayerListMod : MelonMod
     {
         public static PlayerListMod Instance { get; private set; }
+
+        public static bool HasUIX => MelonHandler.Mods.Any(x => x.Info.Name.Equals("UI Expansion Kit"));
 
         public override void OnApplicationStart()
         {
@@ -29,8 +33,22 @@ namespace PlayerList
             EntrySortManager.Init();
             PlayerEntry.EntryInit();
             LocalPlayerEntry.EntryInit();
+
+            if (HasUIX)
+                typeof(UIXManager).GetMethod("AddMethodToUIInit").Invoke(null, null);
+            else
+                MelonCoroutines.Start(StartUiManagerInitIEnumerator());
         }
-        public override void VRChat_OnUiManagerInit()
+
+        private IEnumerator StartUiManagerInitIEnumerator()
+        {
+            while (VRCUiManager.prop_VRCUiManager_0 == null)
+                yield return null;
+
+            OnUiManagerInit();
+        }
+
+        public void OnUiManagerInit()
         {
             // Initialize Constants util
             Constants.UIInit();

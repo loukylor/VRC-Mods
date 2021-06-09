@@ -1,10 +1,13 @@
-﻿using System.Diagnostics;
+﻿using System.Collections;
+using System.Diagnostics;
+using System.Linq;
 using AvatarHider.DataTypes;
 using AvatarHider.Utilities;
 using MelonLoader;
 
 [assembly: MelonInfo(typeof(AvatarHider.AvatarHiderMod), "AvatarHider", "1.2.3", "loukylor and ImTiara", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
+[assembly: MelonOptionalDependencies("UIExpansionKit")]
 
 namespace AvatarHider
 {
@@ -13,6 +16,9 @@ namespace AvatarHider
         public static AvatarHiderMod Instance { get; private set; }
 
         public static readonly Stopwatch timer = Stopwatch.StartNew();
+
+        public static bool HasUIX => MelonHandler.Mods.Any(x => x.Info.Name.Equals("UI Expansion Kit"));
+
         public override void OnApplicationStart()
         {
             Instance = this;
@@ -22,8 +28,20 @@ namespace AvatarHider
             PlayerManager.Init();
             RefreshManager.Init();
             Config.OnConfigChange();
+
+            if (HasUIX)
+                typeof(UIXManager).GetMethod("AddMethodToUIInit").Invoke(null, null);
+            else
+                MelonCoroutines.Start(StartUiManagerInitIEnumerator());
         }
-        public override void VRChat_OnUiManagerInit()
+        private IEnumerator StartUiManagerInitIEnumerator()
+        {
+            while (VRCUiManager.prop_VRCUiManager_0 == null)
+                yield return null;
+
+            OnUiManagerInit();
+        }
+        public void OnUiManagerInit()
         {
             NetworkEvents.NetworkInit();
         }
