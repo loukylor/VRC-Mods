@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Harmony;
+using HarmonyLib;
 using MelonLoader;
 using UnhollowerRuntimeLib;
 using VRC.Core;
@@ -14,7 +14,7 @@ namespace UserInfoExtensions
 
         public static void Init() 
         {
-            UserInfoExtensionsMod.Instance.Harmony.Patch(typeof(API).GetMethod("SendRequestInternal"), new HarmonyMethod(typeof(CacheManager).GetMethod(nameof(OnContainerComplete), BindingFlags.Static | BindingFlags.NonPublic)));
+            UserInfoExtensionsMod.Instance.HarmonyInstance.Patch(typeof(API).GetMethod("SendRequestInternal"), new HarmonyMethod(typeof(CacheManager).GetMethod(nameof(OnContainerComplete), BindingFlags.Static | BindingFlags.NonPublic)));
         } 
 
         private static void OnContainerComplete(ApiContainer __2)

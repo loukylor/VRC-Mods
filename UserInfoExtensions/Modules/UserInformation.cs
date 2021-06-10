@@ -19,7 +19,7 @@ namespace UserInfoExtentions.Modules
         private static Text dateJoinedLabel;
         public override void Init()
         {
-            militaryTimeFormat = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(militaryTimeFormat), true, "Display time in 24 hour time");
+            militaryTimeFormat = MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(militaryTimeFormat), true, "Display time in 24 hour time");
 
             UserInfoExtensionsMod.menu.AddLabel("General User Info");
             UserInfoExtensionsMod.menu.AddSpacer();

@@ -23,7 +23,7 @@ namespace UserInfoExtentions.Modules
 
         public override void Init()
         {
-            QuickMenuFromSocialButton = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(QuickMenuFromSocialButton), false, "Show \"To Quick Menu\" button");
+            QuickMenuFromSocialButton = MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(QuickMenuFromSocialButton), false, "Show \"To Quick Menu\" button");
             UserInfoExtensionsMod.userDetailsMenu.AddSimpleButton("To Quick Menu", ToQuickMenu, new Action<GameObject>((gameObject) => { quickMenuFromSocialButtonGameObject = gameObject; gameObject.SetActive(QuickMenuFromSocialButton.Value); }));
             UserInfoExtensionsMod.menu.AddSimpleButton("To Quick Menu", ToQuickMenu);
 

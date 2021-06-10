@@ -9,7 +9,7 @@ using PlayerList.Utilities;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.5.2", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.5.4", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 [assembly: MelonOptionalDependencies("UIExpansionKit")]
 
@@ -55,7 +55,6 @@ namespace PlayerList
             UIManager.UIInit();
 
             // TODO: Add opacity options, maybe color too, (maybe even for each stage of ping and fps??)
-            // TODO: Make is so the vector 2 acutlaly uses the custom mapper when it gets fixed
             // TODO: add indicator for those in hearing distance
 
             MenuManager.LoadAssetBundle();

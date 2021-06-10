@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using AskToPortal.Utilities;
-using Harmony;
+using HarmonyLib;
 using MelonLoader;
 using UnityEngine;
 using VRC;
@@ -46,16 +46,16 @@ namespace AskToPortal
                 enterPortal = typeof(PortalInternal).GetMethods()
                     .Where(mb => mb.Name.StartsWith("Method_Public_Void_") && mb.Name.Length <= 21 && Xref.CheckUsed(mb, "OnTriggerEnter")).First();
 
-                Harmony.Patch(enterPortal, prefix: new HarmonyMethod(typeof(AskToPortalMod).GetMethod("OnPortalEnter", BindingFlags.Static | BindingFlags.Public)));
-                Harmony.Patch(typeof(PortalInternal).GetMethod("ConfigurePortal"), prefix: new HarmonyMethod(typeof(AskToPortalMod).GetMethod("OnPortalDropped", BindingFlags.Static | BindingFlags.Public)));
-                Harmony.Patch(typeof(PortalInternal).GetMethod("OnDestroy"), prefix: new HarmonyMethod(typeof(AskToPortalMod).GetMethod("OnPortalDestroyed", BindingFlags.Static | BindingFlags.Public)));
+                HarmonyInstance.Patch(enterPortal, prefix: new HarmonyMethod(typeof(AskToPortalMod).GetMethod("OnPortalEnter", BindingFlags.Static | BindingFlags.Public)));
+                HarmonyInstance.Patch(typeof(PortalInternal).GetMethod("ConfigurePortal"), prefix: new HarmonyMethod(typeof(AskToPortalMod).GetMethod("OnPortalDropped", BindingFlags.Static | BindingFlags.Public)));
+                HarmonyInstance.Patch(typeof(PortalInternal).GetMethod("OnDestroy"), prefix: new HarmonyMethod(typeof(AskToPortalMod).GetMethod("OnPortalDestroyed", BindingFlags.Static | BindingFlags.Public)));
 
                 VRCUtils.Init();
 
                 MelonLogger.Msg("Initialized!");
             }
         }
-        public override void VRChat_OnUiManagerInit()
+        public static void VRChat_OnUiManagerInit()
         {
             //MenuManager.LoadAssetBundle();
         }

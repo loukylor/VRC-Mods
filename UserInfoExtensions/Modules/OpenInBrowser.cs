@@ -13,7 +13,7 @@ namespace UserInfoExtentions.Modules
 
         public override void Init()
         {
-            OpenUserInBrowserButton = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(OpenUserInBrowserButton), false, "Show \"Open User in Browser\" button");
+            OpenUserInBrowserButton = MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(OpenUserInBrowserButton), false, "Show \"Open User in Browser\" button");
 
             UserInfoExtensionsMod.userDetailsMenu.AddSimpleButton("Open User in Browser", OpenUserInBrowser, new Action<GameObject>((gameObject) => { openUserInBrowserButtonGameObject = gameObject; gameObject.SetActive(OpenUserInBrowserButton.Value); }));
 

@@ -19,7 +19,7 @@ namespace UserInfoExtentions.Modules
         public static MethodInfo setUpWorldInfo;
         public override void Init()
         {
-            OpenInWorldMenuButton = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(OpenInWorldMenuButton), false, "Show\"Open User World in World Menu\" button");
+            OpenInWorldMenuButton = MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(OpenInWorldMenuButton), false, "Show\"Open User World in World Menu\" button");
 
             UserInfoExtensionsMod.userDetailsMenu.AddSimpleButton("Open User World in World Menu", OpenUserWorldInWorldMenu, new Action<GameObject>((gameObject) => { openInWorldMenuButtonGameObject = gameObject; gameObject.SetActive(OpenInWorldMenuButton.Value); }));
             UserInfoExtensionsMod.menu.AddSimpleButton("Open User World in World Menu", OpenUserWorldInWorldMenu);

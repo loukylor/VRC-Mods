@@ -1,9 +1,9 @@
-﻿using Harmony;
+﻿using HarmonyLib;
 using MelonLoader;
 using UnityEngine;
 using VRC.Core;
 
-[assembly: MelonInfo(typeof(CloningBeGone.CloningBeGoneMod), "CloningBeGone", "1.1.2", "loukylor (https://github.com/loukylor/CloningBeGone)")]
+[assembly: MelonInfo(typeof(CloningBeGone.CloningBeGoneMod), "CloningBeGone", "1.1.3", "loukylor (https://github.com/loukylor/CloningBeGone)")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace CloningBeGone
@@ -23,14 +23,14 @@ namespace CloningBeGone
         public override void OnApplicationStart()
         {
             MelonPreferences.CreateCategory("CloningBeGone", "CloningBeGone Settings");
-            PublicCloningSetting = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("CloningBeGone", nameof(PublicCloningSetting), false, "Cloning setting in public instances");
-            FriendsPlusCloningSetting = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("CloningBeGone", nameof(FriendsPlusCloningSetting), false, "Cloning setting in friends+ instances");
-            FriendsCloningSetting = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("CloningBeGone", nameof(FriendsCloningSetting), false, "Cloning setting in friend only instances");
-            InvitePlusCloningSetting = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("CloningBeGone", nameof(InvitePlusCloningSetting), false, "Cloning setting in invite+ instances");
-            InviteCloningSetting = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("CloningBeGone", nameof(InviteCloningSetting), false, "Cloning setting in invite only instances");
+            PublicCloningSetting = MelonPreferences.CreateEntry("CloningBeGone", nameof(PublicCloningSetting), false, "Cloning setting in public instances");
+            FriendsPlusCloningSetting = MelonPreferences.CreateEntry("CloningBeGone", nameof(FriendsPlusCloningSetting), false, "Cloning setting in friends+ instances");
+            FriendsCloningSetting = MelonPreferences.CreateEntry("CloningBeGone", nameof(FriendsCloningSetting), false, "Cloning setting in friend only instances");
+            InvitePlusCloningSetting = MelonPreferences.CreateEntry("CloningBeGone", nameof(InvitePlusCloningSetting), false, "Cloning setting in invite+ instances");
+            InviteCloningSetting = MelonPreferences.CreateEntry("CloningBeGone", nameof(InviteCloningSetting), false, "Cloning setting in invite only instances");
 
-            Harmony.Patch(typeof(RoomManager).GetMethod("Method_Public_Static_Boolean_ApiWorld_ApiWorldInstance_String_Int32_0"), new HarmonyMethod(typeof(CloningBeGoneMod).GetMethod(nameof(OnInstanceChange))));
-            Harmony.Patch(typeof(NetworkManager).GetMethod("OnJoinedRoom"), new HarmonyMethod(typeof(CloningBeGoneMod).GetMethod(nameof(OnJoinedRoom))));
+            HarmonyInstance.Patch(typeof(RoomManager).GetMethod("Method_Public_Static_Boolean_ApiWorld_ApiWorldInstance_String_Int32_0"), new HarmonyMethod(typeof(CloningBeGoneMod).GetMethod(nameof(OnInstanceChange))));
+            HarmonyInstance.Patch(typeof(NetworkManager).GetMethod("OnJoinedRoom"), new HarmonyMethod(typeof(CloningBeGoneMod).GetMethod(nameof(OnJoinedRoom))));
         }
         public override void OnPreferencesSaved()
         {

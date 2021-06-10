@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using Harmony;
+using HarmonyLib;
 using MelonLoader;
 using PlayerList.Config;
 using PlayerList.UI;
 using PlayerList.Utilities;
-using UnhollowerBaseLib;
 using UnityEngine;
 using VRC;
 using VRC.Core;
@@ -68,7 +66,7 @@ namespace PlayerList.Entries
             NetworkEvents.OnUnFriended += OnUnfriended;
             NetworkEvents.OnSetupFlagsReceived += OnSetupFlagsReceived;
 
-            PlayerListMod.Instance.Harmony.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend), BindingFlags.NonPublic | BindingFlags.Static)));        
+            PlayerListMod.Instance.HarmonyInstance.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend), BindingFlags.NonPublic | BindingFlags.Static)));        
         }
         public override void Init(object[] parameters)
         {
@@ -279,7 +277,7 @@ namespace PlayerList.Entries
         private void GetPlayerColor(bool shouldSort = true)
         {
             playerColor = "";
-            switch (PlayerListConfig.DisplayNameColorMode)
+            switch (PlayerListConfig.displayNameColorMode.Value)
             {
                 case DisplayNameColorMode.TrustAndFriends:
                     playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(apiUser));

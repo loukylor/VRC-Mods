@@ -19,12 +19,12 @@ namespace AskToPortal
         {
             MelonPreferences.CreateCategory(catagory, "AskToPortal Settings");
 
-            enabled = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(catagory, nameof(enabled), true, "Enable/disable the mod");
-            autoAcceptFriends = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(catagory, nameof(autoAcceptFriends), false, "Automatically enter friends portals");
-            autoAcceptWorld = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(catagory, nameof(autoAcceptWorld), false, "Automatically enter portals that aren't player dropped");
-            autoAcceptHome = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(catagory, nameof(autoAcceptHome), false, "Automatically enter home portals");
-            autoAcceptSelf = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(catagory, nameof(autoAcceptSelf), true, "Automatically enter your own portals");
-            onlyPortalDrop = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(catagory, nameof(onlyPortalDrop), false, "Only ask if a portal dropper is detected");
+            enabled = MelonPreferences.CreateEntry(catagory, nameof(enabled), true, "Enable/disable the mod");
+            autoAcceptFriends = MelonPreferences.CreateEntry(catagory, nameof(autoAcceptFriends), false, "Automatically enter friends portals");
+            autoAcceptWorld = MelonPreferences.CreateEntry(catagory, nameof(autoAcceptWorld), false, "Automatically enter portals that aren't player dropped");
+            autoAcceptHome = MelonPreferences.CreateEntry(catagory, nameof(autoAcceptHome), false, "Automatically enter home portals");
+            autoAcceptSelf = MelonPreferences.CreateEntry(catagory, nameof(autoAcceptSelf), true, "Automatically enter your own portals");
+            onlyPortalDrop = MelonPreferences.CreateEntry(catagory, nameof(onlyPortalDrop), false, "Only ask if a portal dropper is detected");
             //startOnDetailed = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(catagory, nameof(startOnDetailed), false, "Only ask if a portal dropper is detected");
         }
     }

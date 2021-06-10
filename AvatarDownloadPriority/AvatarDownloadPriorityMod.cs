@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Harmony;
+using HarmonyLib;
 using MelonLoader;
 using UnhollowerBaseLib;
 using UnhollowerRuntimeLib.XrefScans;
@@ -60,17 +60,17 @@ namespace AvatarDownloadPriority
         {
             Config.Init();
 
-            Harmony.Patch(typeof(NetworkManager).GetMethod("OnLeftRoom"), new HarmonyMethod(typeof(AvatarDownloadPriorityMod).GetMethod(nameof(OnLeftRoom))));
-            Harmony.Patch(typeof(VRCAvatarManager).GetMethod("OnDestroy"), new HarmonyMethod(typeof(AvatarDownloadPriorityMod).GetMethod(nameof(OnDestroy))));
+            HarmonyInstance.Patch(typeof(NetworkManager).GetMethod("OnLeftRoom"), new HarmonyMethod(typeof(AvatarDownloadPriorityMod).GetMethod(nameof(OnLeftRoom))));
+            HarmonyInstance.Patch(typeof(VRCAvatarManager).GetMethod("OnDestroy"), new HarmonyMethod(typeof(AvatarDownloadPriorityMod).GetMethod(nameof(OnDestroy))));
 
             downloadAvatarMethod = typeof(VRCAvatarManager).GetMethods().First(mb => mb.Name.StartsWith("Method_Private_Void_ApiAvatar_Single_MulticastDelegateNPublic")
                 && mb.GetParameters().Count() == 4 && mb.GetParameters()[3].ParameterType == typeof(ApiAvatar));
-            Harmony.Patch(downloadAvatarMethod, new HarmonyMethod(typeof(AvatarDownloadPriorityMod).GetMethod(nameof(OnAvatarDownload))));
+            HarmonyInstance.Patch(downloadAvatarMethod, new HarmonyMethod(typeof(AvatarDownloadPriorityMod).GetMethod(nameof(OnAvatarDownload))));
             foreach (XrefInstance instance in XrefScanner.XrefScan(downloadAvatarMethod))
             {
                 if (instance.Type == XrefType.Method && instance.TryResolve() != null && instance.TryResolve().Name.Contains("ApiAvatar"))
                 {
-                    Harmony.Patch(instance.TryResolve(), new HarmonyMethod(typeof(AvatarDownloadPriorityMod).GetMethod(nameof(OnAssetBundleDownload))));
+                    HarmonyInstance.Patch(instance.TryResolve(), new HarmonyMethod(typeof(AvatarDownloadPriorityMod).GetMethod(nameof(OnAssetBundleDownload))));
                     break;
                 }
             }
@@ -79,11 +79,11 @@ namespace AvatarDownloadPriority
                 mb.GetParameters().Length == 7
                 && mb.GetParameters()[0].ParameterType == typeof(UnityEngine.Object)
                 && mb.GetParameters()[1].ParameterType == typeof(string));
-            Harmony.Patch(attachAvatarEnumeratorMethod, new HarmonyMethod(typeof(AvatarDownloadPriorityMod).GetMethod(nameof(OnAttachAvatarEnumerator))));
+            HarmonyInstance.Patch(attachAvatarEnumeratorMethod, new HarmonyMethod(typeof(AvatarDownloadPriorityMod).GetMethod(nameof(OnAttachAvatarEnumerator))));
             MethodInfo loadAvatarMethod = typeof(VRCAvatarManager).GetMethods().First(mb => mb.Name.StartsWith("Method_Private_IEnumerator_ApiAvatar_AssetBundleDownload_Action_1_GameObject_Action_"));
-            Harmony.Patch(loadAvatarMethod, null, new HarmonyMethod(typeof(AvatarDownloadPriorityMod).GetMethod(nameof(OnAvatarLoad))));
+            HarmonyInstance.Patch(loadAvatarMethod, null, new HarmonyMethod(typeof(AvatarDownloadPriorityMod).GetMethod(nameof(OnAvatarLoad))));
             startCoroutineMethod = typeof(MonoBehaviour).GetMethod("StartCoroutine", new Type[1] { typeof(Il2CppSystem.Collections.IEnumerator) });
-            Harmony.Patch(typeof(MonoBehaviour).GetMethod("StopCoroutine", new Type[1] { typeof(Coroutine) }), new HarmonyMethod(typeof(AvatarDownloadPriorityMod).GetMethod(nameof(OnCoroutineStop))));
+            HarmonyInstance.Patch(typeof(MonoBehaviour).GetMethod("StopCoroutine", new Type[1] { typeof(Coroutine) }), new HarmonyMethod(typeof(AvatarDownloadPriorityMod).GetMethod(nameof(OnCoroutineStop))));
         }
         public override void OnUpdate()
         {

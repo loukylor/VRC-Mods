@@ -14,17 +14,17 @@ namespace AvatarDownloadPriority
         {
             MelonPreferences.CreateCategory(categoryIdentifier, "AvatarPriorityDownloading Config");
             
-            maxDownloadingAvatarsAtOnce = (MelonPreferences_Entry<int>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(maxDownloadingAvatarsAtOnce), 15, "Max number of avatars downloading at once");
+            maxDownloadingAvatarsAtOnce = MelonPreferences.CreateEntry(categoryIdentifier, nameof(maxDownloadingAvatarsAtOnce), 15, "Max number of avatars downloading at once");
             maxDownloadingAvatarsAtOnce.OnValueChanged += OnMaxConfigValuesChange;
-            maxLoadingAvatarsAtOnce = (MelonPreferences_Entry<int>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(maxLoadingAvatarsAtOnce), 5, "Max number of avatars loading at once");
+            maxLoadingAvatarsAtOnce = MelonPreferences.CreateEntry(categoryIdentifier, nameof(maxLoadingAvatarsAtOnce), 5, "Max number of avatars loading at once");
             maxLoadingAvatarsAtOnce.OnValueChanged += OnMaxConfigValuesChange;
             OnMaxConfigValuesChange(0, 1);
 
-            prioritizeSelf = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(prioritizeSelf), true, "Prioritize downloading your own avatar");
+            prioritizeSelf = MelonPreferences.CreateEntry(categoryIdentifier, nameof(prioritizeSelf), true, "Prioritize downloading your own avatar");
             prioritizeSelf.OnValueChanged += OnSortConfigChange;
-            prioritizeFavoriteFriends = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(prioritizeFavoriteFriends), true, "Prioritize downloading favorite friends' avatars");
+            prioritizeFavoriteFriends = MelonPreferences.CreateEntry(categoryIdentifier, nameof(prioritizeFavoriteFriends), true, "Prioritize downloading favorite friends' avatars");
             prioritizeFavoriteFriends.OnValueChanged += OnSortConfigChange;
-            prioritizeFriends = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(categoryIdentifier, nameof(prioritizeFriends), true, "Prioritize downloading friends' avatars");
+            prioritizeFriends = MelonPreferences.CreateEntry(categoryIdentifier, nameof(prioritizeFriends), true, "Prioritize downloading friends' avatars");
             prioritizeFriends.OnValueChanged += OnSortConfigChange;
 
             OnSortConfigChange(true, false);

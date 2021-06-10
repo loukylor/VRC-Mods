@@ -78,16 +78,16 @@ namespace PlayerList
 
         public static void Init()
         {
-            baseComparisonProperty = typeof(PlayerListConfig).GetProperty(nameof(PlayerListConfig.CurrentBaseSortType));
-            upperComparisonProperty = typeof(PlayerListConfig).GetProperty(nameof(PlayerListConfig.CurrentUpperSortType));
-            highestComparisonProperty = typeof(PlayerListConfig).GetProperty(nameof(PlayerListConfig.CurrentHighestSortType));
+            baseComparisonProperty = typeof(PlayerListConfig).GetProperty(nameof(PlayerListConfig.currentBaseSort));
+            upperComparisonProperty = typeof(PlayerListConfig).GetProperty(nameof(PlayerListConfig.currentUpperSort));
+            highestComparisonProperty = typeof(PlayerListConfig).GetProperty(nameof(PlayerListConfig.currentHighestSort));
 
             PlayerListConfig.OnConfigChanged += OnStaticConfigChange;
             EntryManager.OnWorldAllowedChanged += OnWorldAllowedChanged;
         }
         private static void OnStaticConfigChange()
         {
-            switch (PlayerListConfig.CurrentBaseSortType)
+            switch (PlayerListConfig.currentBaseSort.Value)
             {
                 case SortType.None:
                     currentBaseComparison = null;
@@ -118,7 +118,7 @@ namespace PlayerList
                     break;
             }
 
-            switch (PlayerListConfig.CurrentUpperSortType)
+            switch (PlayerListConfig.currentUpperSort.Value)
             {
                 case SortType.None:
                     currentUpperComparison = null;
@@ -149,7 +149,7 @@ namespace PlayerList
                     break;
             }
 
-            switch (PlayerListConfig.CurrentHighestSortType)
+            switch (PlayerListConfig.currentHighestSort.Value)
             {
                 case SortType.None:
                     currentHighestComparison = null;
@@ -221,20 +221,20 @@ namespace PlayerList
         {
             if (EntryManager.WorldAllowed)
             { 
-                if (PlayerListConfig.CurrentBaseSortType == SortType.Distance)
+                if (PlayerListConfig.currentBaseSort.Value == SortType.Distance)
                     currentBaseComparison = distanceSort;
-                if (PlayerListConfig.CurrentUpperSortType == SortType.Distance)
+                if (PlayerListConfig.currentUpperSort.Value == SortType.Distance)
                     currentUpperComparison = distanceSort;
-                if (PlayerListConfig.CurrentHighestSortType == SortType.Distance)
+                if (PlayerListConfig.currentHighestSort.Value == SortType.Distance)
                     currentHighestComparison = distanceSort;
             }
             else
             {
-                if (PlayerListConfig.CurrentBaseSortType == SortType.Distance)
+                if (PlayerListConfig.currentBaseSort.Value == SortType.Distance)
                     currentBaseComparison = null;
-                if (PlayerListConfig.CurrentUpperSortType == SortType.Distance)
+                if (PlayerListConfig.currentUpperSort.Value == SortType.Distance)
                     currentUpperComparison = null;
-                if (PlayerListConfig.CurrentHighestSortType == SortType.Distance)
+                if (PlayerListConfig.currentHighestSort.Value == SortType.Distance)
                     currentHighestComparison = null;
             }
         }
@@ -292,8 +292,8 @@ namespace PlayerList
             }
         }
 
-        public static bool IsSortTypeInUse(SortType sortType) => PlayerListConfig.CurrentBaseSortType == sortType || PlayerListConfig.CurrentUpperSortType == sortType || PlayerListConfig.CurrentHighestSortType == sortType;
-        public static bool IsSortTypeInAllUses(SortType sortType) => PlayerListConfig.CurrentBaseSortType == sortType && PlayerListConfig.CurrentUpperSortType == sortType && PlayerListConfig.CurrentHighestSortType == sortType;
+        public static bool IsSortTypeInUse(SortType sortType) => PlayerListConfig.currentBaseSort.Value == sortType || PlayerListConfig.currentUpperSort.Value == sortType || PlayerListConfig.currentHighestSort.Value == sortType;
+        public static bool IsSortTypeInAllUses(SortType sortType) => PlayerListConfig.currentBaseSort.Value == sortType && PlayerListConfig.currentUpperSort.Value == sortType && PlayerListConfig.currentHighestSort.Value == sortType;
 
         public enum SortType
         {

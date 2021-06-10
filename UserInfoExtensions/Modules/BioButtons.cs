@@ -56,8 +56,8 @@ namespace UserInfoExtentions.Modules
 
         public override void Init()
         {
-            BioLinksButton = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(BioLinksButton), false, "Show \"Bio Links\" button");
-            BioLanguagesButton = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(BioLanguagesButton), false, "Show \"Bio Languages\" button");
+            BioLinksButton = MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(BioLinksButton), false, "Show \"Bio Links\" button");
+            BioLanguagesButton = MelonPreferences.CreateEntry("UserInfoExtensionsSettings", nameof(BioLanguagesButton), false, "Show \"Bio Languages\" button");
 
             UserInfoExtensionsMod.userDetailsMenu.AddSimpleButton("Bio Links", ShowBioLinksPopup, new Action<GameObject>((gameObject) => { bioLinksButtonGameObject = gameObject; gameObject.SetActive(BioLinksButton.Value); }));
             UserInfoExtensionsMod.userDetailsMenu.AddSimpleButton("Bio Languages", ShowBioLanguagesPopup, new Action<GameObject>((gameObject) => { bioLanguagesButtonGameObject = gameObject; gameObject.SetActive(BioLanguagesButton.Value); }));

@@ -19,8 +19,8 @@ namespace SelectYourself
         public static GameObject selectYourselfButton;
         public override void OnApplicationStart()
         {
-            MelonPreferences.CreateCategory("SelectYourself", "SelectYourself Settings");
-            selectYourselfPref = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("SelectYourself", nameof(selectYourselfPref), true, "Enable/Disable Select Yourself Button");
+            MelonPreferences_Category category = MelonPreferences.CreateCategory("SelectYourself", "SelectYourself Settings");
+            selectYourselfPref = category.CreateEntry(nameof(selectYourselfPref), true, "Enable/Disable Select Yourself Button");
 
             List<Type> quickMenuNestedEnums = typeof(QuickMenu).GetNestedTypes().Where(type => type.IsEnum).ToList();
             PropertyInfo quickMenuEnumProperty = typeof(QuickMenu).GetProperties()

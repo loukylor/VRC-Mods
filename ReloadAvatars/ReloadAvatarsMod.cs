@@ -20,9 +20,9 @@ namespace ReloadAvatars
 
         public override void OnApplicationStart()
         {
-            MelonPreferences.CreateCategory("ReloadAvatars", "ReloadAvatars Settings");
-            reloadAvatarPref = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("ReloadAvatars", "ReloadAvatar", true, "Enable/Disable Reload Avatar Button");
-            reloadAllAvatarsPref = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry("ReloadAvatars", "ReloadAllAvatars", true, "Enable/Disable Reload All Avatars Button");
+            MelonPreferences_Category category = MelonPreferences.CreateCategory("ReloadAvatars", "ReloadAvatars Settings");
+            reloadAvatarPref = category.CreateEntry("ReloadAvatar", true, "Enable/Disable Reload Avatar Button");
+            reloadAllAvatarsPref = category.CreateEntry("ReloadAllAvatars", true, "Enable/Disable Reload All Avatars Button");
 
             MethodInfo reloadAvatarMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.Name.StartsWith("Method_Private_Void_Boolean_") && mi.Name.Length < 31 && mi.GetParameters().Any(pi => pi.IsOptional));
             MethodInfo reloadAllAvatarsMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.Name.StartsWith("Method_Public_Void_Boolean_") && mi.Name.Length < 30 && mi.GetParameters().Any(pi => pi.IsOptional));// Both methods seem to do the same thing

@@ -105,7 +105,7 @@ namespace PlayerList.Entries
             entry._originalText = entry.textComponent.text;
             if (includeConfig)
             { 
-                entry.prefEntry = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(PlayerListConfig.categoryIdentifier, entry.Name.Replace(" ", ""), true, is_hidden: true);
+                entry.prefEntry = PlayerListConfig.category.CreateEntry(entry.Name.Replace(" ", ""), true, is_hidden: true);
                 entry.gameObject.SetActive(entry.prefEntry.Value);
             }
             entry.Init(parameters);

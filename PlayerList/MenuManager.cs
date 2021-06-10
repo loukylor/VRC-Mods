@@ -53,7 +53,7 @@ namespace PlayerList
         }
         public static void OnConfigChanged()
         {
-            switch (PlayerListConfig.MenuButtonPosition)
+            switch (PlayerListConfig.menuButtonPosition.Value)
             {
                 case MenuButtonPositionEnum.TopLeft:
                     menuButton.transform.localPosition = Converters.ConvertToUnityUnits(new Vector3(2, -1));
@@ -116,7 +116,7 @@ namespace PlayerList
 
             playerList.SetLayerRecursive(12);
             playerListRect = playerList.GetComponent<RectTransform>();
-            playerListRect.anchoredPosition = PlayerListConfig.PlayerListPosition;
+            playerListRect.anchoredPosition = PlayerListConfig.playerListPosition.Value;
             playerListRect.localPosition = playerListRect.localPosition.SetZ(25); // Do this or else it looks off for whatever reason
             playerList.SetActive(false);
 
@@ -176,7 +176,7 @@ namespace PlayerList
             playerListMenuListener.OnDisableEvent += new Action(() =>
             {
                 playerList.SetActive(false);
-                playerListRect.anchoredPosition = PlayerListConfig.PlayerListPosition;
+                playerListRect.anchoredPosition = PlayerListConfig.playerListPosition.Value;
                 playerListRect.localPosition = playerListRect.localPosition.SetZ(25);
                 newElements.SetActive(true);
             });
@@ -214,11 +214,11 @@ namespace PlayerList
             {
                 EntrySortManager.SortType currentSortType = EntrySortManager.SortType.None;
                 if (EntrySortManager.currentComparisonProperty.Name.Contains("Base"))
-                    currentSortType = PlayerListConfig.CurrentBaseSortType;
+                    currentSortType = PlayerListConfig.currentBaseSort.Value;
                 else if (EntrySortManager.currentComparisonProperty.Name.Contains("Upper"))
-                    currentSortType = PlayerListConfig.CurrentUpperSortType;
+                    currentSortType = PlayerListConfig.currentUpperSort.Value;
                 else if (EntrySortManager.currentComparisonProperty.Name.Contains("Highest"))
-                    currentSortType = PlayerListConfig.CurrentHighestSortType;
+                    currentSortType = PlayerListConfig.currentHighestSort.Value;
 
                 if (currentHighlightedSortType != null)
                     currentHighlightedSortType.sprite = UIManager.regularButtonSprite;
@@ -236,10 +236,10 @@ namespace PlayerList
 
             new SingleButton(playerListMenus[1].path, new Vector3(3, 1), "Move to Right of QuickMenu", new Action(ListPositionManager.MovePlayerListToEndOfMenu), "Move PlayerList to right side of menu, this can also serve as a reset position button", "LockPlayerListToRightButton", true);
 
-            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(0, 0), "1", new Action(() => PlayerListConfig.MenuButtonPosition = MenuButtonPositionEnum.TopRight), "Move PlayerList menu button to the top right", "1PlayerListMenuButton");
-            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(1, 0), "2", new Action(() => PlayerListConfig.MenuButtonPosition = MenuButtonPositionEnum.TopLeft), "Move PlayerList menu button to the top left", "2PlayerListMenuButton");
-            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(1, 1), "3", new Action(() => PlayerListConfig.MenuButtonPosition = MenuButtonPositionEnum.BottomLeft), "Move PlayerList menu button to the bottom left", "3PlayerListMenuButton");
-            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(0, 1), "4", new Action(() => PlayerListConfig.MenuButtonPosition = MenuButtonPositionEnum.BottomRight), "Move PlayerList menu button to the bottom right", "4PlayerListMenuButton");
+            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(0, 0), "1", new Action(() => PlayerListConfig.menuButtonPosition.Value = MenuButtonPositionEnum.TopRight), "Move PlayerList menu button to the top right", "1PlayerListMenuButton");
+            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(1, 0), "2", new Action(() => PlayerListConfig.menuButtonPosition.Value = MenuButtonPositionEnum.TopLeft), "Move PlayerList menu button to the top left", "2PlayerListMenuButton");
+            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(1, 1), "3", new Action(() => PlayerListConfig.menuButtonPosition.Value = MenuButtonPositionEnum.BottomLeft), "Move PlayerList menu button to the bottom left", "3PlayerListMenuButton");
+            new QuarterButton(playerListMenus[1].path, new Vector3(3, 2), new Vector2(0, 1), "4", new Action(() => PlayerListConfig.menuButtonPosition.Value = MenuButtonPositionEnum.BottomRight), "Move PlayerList menu button to the bottom right", "4PlayerListMenuButton");
 
             new SingleButton(playerListMenus[1].path, new Vector3(1, 0), "Snap Grid\nSize +", new Action(() => PlayerListConfig.snapToGridSize.Value += 10), "Increase the size of the snap to grid by 10", "IncreaseSnapGridSize", true);
             new SingleButton(playerListMenus[1].path, new Vector3(1, 2), "Snap Grid\nSize -", new Action(() => PlayerListConfig.snapToGridSize.Value -= 10), "Decrease the size of the snap to grid by 10", "DecreaseSnapGridSize", true);
@@ -271,10 +271,10 @@ namespace PlayerList
             new ToggleButton(playerListMenus[3].path, new Vector3(2, 1), "Enable Distance", "Disabled", new Action<bool>((state) => PlayerListConfig.distanceToggle.Value = state), "Toggle distance to player", "Toggle distance to player", "DistanceToPlayerToggle", PlayerListConfig.distanceToggle.Value, true);
             new ToggleButton(playerListMenus[3].path, new Vector3(3, 1), "Enable DisplayName", "Disabled", new Action<bool>((state) => PlayerListConfig.displayNameToggle.Value = state), "Why...?", "Why...?", "DisplayNameToggle", PlayerListConfig.displayNameToggle.Value, true);
 
-            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(0, 0), "TF", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.TrustAndFriends), "Set displayname coloring to show friends and trust rank", "TrustAndFriendsButton");
-            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(1, 0), "T", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.TrustOnly), "Set displayname coloring to show trust rank only", "TrustOnlyButton");
-            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(1, 1), "F", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.FriendsOnly), "Set displayname coloring to show friends only", "FriendsOnlyButton");
-            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(0, 1), "N", new Action(() => PlayerListConfig.DisplayNameColorMode = PlayerEntry.DisplayNameColorMode.None), "Set displayname coloring to none", "NoneButton");
+            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(0, 0), "TF", new Action(() => PlayerListConfig.displayNameColorMode.Value = PlayerEntry.DisplayNameColorMode.TrustAndFriends), "Set displayname coloring to show friends and trust rank", "TrustAndFriendsButton");
+            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(1, 0), "T", new Action(() => PlayerListConfig.displayNameColorMode.Value = PlayerEntry.DisplayNameColorMode.TrustOnly), "Set displayname coloring to show trust rank only", "TrustOnlyButton");
+            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(1, 1), "F", new Action(() => PlayerListConfig.displayNameColorMode.Value = PlayerEntry.DisplayNameColorMode.FriendsOnly), "Set displayname coloring to show friends only", "FriendsOnlyButton");
+            new QuarterButton(playerListMenus[3].path, new Vector3(3, 2), new Vector2(0, 1), "N", new Action(() => PlayerListConfig.displayNameColorMode.Value = PlayerEntry.DisplayNameColorMode.None), "Set displayname coloring to none", "NoneButton");
         }
 
         public static void CreateGeneralInfoSubMenus()
@@ -328,7 +328,7 @@ namespace PlayerList
             subMenuListener.OnDisableEvent += new Action(() =>
             {
                 playerList.SetActive(false);
-                playerListRect.anchoredPosition = PlayerListConfig.PlayerListPosition;
+                playerListRect.anchoredPosition = PlayerListConfig.playerListPosition.Value;
                 playerListRect.localPosition = playerListRect.localPosition.SetZ(25);
             });
         }

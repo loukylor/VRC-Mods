@@ -2,22 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Harmony;
+using HarmonyLib;
 using MelonLoader;
 using UIExpansionKit.API;
 using UserInfoExtentions.Modules;
 using UserInfoExtentions.Utilities;
 using VRC.UI;
 
-[assembly: MelonInfo(typeof(UserInfoExtensions.UserInfoExtensionsMod), "UserInfoExtensions", "2.5.1", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(UserInfoExtensions.UserInfoExtensionsMod), "UserInfoExtensions", "2.5.2", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace UserInfoExtensions
 {
     public class UserInfoExtensionsMod : MelonMod
     {
-        public static UIExpansionKit.API.ICustomLayoutedMenu userDetailsMenu;
-        public static UIExpansionKit.API.ICustomShowableLayoutedMenu menu;
+        public static ICustomLayoutedMenu userDetailsMenu;
+        public static ICustomShowableLayoutedMenu menu;
 
         internal static List<ModuleBase> modules = new List<ModuleBase>();
 
@@ -30,16 +30,16 @@ namespace UserInfoExtensions
             VRCUtils.Init();
 
             foreach (MethodInfo method in typeof(MenuController).GetMethods().Where(mi => mi.Name.StartsWith("Method_Public_Void_APIUser_") && !mi.Name.Contains("_PDM_")))
-                Harmony.Patch(method, postfix: new HarmonyMethod(typeof(UserInfoExtensionsMod).GetMethod("OnUserInfoOpen", BindingFlags.Static | BindingFlags.Public)));
-            Harmony.Patch(AccessTools.Method(typeof(PageUserInfo), "Back"), postfix: new HarmonyMethod(typeof(UserInfoExtensionsMod).GetMethod("OnUserInfoClose", BindingFlags.Static | BindingFlags.Public)));
-            UIExpansionKit.API.LayoutDescription popupLayout = new UIExpansionKit.API.LayoutDescription
+                HarmonyInstance.Patch(method, postfix: new HarmonyMethod(typeof(UserInfoExtensionsMod).GetMethod("OnUserInfoOpen", BindingFlags.Static | BindingFlags.Public)));
+            HarmonyInstance.Patch(AccessTools.Method(typeof(PageUserInfo), "Back"), postfix: new HarmonyMethod(typeof(UserInfoExtensionsMod).GetMethod("OnUserInfoClose", BindingFlags.Static | BindingFlags.Public)));
+            LayoutDescription popupLayout = new LayoutDescription
             {
                 RowHeight = 80,
                 NumColumns = 3,
                 NumRows = 5
             };
-            menu = UIExpansionKit.API.ExpansionKitApi.CreateCustomFullMenuPopup(popupLayout);
-            userDetailsMenu = UIExpansionKit.API.ExpansionKitApi.GetExpandedMenu(UIExpansionKit.API.ExpandedMenu.UserDetailsMenu);
+            menu = ExpansionKitApi.CreateCustomFullMenuPopup(popupLayout);
+            userDetailsMenu = ExpansionKitApi.GetExpandedMenu(ExpandedMenu.UserDetailsMenu);
 
             menu.AddLabel("General Things");
             menu.AddSpacer();

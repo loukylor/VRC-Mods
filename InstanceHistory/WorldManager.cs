@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using Harmony;
+using HarmonyLib;
 using InstanceHistory.Utilities;
 using MelonLoader;
 using VRC.Core;
@@ -20,7 +20,7 @@ namespace InstanceHistory
             // Ty Ben (https://github.com/BenjaminZehowlt/) for this patch
             typeof(RoomManager).GetMethods(BindingFlags.Public | BindingFlags.Static)
                 .Where(m => m.Name.StartsWith("Method_Public_Static_Boolean_ApiWorld_ApiWorldInstance_String_Int32_"))
-                .ToList().ForEach(m => InstanceHistoryMod.Instance.Harmony.Patch(m, prefix: new HarmonyMethod(typeof(WorldManager).GetMethod(nameof(OnEnterWorld), BindingFlags.Public | BindingFlags.Static))));
+                .ToList().ForEach(m => InstanceHistoryMod.Instance.HarmonyInstance.Patch(m, prefix: new HarmonyMethod(typeof(WorldManager).GetMethod(nameof(OnEnterWorld), BindingFlags.Public | BindingFlags.Static))));
 
             transitionInfoEnum = typeof(WorldTransitionInfo).GetNestedTypes().First();
             enterWorldMethod = typeof(VRCFlowManager).GetMethod("Method_Public_Void_String_String_WorldTransitionInfo_Action_1_String_Boolean_0");
