@@ -9,7 +9,7 @@ using PlayerList.Utilities;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.5.4", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.5.3", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 [assembly: MelonOptionalDependencies("UIExpansionKit")]
 
