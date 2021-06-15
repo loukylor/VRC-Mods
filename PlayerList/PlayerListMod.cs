@@ -34,10 +34,7 @@ namespace PlayerList
             PlayerEntry.EntryInit();
             LocalPlayerEntry.EntryInit();
 
-            if (HasUIX)
-                typeof(UIXManager).GetMethod("AddMethodToUIInit").Invoke(null, null);
-            else
-                MelonCoroutines.Start(StartUiManagerInitIEnumerator());
+            MelonCoroutines.Start(StartUiManagerInitIEnumerator());
         }
 
         private IEnumerator StartUiManagerInitIEnumerator()

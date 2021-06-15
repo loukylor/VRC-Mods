@@ -83,7 +83,7 @@ namespace PlayerList.Config
 
         public static EntryWrapper<T> CreateEntry<T>(string entry_identifier, T default_value, string display_name = null, bool is_hidden = false)
         {
-            MelonPreferences_Entry<T> melonPref = category.CreateEntry(entry_identifier, default_value, display_name, is_hidden);
+            MelonPreferences_Entry<T> melonPref = (MelonPreferences_Entry<T>)category.CreateEntry(entry_identifier, default_value, display_name, is_hidden);
             EntryWrapper<T> entry = new EntryWrapper<T>()
             {
                 pref = melonPref

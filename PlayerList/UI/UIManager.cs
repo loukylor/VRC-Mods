@@ -71,7 +71,7 @@ namespace PlayerList.UI
             quickMenuEnumProperty = typeof(QuickMenu).GetProperties()
                 .First(pi => pi.PropertyType.IsEnum && quickMenuNestedEnums.Contains(pi.PropertyType));
             setMenuIndex = typeof(QuickMenu).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_Enum") && mb.GetParameters()[0].ParameterType == quickMenuEnumProperty.PropertyType);
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Enum") && mb.GetParameters().Length == 1 && mb.GetParameters()[0].ParameterType == quickMenuEnumProperty.PropertyType);
 
             closeQuickMenu = typeof(QuickMenu).GetMethods()
                 .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && Xref.CheckUsed(mb, setMenuIndex.Name));
@@ -114,10 +114,6 @@ namespace PlayerList.UI
 
             PlayerListMod.Instance.HarmonyInstance.Patch(openQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuOpen), BindingFlags.NonPublic | BindingFlags.Static)));
             PlayerListMod.Instance.HarmonyInstance.Patch(closeQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuClose), BindingFlags.NonPublic | BindingFlags.Static)));
-        }
-        public static void Print(MethodInfo __originalMethod)
-        {
-            MelonLogger.Msg(__originalMethod.Name);
         }
         public static void UIInit()
         {
