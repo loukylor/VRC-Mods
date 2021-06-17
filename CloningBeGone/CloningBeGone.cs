@@ -3,7 +3,7 @@ using MelonLoader;
 using UnityEngine;
 using VRC.Core;
 
-[assembly: MelonInfo(typeof(CloningBeGone.CloningBeGoneMod), "CloningBeGone", "1.1.3", "loukylor (https://github.com/loukylor/CloningBeGone)")]
+[assembly: MelonInfo(typeof(CloningBeGone.CloningBeGoneMod), "CloningBeGone", "1.1.4", "loukylor (https://github.com/loukylor/CloningBeGone)")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace CloningBeGone
@@ -16,7 +16,7 @@ namespace CloningBeGone
         public static MelonPreferences_Entry<bool> InvitePlusCloningSetting;
         public static MelonPreferences_Entry<bool> InviteCloningSetting;
 
-        public static ApiWorldInstance.AccessType currentAccessType;
+        public static InstanceAccessType currentAccessType;
         public static UiSettingConfig cloningSetting;
         public static bool isClosing = false;
 
@@ -34,7 +34,7 @@ namespace CloningBeGone
         }
         public override void OnPreferencesSaved()
         {
-            if (RoomManager.field_Internal_Static_ApiWorldInstance_0 != null) CheckAccessType(RoomManager.field_Internal_Static_ApiWorldInstance_0.InstanceType);
+            if (RoomManager.field_Internal_Static_ApiWorldInstance_0 != null) CheckAccessType(RoomManager.field_Internal_Static_ApiWorldInstance_0.type);
         }
 
         public static void OnJoinedRoom()
@@ -43,30 +43,30 @@ namespace CloningBeGone
         }
         public static void OnInstanceChange(ApiWorldInstance __1)
         {
-            if (__1 != null) currentAccessType = __1.InstanceType;
+            if (__1 != null) currentAccessType = __1.type;
         }
         public override void OnApplicationQuit()
         {
             isClosing = true;
         }
 
-        public static void CheckAccessType(ApiWorldInstance.AccessType accessType)
+        public static void CheckAccessType(InstanceAccessType accessType)
         {
             switch (accessType)
             {
-                case ApiWorldInstance.AccessType.Public:
+                case InstanceAccessType.Public:
                     SetCloning(PublicCloningSetting.Value);
                     break;
-                case ApiWorldInstance.AccessType.FriendsOfGuests:
+                case InstanceAccessType.FriendsOfGuests:
                     SetCloning(FriendsPlusCloningSetting.Value);
                     break;
-                case ApiWorldInstance.AccessType.FriendsOnly:
+                case InstanceAccessType.FriendsOnly:
                     SetCloning(FriendsCloningSetting.Value);
                     break;
-                case ApiWorldInstance.AccessType.InvitePlus:
+                case InstanceAccessType.InvitePlus:
                     SetCloning(InvitePlusCloningSetting.Value);
                     break;
-                case ApiWorldInstance.AccessType.InviteOnly:
+                case InstanceAccessType.InviteOnly:
                     SetCloning(InviteCloningSetting.Value);
                     break;
             }
