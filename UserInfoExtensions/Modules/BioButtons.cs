@@ -65,9 +65,9 @@ namespace UserInfoExtentions.Modules
             UserInfoExtensionsMod.menu.AddLabel("Bio Related Things");
             UserInfoExtensionsMod.menu.AddSpacer();
             UserInfoExtensionsMod.menu.AddSpacer();
-            UserInfoExtensionsMod.menu.AddSpacer();
             UserInfoExtensionsMod.menu.AddSimpleButton("Bio Links", ShowBioLinksPopup);
             UserInfoExtensionsMod.menu.AddSimpleButton("Bio Languages", ShowBioLanguagesPopup);
+            UserInfoExtensionsMod.menu.AddSpacer();
         }
         public override void UiInit() //This is a shit show but it works so shshshhhshh
         {
@@ -77,6 +77,7 @@ namespace UserInfoExtentions.Modules
             UnityEngine.Object.DestroyImmediate(popupGameObject.GetComponent<PopupUpdateStatus>());
             UnityEngine.Object.DestroyImmediate(popupGameObject.transform.Find("Popup/StatusSettings/DoNotDisturbStatus").gameObject);
             UnityEngine.Object.DestroyImmediate(popupGameObject.transform.Find("Popup/StatusSettings/OfflineStatus").gameObject);
+            UnityEngine.Object.DestroyImmediate(popupGameObject.transform.Find("Popup/StatusHistoryButton").gameObject);
             UnityEngine.Object.DestroyImmediate(popupGameObject.transform.Find("Popup/InputFieldStatus").gameObject);
             foreach (I2.Loc.Localize component in popupGameObject.GetComponentsInChildren<I2.Loc.Localize>()) UnityEngine.Object.Destroy(component);
 
@@ -143,6 +144,7 @@ namespace UserInfoExtentions.Modules
             UnityEngine.Object.DestroyImmediate(popupGameObject.transform.Find("Popup/StatusSettings/DoNotDisturbStatus").gameObject);
             UnityEngine.Object.DestroyImmediate(popupGameObject.transform.Find("Popup/StatusSettings/OfflineStatus").gameObject);
             UnityEngine.Object.DestroyImmediate(popupGameObject.transform.Find("Popup/InputFieldStatus").gameObject);
+            UnityEngine.Object.DestroyImmediate(popupGameObject.transform.Find("Popup/StatusHistoryButton").gameObject);
             foreach (I2.Loc.Localize component in popupGameObject.GetComponentsInChildren<I2.Loc.Localize>()) UnityEngine.Object.Destroy(component);
 
             bioLanguagesPopup = popupGameObject.AddComponent<BioLanguagesPopup>();

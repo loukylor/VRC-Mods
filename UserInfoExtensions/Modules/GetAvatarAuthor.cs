@@ -40,6 +40,7 @@ namespace UserInfoExtentions.Modules
             UserInfoExtensionsMod.userDetailsMenu.AddSimpleButton("Avatar Author", FromSocial, new Action<GameObject>((gameObject) => { authorFromSocialMenuButtonGameObject = gameObject; gameObject.SetActive(AuthorFromSocialMenuButton.Value); }));
             UIExpansionKit.API.ExpansionKitApi.GetExpandedMenu(UIExpansionKit.API.ExpandedMenu.AvatarMenu).AddSimpleButton("Avatar Author", FromAvatar, new Action<GameObject>((gameObject) => { authorFromAvatarMenuButtonGameObject = gameObject; gameObject.SetActive(AuthorFromAvatarMenuButton.Value); }));
             UserInfoExtensionsMod.menu.AddSimpleButton("Avatar Author", FromSocial);
+            UserInfoExtensionsMod.menu.AddSpacer();
 
             screenStackProp = typeof(VRCUiManager).GetProperties().Where(pi => pi.Name.Contains("field_Internal_List_1_") && !pi.Name.Contains("String")).First();
 

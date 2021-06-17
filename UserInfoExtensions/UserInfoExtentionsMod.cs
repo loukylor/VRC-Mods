@@ -54,9 +54,7 @@ namespace UserInfoExtensions
 
             AddModule(new QuickMenuFromSocial());
             AddModule(new GetAvatarAuthor());
-            AddModule(new OpenInWorldMenu());
             AddModule(new BioButtons());
-            AddModule(new OpenInBrowser());
             AddModule(new UserInformation());
 
             ExpansionKitApi.OnUiManagerInit += OnUiManagerInit;
