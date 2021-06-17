@@ -33,7 +33,6 @@ namespace AvatarHider.DataTypes
         public Vector3 Position => player.transform.position;
         public Player player;
         public GameObject avatar;
-        public List<RendererObject> avatarRenderers = new List<RendererObject>();
         public List<AudioSource> audioSources = new List<AudioSource>();
         public bool hasLetAudioPlay;
 
@@ -72,12 +71,9 @@ namespace AvatarHider.DataTypes
 
         public void SetAvatar(GameObject avatar)
         {
-            avatarRenderers.Clear();
             if (avatar != null)
             {
                 this.avatar = avatar;
-                foreach (Renderer renderer in avatar.GetComponentsInChildren<Renderer>(true))
-                    avatarRenderers.Add(new RendererObject(renderer, renderer.enabled));
                 avatar.SetActive(true);
                 active = false; // Do this so avatar sounds run on the first time
                 foreach (AudioSource audioSource in avatar.GetComponentsInChildren<AudioSource>(true))
@@ -99,64 +95,13 @@ namespace AvatarHider.DataTypes
         }
 
         private static Action<AvatarHiderPlayer> setInactiveDelegate;
-        private static readonly Action<AvatarHiderPlayer> setInactivePartlyDelegate = new Action<AvatarHiderPlayer>((playerProp) =>
-        {
-            for (int i = 0; i < playerProp.avatarRenderers.Count; i++)
-            {
-                if (playerProp.avatarRenderers[i].renderer == null)
-                {
-                    playerProp.avatarRenderers.RemoveAt(i);
-                    i -= 1;
-                    continue;
-                }
-
-                bool isEnabled = playerProp.avatarRenderers[i].renderer.enabled;
-                if (isEnabled && !playerProp.avatarRenderers[i].wasActive)
-                    playerProp.avatarRenderers[i].wasActive = true;
-                else if (!isEnabled && !playerProp.avatarRenderers[i].wasActive)
-                    playerProp.avatarRenderers[i].wasActive = false;
-
-                if (isEnabled)
-                    playerProp.avatarRenderers[i].renderer.enabled = false;
-            }
-        });
         private static readonly Action<AvatarHiderPlayer> setInactiveCompletelyDelegate = new Action<AvatarHiderPlayer>((playerProp) =>
         {
-            for (int i = 0; i < playerProp.avatarRenderers.Count; i++)
-            {
-                if (playerProp.avatarRenderers[i].renderer == null)
-                {
-                    playerProp.avatarRenderers.RemoveAt(i);
-                    i -= 1;
-                    continue;
-                }
-
-                bool isEnabled = playerProp.avatarRenderers[i].renderer.enabled;
-                if (isEnabled && !playerProp.avatarRenderers[i].wasActive)
-                    playerProp.avatarRenderers[i].wasActive = true;
-                else if (!isEnabled && !playerProp.avatarRenderers[i].wasActive)
-                    playerProp.avatarRenderers[i].wasActive = false;
-            }
-
             if (playerProp.avatar != null)
                 playerProp.avatar.SetActive(false);
         });
 
         private static Action<AvatarHiderPlayer> setActiveDelegate;
-        private static readonly Action<AvatarHiderPlayer> setActivePartlyDelegate = new Action<AvatarHiderPlayer>((playerProp) =>
-        {
-            for (int i = 0; i < playerProp.avatarRenderers.Count; i++)
-            {
-                if (playerProp.avatarRenderers[i].renderer == null)
-                {
-                    playerProp.avatarRenderers.RemoveAt(i);
-                    i -= 1;
-                    continue;
-                }
-
-                playerProp.avatarRenderers[i].renderer.enabled = playerProp.avatarRenderers[i].wasActive;
-            }
-        });
         private static readonly Action<AvatarHiderPlayer> setActiveCompletelyDelegate = new Action<AvatarHiderPlayer>((playerProp) =>
         {
             if (playerProp.avatar != null)
@@ -168,7 +113,6 @@ namespace AvatarHider.DataTypes
 
         public static void Init()
         {
-            Config.HideAvatarsCompletely.OnValueChanged += OnRelevantConfigChanged;
             Config.DisableSpawnSound.OnValueChanged += OnRelevantConfigChanged;
             OnRelevantConfigChanged(true, false);
         }
@@ -185,37 +129,30 @@ namespace AvatarHider.DataTypes
                 playerProp.SetActive();
                 playerProp.active = false; // Do this so avatar sounds run on the first time
             }
-            if (Config.HideAvatarsCompletely.Value)
+
+            if (Config.DisableSpawnSound.Value)
             {
-                if (Config.DisableSpawnSound.Value)
-                {
-                    foreach (AvatarHiderPlayer playerProp in PlayerManager.filteredPlayers.Values)
-                        playerProp.hasLetAudioPlay = false;
+                foreach (AvatarHiderPlayer playerProp in PlayerManager.filteredPlayers.Values)
+                    playerProp.hasLetAudioPlay = false;
 
-                    setActiveDelegate = setActiveCompletelyDelegate;
-                    setInactiveDelegate = setInactiveCompletelyDelegate;
+                setActiveDelegate = setActiveCompletelyDelegate;
+                setInactiveDelegate = setInactiveCompletelyDelegate;
 
-                    OnEnable = new Action<AvatarHiderPlayer>((playerProp) =>
-                    {
-                        if (playerProp.hasLetAudioPlay)
-                            playerProp.StopAudio();
-                    });
-                    OnDisable = new Action<AvatarHiderPlayer>((playerProp) =>
-                    {
-                        if (!playerProp.hasLetAudioPlay)
-                            playerProp.hasLetAudioPlay = true;
-                    });
-                }
-                else
+                OnEnable = new Action<AvatarHiderPlayer>((playerProp) =>
                 {
-                    setActiveDelegate = setActiveCompletelyDelegate;
-                    setInactiveDelegate = setInactiveCompletelyDelegate;
-                }
+                    if (playerProp.hasLetAudioPlay)
+                        playerProp.StopAudio();
+                });
+                OnDisable = new Action<AvatarHiderPlayer>((playerProp) =>
+                {
+                    if (!playerProp.hasLetAudioPlay)
+                        playerProp.hasLetAudioPlay = true;
+                });
             }
             else
             {
-                setActiveDelegate = setActivePartlyDelegate;
-                setInactiveDelegate = setInactivePartlyDelegate;
+                setActiveDelegate = setActiveCompletelyDelegate;
+                setInactiveDelegate = setInactiveCompletelyDelegate;
             }
 
             RefreshManager.Refresh();
