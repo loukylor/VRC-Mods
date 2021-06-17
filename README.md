@@ -80,10 +80,6 @@ And set the friend with the unoptimized avatar to the "Use Safety Settings" in t
 I spent lots of time to make sure the mod runs well, and also can be more snappy.
 There is no longer any delay to hide an avatar and also there should be less performance hit in general.
 
-Adding onto performance increases, is now an option to only disable renderers. This means it will lag less when you walk into a crowd of people and lots of avatar enable at once.
-The downside to this though, is that things like dynamic bones, final IK and other things will still calculate and take frametime. Just the avatar will be invisible.
-
-If you prefer to disable the entire avatar (like how AvatarHider worked before), things have mostly stayed the same. 
 The only difference is that the "Disable Spawn Sounds" setting will allow an avatar's spawn sounds to run once.
 
 The last addition is there is now an option to always include hidden avatars, even if they're a friend and you set AvatarHider to ignore friends.
@@ -193,12 +189,8 @@ A mod that adds buttons to the to make VRChat more convenient
 Adding individually toggleable buttons that allow you to:
  - Select a user in the Quick Menu from the Social Menu page.
  - Find the avatar's author from the Social Menu and Avatar Menu pages.
- - Selects the world instance of the selected user in the World Menu (if you can join their world).
- - Show the bio of the selected user (bio is different from status).
  - Open the links the selected user has in their bio.
  - Display the languages the selected user has in their bio.
- - Open the selected user in the system's default browser.
- - Open the selected user's avatar in the system's default browser.
 
 The buttons can always be accessed in a popup attached to the User Details Page.
 
