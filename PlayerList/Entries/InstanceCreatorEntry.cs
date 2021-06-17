@@ -16,7 +16,7 @@ namespace PlayerList.Entries
         }
         public IEnumerator GetInstanceCreator(ApiWorldInstance instance)
         {
-            string creator = instance.GetInstanceCreator();
+            string creator = instance.ownerId;
 
             if (creator != null)
             { 

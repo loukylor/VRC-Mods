@@ -18,7 +18,7 @@ namespace PlayerList.Utilities
             catch { }
             return false;
         }
-        public static bool CheckUsed(MethodInfo method, string methodName)
+        public static bool CheckUsedBy(MethodInfo method, string methodName)
         {
             try
             {

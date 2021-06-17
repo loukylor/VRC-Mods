@@ -75,7 +75,7 @@ namespace PlayerList.Config
 
             menuButtonPosition = CreateEntry(nameof(menuButtonPosition), MenuManager.MenuButtonPositionEnum.TopRight, is_hidden: true);
 
-            playerListPosition = CreateEntry(nameof(playerListPosition), new Vector2(7.5f, 3.5f), is_hidden: true);
+            playerListPosition = CreateEntry(nameof(playerListPosition), new Vector2(2100, 0), is_hidden: true);
 
             foreach (EntryWrapper entry in entries)
                 entry.OnValueChangedUntyped += new Action(() => OnConfigChange());

@@ -71,41 +71,13 @@ namespace PlayerList.UI
             quickMenuEnumProperty = typeof(QuickMenu).GetProperties()
                 .First(pi => pi.PropertyType.IsEnum && quickMenuNestedEnums.Contains(pi.PropertyType));
             setMenuIndex = typeof(QuickMenu).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_Enum") && mb.GetParameters().Length == 1 && mb.GetParameters()[0].ParameterType == quickMenuEnumProperty.PropertyType);
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Enum") && !mb.Name.Contains("_PDM_") && mb.GetParameters().Length == 1 && mb.GetParameters()[0].ParameterType == quickMenuEnumProperty.PropertyType);
+
+            openQuickMenu = typeof(QuickMenu).GetMethods()
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && Xref.CheckUsing(mb, setMenuIndex.Name, typeof(QuickMenu)));
 
             closeQuickMenu = typeof(QuickMenu).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && Xref.CheckUsed(mb, setMenuIndex.Name));
-
-            foreach (MethodInfo method in typeof(QuickMenu).GetMethods().Where(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM")))
-            {
-                MethodBase[] possibleMethods = null;
-                try
-                {
-                    possibleMethods = XrefScanner.UsedBy(method)
-                        .Where(instance => instance.Type == XrefType.Method && instance.TryResolve() != null && instance.TryResolve().Name.StartsWith("Method_Public_Void_") && !instance.TryResolve().Name.Contains("_PDM_") && instance.TryResolve().GetParameters().Length == 0)
-                        .Select(instance => instance.TryResolve())
-                        .ToArray();
-                }
-                catch (InvalidOperationException)
-                {
-                    continue;
-                }
-
-                if (possibleMethods.Length == 0)
-                    continue;
-
-                foreach (MethodInfo possibleMethod in possibleMethods)
-                {
-                    if (XrefScanner.UsedBy(possibleMethod).Any(instance => instance.Type == XrefType.Method && instance.TryResolve() != null && instance.TryResolve().Name.Contains("OpenQuickMenu")))
-                    {
-                        openQuickMenu = method;
-                        break;
-                    }
-                }
-
-                if (openQuickMenu != null)
-                    break;
-            }
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && Xref.CheckUsedBy(mb, setMenuIndex.Name));
 
             QuickMenuContextualDisplayEnum = typeof(QuickMenuContextualDisplay).GetNestedTypes()
                 .First(type => type.Name.StartsWith("Enum"));

@@ -41,7 +41,6 @@ namespace PlayerList
             NetworkEvents.OnPlayerJoined += OnPlayerJoined;
             NetworkEvents.OnPlayerLeft += OnPlayerLeft;
             NetworkEvents.OnInstanceChanged += OnInstanceChanged;
-            NetworkEvents.OnAvatarChanged += OnAvatarChanged;
             NetworkEvents.OnAvatarInstantiated += OnAvatarInstantiated;
             NetworkEvents.OnAvatarDownloadProgressed += OnAvatarDownloadProgressed;
 
@@ -115,14 +114,7 @@ namespace PlayerList
             foreach (EntryBase entry in entries)
                 entry.OnConfigChanged();
         }
-        // Despite only having one entry that uses this, there can be multiple instances of those entries and it's easier to just loop like this
-        public static void OnAvatarChanged(ApiAvatar avatar, VRCAvatarManager manager)
-        {
-            foreach (EntryBase entry in playerEntries)
-                entry.OnAvatarChanged(avatar, manager);
-            localPlayerEntry?.OnAvatarChanged(avatar, manager);
-        }
-        public static void OnAvatarInstantiated(VRCPlayer player, GameObject avatar)
+        public static void OnAvatarInstantiated(VRCAvatarManager player, GameObject avatar)
         {
             foreach (EntryBase entry in playerEntries)
                 entry.OnAvatarInstantiated(player, avatar);

@@ -118,28 +118,14 @@ namespace PlayerList.Entries
             if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.Distance))
                 EntrySortManager.SortPlayer(this);
         }
-        public override void OnAvatarChanged(ApiAvatar avatar, VRCAvatarManager manager)
-        {
-            if (manager.field_Private_VRCPlayer_0.prop_Player_0.prop_APIUser_0.id != userId)
-                return;
-            
-            perf = PerformanceRating.None;
-            perfString = "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, perf)) + ">" + PlayerUtils.ParsePerformanceText(perf) + "</color>";
-
-            if (player.prop_PlayerNet_0 != null)
-                UpdateEntry(player.prop_PlayerNet_0, this, true);
-            
-            if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.AvatarPerf))
-                EntrySortManager.SortPlayer(this);
-        }
-        public override void OnAvatarInstantiated(VRCPlayer vrcPlayer, GameObject avatar)
+        public override void OnAvatarInstantiated(VRCAvatarManager manager, GameObject avatar)
         {
             apiUser = player.prop_APIUser_0;
             userId = apiUser.id;
-            if (vrcPlayer.prop_Player_0.prop_APIUser_0?.id != userId)
+            if (manager.field_Private_VRCPlayer_0.prop_Player_0.prop_APIUser_0?.id != userId)
                 return;
 
-            perf = vrcPlayer.prop_VRCAvatarManager_0.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall];
+            perf = manager.prop_AvatarPerformanceStats_0.field_Private_ArrayOf_PerformanceRating_0[(int)AvatarPerformanceCategory.Overall];
             perfString = "<color=#" + ColorUtility.ToHtmlStringRGB(VRCUiAvatarStatsPanel.Method_Private_Static_Color_AvatarPerformanceCategory_PerformanceRating_0(AvatarPerformanceCategory.Overall, perf)) + ">" + PlayerUtils.ParsePerformanceText(perf) + "</color>";
             
             if (player.prop_PlayerNet_0 != null)
