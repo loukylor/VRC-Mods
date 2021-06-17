@@ -12,7 +12,7 @@ namespace InstanceHistory
         public static void Init()
         {
             category = MelonPreferences.CreateCategory("InstanceHistory Config");
-            useUIX = category.CreateEntry(nameof(useUIX), true, "Should use UIX instead of regular buttons", is_hidden: !InstanceHistoryMod.HasUIX);
+            useUIX = category.CreateEntry(nameof(useUIX), true, "Should use UIX instead of regular buttons", null, !InstanceHistoryMod.HasUIX);
             openButtonX = category.CreateEntry(nameof(openButtonX), 0f, "X position of button. Does not apply when using UIX.");
             openButtonY = category.CreateEntry(nameof(openButtonY), 0f, "Y position of button. Does not apply when using UIX.");
         }

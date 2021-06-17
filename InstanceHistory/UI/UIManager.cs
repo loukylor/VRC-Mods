@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Harmony;
+using HarmonyLib;
 using InstanceHistory.Utilities;
 using UnhollowerRuntimeLib.XrefScans;
 using UnityEngine;
 using UnityEngine.UI;
+
+using MelonLoader;
 
 namespace InstanceHistory.UI
 {
@@ -50,53 +52,25 @@ namespace InstanceHistory.UI
 
         public static void Init()
         {
-            foreach (MethodInfo method in typeof(QuickMenu).GetMethods().Where(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && !mb.Name.Contains("PDM")))
-            {
-                MethodBase[] possibleMethods = null;
-                try
-                {
-                    possibleMethods = XrefScanner.UsedBy(method)
-                        .Where(instance => instance.Type == XrefType.Method && instance.TryResolve() != null && instance.TryResolve().Name.StartsWith("Method_Public_Void_") && !instance.TryResolve().Name.Contains("_PDM_") && instance.TryResolve().GetParameters().Length == 0)
-                        .Select(instance => instance.TryResolve())
-                        .ToArray();
-                }
-                catch (InvalidOperationException)
-                {
-                    continue;
-                }
-
-                if (possibleMethods.Length == 0)
-                    continue;
-
-                foreach (MethodInfo possibleMethod in possibleMethods)
-                {
-                    if (XrefScanner.UsedBy(possibleMethod).Any(instance => instance.Type == XrefType.Method && instance.TryResolve() != null && instance.TryResolve().Name.Contains("OpenQuickMenu")))
-                    {
-                        openQuickMenu = method;
-                        break;
-                    }
-                }
-
-                if (openQuickMenu != null)
-                    break;
-            }
-
             List<Type> quickMenuNestedEnums = typeof(QuickMenu).GetNestedTypes().Where(type => type.IsEnum).ToList();
             quickMenuEnumProperty = typeof(QuickMenu).GetProperties()
                 .First(pi => pi.PropertyType.IsEnum && quickMenuNestedEnums.Contains(pi.PropertyType));
             setMenuIndex = typeof(QuickMenu).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_Enum") && mb.GetParameters()[0].ParameterType == quickMenuEnumProperty.PropertyType);
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Enum") && !mb.Name.Contains("_PDM_") && mb.GetParameters().Length == 1 && mb.GetParameters()[0].ParameterType == quickMenuEnumProperty.PropertyType);
+
+            openQuickMenu = typeof(QuickMenu).GetMethods()
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && Xref.CheckUsing(mb, setMenuIndex.Name, typeof(QuickMenu)));
 
             closeQuickMenu = typeof(QuickMenu).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && Xref.CheckUsed(mb, setMenuIndex.Name));
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && Xref.CheckUsedBy(mb, setMenuIndex.Name));
 
             QuickMenuContextualDisplayEnum = typeof(QuickMenuContextualDisplay).GetNestedTypes()
                 .First(type => type.Name.StartsWith("Enum"));
 
             QuickMenuContexualDisplayMethod = typeof(QuickMenuContextualDisplay).GetMethod($"Method_Public_Void_{QuickMenuContextualDisplayEnum.Name}_0");
 
-            InstanceHistoryMod.Instance.Harmony.Patch(openQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuOpen), BindingFlags.NonPublic | BindingFlags.Static)));
-            InstanceHistoryMod.Instance.Harmony.Patch(closeQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuClose), BindingFlags.NonPublic | BindingFlags.Static)));
+            InstanceHistoryMod.Instance.HarmonyInstance.Patch(openQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuOpen), BindingFlags.NonPublic | BindingFlags.Static)));
+            InstanceHistoryMod.Instance.HarmonyInstance.Patch(closeQuickMenu, null, new HarmonyMethod(typeof(UIManager).GetMethod(nameof(OnQuickMenuClose), BindingFlags.NonPublic | BindingFlags.Static)));
         }
         public static void OnSceneWasLoaded()
         {

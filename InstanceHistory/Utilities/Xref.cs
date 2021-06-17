@@ -18,7 +18,7 @@ namespace InstanceHistory.Utilities
             catch { }
             return false;
         }
-        public static bool CheckUsed(MethodBase methodBase, string methodName)
+        public static bool CheckUsedBy(MethodBase methodBase, string methodName)
         {
             try
             {

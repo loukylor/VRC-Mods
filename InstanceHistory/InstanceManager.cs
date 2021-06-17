@@ -52,7 +52,7 @@ namespace InstanceHistory
 
         public static void Add(ApiWorld world, ApiWorldInstance instance)
         {
-            instances.Insert(0, new WorldInstance(world.name, world.id, instance.idWithTags));
+            instances.Insert(0, new WorldInstance(world.name, world.id, instance.instanceId));
 
             File.WriteAllText(instanceDatabasePath, JsonConvert.SerializeObject(instances, Formatting.Indented));
         }
