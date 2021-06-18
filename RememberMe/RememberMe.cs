@@ -103,7 +103,7 @@ namespace RememberMe
             uiManager.field_Private_Action_1_VRCUiPage_0 = (
                 (uiManager.field_Private_Action_1_VRCUiPage_0 == null)
                 ? new Action<VRCUiPage>(OnPageShown)
-                : Il2CppSystem.Delegate.Combine(uiManager.field_Private_Action_1_VRCUiPage_0, (UnityEngine.Events.UnityAction<VRCUiPage>)new Action<VRCUiPage>(OnPageShown)).Cast<Il2CppSystem.Action<VRCUiPage>>()
+                : Il2CppSystem.Delegate.Combine(uiManager.field_Private_Action_1_VRCUiPage_0, (Il2CppSystem.Action<VRCUiPage>)new Action<VRCUiPage>(OnPageShown)).Cast<Il2CppSystem.Action<VRCUiPage>>()
                 );
         }
 
