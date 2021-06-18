@@ -18,7 +18,7 @@ namespace RememberMe
         public const string Name = "RememberMe";
         public const string Author = "Herp Derpinstine & dave-kun";
         public const string Company = "Lava Gang";
-        public const string Version = "1.06";
+        public const string Version = "1.0.6";
         public const string DownloadLink = "https://github.com/HerpDerpinstine/RememberMe";
     }
 
