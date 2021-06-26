@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using AvatarHider.DataTypes;
-using AvatarHider.Utilities;
 using UnityEngine;
 using VRC;
 using VRC.Core;
+using VRChatUtilityKit.Utilities;
 
 namespace AvatarHider
 {
@@ -31,8 +31,6 @@ namespace AvatarHider
 
         private static void OnAvatarChanged(VRCAvatarManager manager, GameObject gameObject)
         {
-            if (manager.field_Private_VRCPlayer_0 == null) return;
-            
             int photonId = manager.field_Private_VRCPlayer_0.prop_PlayerNet_0.prop_PhotonView_0.field_Private_Int32_0;
 
             if (!players.ContainsKey(photonId)) return;
@@ -43,7 +41,6 @@ namespace AvatarHider
             else
                 if (Config.IncludeHiddenAvatars.Value && players[photonId].isHidden)
                     players[photonId].SetInActive();
-
         }
 
         private static void OnPlayerJoin(Player player)
