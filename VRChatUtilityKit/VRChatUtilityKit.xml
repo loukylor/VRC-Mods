@@ -1,0 +1,589 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>VRChatUtilityKit</name>
+    </assembly>
+    <members>
+        <member name="T:VRChatUtilityKit.Components.EnableDisableListener">
+            <summary>
+            A simple enable/disable listener component
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Components.EnableDisableListener.OnEnableEvent">
+            <summary>
+            Calls when the component is enabled.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Components.EnableDisableListener.OnDisableEvent">
+            <summary>
+            Calls when the component is disabled.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.ElementBase.Path">
+            <summary>
+            The path of the GameObject
+            </summary>
+        </member>
+        <member name="T:VRChatUtilityKit.Ui.ToggleButton">
+            <summary>
+            A class representing a toggle button in VRChat's UI.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.ToggleButton.TextContainer">
+            <summary>
+            The GameObject containing all the text.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.ToggleButton.OnClick">
+            <summary>
+            The onClick event of toggle button.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.ToggleButton.Resize">
+            <summary>
+            Sets whether the text should resize for best fit.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.ToggleButton.State">
+            <summary>
+            The state of the toggle.
+            </summary>
+        </member>
+        <member name="T:VRChatUtilityKit.Ui.UiManager">
+            <summary>
+            A UiManager that contains many utilites pertaining to VRChat's UI.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Ui.UiManager.OnBigMenuOpened">
+            <summary>
+            Called when the big menu is opened.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Ui.UiManager.OnBigMenuClosed">
+            <summary>
+            Called when the big menu is closed.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.UiManager.BigMenuIndexEnum">
+            <summary>
+            The type of the enum that is used for the big menu index.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.UiManager.BigMenuIndexToPathTable">
+            <summary>
+            A table that will convert the big menu index to the path of the page.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Ui.UiManager.OnUserInfoMenuOpened">
+            <summary>
+            Called when the user info menu is opened.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Ui.UiManager.OnUserInfoMenuClosed">
+            <summary>
+            Called when the user info menu is closed.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Ui.UiManager.OnQuickMenuOpened">
+            <summary>
+            Called when the QuickMenu is opened.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Ui.UiManager.OnQuickMenuClosed">
+            <summary>
+            Called when the QuickMenu is closed.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.UiManager.QuickMenuIndexEnum">
+            <summary>
+            The type of the enum that is used for the QuickMenu index.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.UiManager.ExistingTabs">
+            <summary>
+            The current list of tabs registered by the game.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.UiManager.FullOnButtonSprite">
+            <summary>
+            The filled in button sprite.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.UiManager.RegularButtonSprite">
+            <summary>
+            The regular button sprite.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.UiManager.CurrentMenu">
+            <summary>
+            The current menu stored by VRChat.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.UiManager.CurrentTabMenu">
+            <summary>
+            The current tab menu stored by VRChat.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenSubMenu(VRChatUtilityKit.Ui.SubMenu,System.Boolean,System.Boolean)">
+            <summary>
+            Opens the given page in the QuickMenu.
+            </summary>
+            <param name="page">The page to open</param>
+            <param name="setCurrentMenu">Whether to set the current menu stored by VRChat to the page given</param>
+            <param name="setCurrentTab">Whether to set the current tab menu stored by VRChat to the page given</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenSubMenu(System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Opens the given page in the QuickMenu.
+            </summary>
+            <param name="page">The page to open</param>
+            <param name="setCurrentMenu">Whether to set the current menu stored by VRChat to the page given</param>
+            <param name="setCurrentTab">Whether to set the current tab menu stored by VRChat to the page given</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenSubMenu(UnityEngine.GameObject,System.Boolean,System.Boolean)">
+            <summary>
+            Opens the given page in the QuickMenu.
+            </summary>
+            <param name="page">The page to open</param>
+            <param name="setCurrentMenu">Whether to set the current menu stored by VRChat to the page given</param>
+            <param name="setCurrentTab">Whether to set the current tab menu stored by VRChat to the page given</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenTabMenu(VRChatUtilityKit.Ui.TabButton,UnityEngine.GameObject,System.Boolean,System.Boolean)">
+            <summary>
+            Opens the given tab as a tab menu and highlights the given tab button.
+            </summary>
+            <param name="tabButton">The tab button to highlight</param>
+            <param name="page">The page to open</param>
+            <param name="setCurrentMenu">Whether to set the current menu stored by VRChat to the page given</param>
+            <param name="setCurrentTab">Whether to set the current tab menu stored by VRChat to the page given</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.SetBigMenuIndex(System.Int32,System.Boolean)">
+            <summary>
+            Sets the index of the big menu.
+            </summary>
+            <param name="index">The index to set it to</param>
+            <param name="addToScreenStack">Whether the new screen opened should be added to the screen stack</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenBigMenuWithIndex(System.Int32)">
+            <summary>
+            Opens a new instance of the big menu with the given index.
+            </summary>
+            <param name="index">The index to set it to</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.CloseBigMenu">
+            <summary>
+            Closes the big menu.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenBigMenu">
+            <summary>
+            Opens the big menu.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.SetQuickMenuIndex(System.Int32)">
+            <summary>
+            Sets the index of the QuickMenu.
+            </summary>
+            <param name="index">The index to set it to</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenUserInQuickMenu(VRC.Player)">
+            <summary>
+            Opens given user in the QuickMenu.
+            </summary>
+            <param name="playerToSelect">The player to select</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenQuickMenu">
+            <summary>
+            Opens the QuickMenu.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenQuickMenu(System.Boolean)">
+            <summary>
+            Opens the QuickMenu.
+            </summary>
+            <param name="useRight">Whether open the QuickMenu on the right hand</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.CloseQuickMenu">
+            <summary>
+            Closes the QuickMenu.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.ClosePopup">
+            <summary>
+            Closes the current open popup
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenSmallPopup(System.String,System.String,System.String,System.Action,System.Action{VRCUiPopup})">
+            <summary>
+            Opens a small popup v2.
+            </summary>
+            <param name="title">The title of the popup</param>
+            <param name="description">The description of the popup</param>
+            <param name="buttonText">The text of the center button</param>
+            <param name="onButtonClick">The onClick of the center button</param>
+            <param name="additionalSetup">A callback called when the popup is initialized</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenErrorPopup(System.String)">
+            <summary>
+            Opens a small popup v2 with the title "Error!".
+            </summary>
+            <param name="description">The description of the popup</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenAlertPopup(System.String)">
+            <summary>
+            Opens a small popup v2 with the title "Alert!".
+            </summary>
+            <param name="description">The description of the popup</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenPopup(System.String,System.String,System.String,System.Action,System.String,System.Action,System.Action{VRCUiPopup})">
+            <summary>
+            Opens a small popup v2.
+            </summary>
+            <param name="title">The title of the popup</param>
+            <param name="description">The description of the popup</param>
+            <param name="leftButtonText">The text of the left button</param>
+            <param name="leftButtonClick">The onClick of the left button</param>
+            <param name="rightButtonText">The text of the right button</param>
+            <param name="rightButtonClick">The onClick of the right button</param>
+            <param name="additionalSetup">A callback called when the popup is initialized</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.SetIndexOfTab(VRChatUtilityKit.Ui.TabButton,System.Int32)">
+            <summary>
+            Sets the index of the given tab.
+            </summary>
+            <param name="tabButton">The tab button to set the index of</param>
+            <param name="index">the index to set the tab button to</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.ShowTabContent(VRChatUtilityKit.Ui.TabButton)">
+            <summary>
+            Shows the content of the tab.
+            </summary>
+            <param name="tabButton">The tab button whose content is shown</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.ShowTabContent(UnityEngine.GameObject)">
+            <summary>
+            Shows the content of the tab.
+            </summary>
+            <param name="tabButton">The tab button whose content is shown</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.SetTabIndexInQuickMenu(System.Int32)">
+            <summary>
+            Sets the tab index in the QuickMenu.
+            </summary>
+            <param name="index">The index to set in the QuickMenu</param>
+        </member>
+        <member name="T:VRChatUtilityKit.Utilities.AsyncUtils">
+            <summary>
+            A set of async utilities.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.AsyncUtils.YieldToMainThread">
+            <summary>
+            Await this to force the rest of the method body to run on the main thread.
+            </summary>
+        </member>
+        <member name="T:VRChatUtilityKit.Utilities.Converters">
+            <summary>
+            A set of converters for positions.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.Converters.ConvertToUnityUnits(UnityEngine.Vector3)">
+            <summary>
+            Returns the given coordinate converted from emm units to Unity units.
+            </summary>
+            <param name="emmPosition">The position to conver to Unity units</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.Converters.ConvertToEmmUnits(UnityEngine.Vector3)">
+            <summary>
+            Returns the given coordinate converted from Unity units to emm units.
+            </summary>
+            <param name="unityPosition">The position to conver to emm units</param>
+        </member>
+        <member name="T:VRChatUtilityKit.Utilities.CursorUtils">
+            <summary>
+            A set of utilities pertaining to VRChat's cursor
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.CursorUtils.CurrentCursor">
+            <summary>
+            Returns the current cursor being used by VRChat.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.CursorUtils.IsUseInputPressed">
+            <summary>
+            Returns whether the use input is being pressed on the current cursor.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.CursorUtils.HitPosition">
+            <summary>
+            Returns where the raycast of the current cursor is colliding.
+            </summary>
+        </member>
+        <member name="T:VRChatUtilityKit.Utilities.DataUtils">
+            <summary>
+            A set of utilities for data.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.DataUtils.CalculateSHA256Hash(System.Byte[])">
+            <summary>
+            Returns the SHA256 hash of the given byte array.
+            </summary>
+            <param name="data">The byte array to get the hash of</param>
+        </member>
+        <member name="T:VRChatUtilityKit.Utilities.Extensions">
+            <summary>
+            A set of extensions for various things.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.Extensions.GetPath(UnityEngine.GameObject)">
+            <summary>
+            Returns the path of the given GameObject.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.Extensions.SetLayerRecursive(UnityEngine.GameObject,System.Int32)">
+            <summary>
+            Sets the layer of the given GameObject and its children to the one given
+            </summary>
+            <param name="layer">The layer to set the GameObject and children to</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.Extensions.SetZ(UnityEngine.Vector3,System.Single)">
+            <summary>
+            Returns a new Vector3 with its z position set to the given one.
+            </summary>
+            <param name="newZ">The new z position of the vector</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.Extensions.RoundAmount(System.Single,System.Single)">
+            <summary>
+            Returns a copy of the float rounded to the given number.
+            </summary>
+            <param name="nearestFactor">The number the float should be rounded to</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.Extensions.RoundAmount(UnityEngine.Vector3,System.Single)">
+            <summary>
+            Returns a copy of the vector rounded to the given number.
+            </summary>
+            <param name="nearestFactor">The number the vector should be rounded to</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.Extensions.RoundAmount(UnityEngine.Vector2,System.Single)">
+            <summary>
+            Returns a copy of the vector rounded to the given number.
+            </summary>
+            <param name="nearestFactor">The number the vector should be rounded to</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.Extensions.DelegateSafeInvoke(System.Delegate,System.Object[])">
+            <summary>
+            Safely invokes the given delegate with the given args.
+            </summary>
+            <param name="delegate">The given delegate</param>
+            <param name="args">The params of the delegate</param>
+        </member>
+        <member name="T:VRChatUtilityKit.Utilities.NetworkEvents">
+            <summary>
+            A set of events pertaining to VRChat's network.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnPlayerLeft">
+            <summary>
+            Calls when a player has left the instance.
+            This will also call as every player is removed after leaving an instance.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnPlayerJoined">
+            <summary>
+            Calls when a player joins the instance.
+            The first call of this may contain a null APIUser.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnFriended">
+            <summary>
+            Calls when a new friend is added.
+            Whether they accepted your friend request or you accepted theirs does not matter.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnUnfriended">
+            <summary>
+            Calls when a friend is removed.
+            Whether you removed them or they removed you does not matter.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnInstanceChanged">
+            <summary>
+            Calls during the loading screen into a new instance.
+            Does not call if there was a desync while joining the instance.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnMasterChanged">
+            <summary>
+            Calls when the master of the instance changes.
+            Does not call upon initialy receiving the master after joining the instance.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnAvatarChanged">
+            <summary>
+            Calls when the internal value of the avatar in an instance of VRCAvatarManager is changed.
+            It will call for every GameObject change. This is not limited to, but includes the error bot and platform substitute.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnAvatarInstantiated">
+            <summary>
+            Calls when an avatar is instantiated
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnAvatarDownloadProgressed">
+            <summary>
+            Calls when an avatar download is progressing. 
+            The float is percentage and long is total size.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnSetupFlagsReceived">
+            <summary>
+            Calls when the setup flags of a VRCPlayer is received from photon.
+            The int is actually the enum "VRCPlayer.EnumNPrivateSealedvaViMoVRStShAvUsFa9vUnique" at the time of writing.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnShowSocialRankChanged">
+            <summary>
+            Calls when the local user changes whether to show their social rank.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnPlayerModerationSent">
+            <summary>
+            Calls when a player moderation is sent from the local user.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnPlayerModerationRemoved">
+            <summary>
+            Calls when a player moderation is removed by the local user.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.SemverVersion.Major">
+            <summary>
+            The major number of the version.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.SemverVersion.Minor">
+            <summary>
+            The minor number of the version.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.SemverVersion.Patch">
+            <summary>
+            The patch number of the version.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.SemverVersion.Type">
+            <summary>
+            The release type of the version.
+            </summary>
+        </member>
+        <member name="T:VRChatUtilityKit.Utilities.VRCUtils">
+            <summary>
+            A set of utilities pertaining to VRChat itself.
+            </summary>
+        </member>
+        <member name="F:VRChatUtilityKit.Utilities.VRCUtils.OnUiManagerInit">
+            <summary>
+            Calls when the VRChat UiManager is initialized
+            </summary>
+        </member>
+        <member name="F:VRChatUtilityKit.Utilities.VRCUtils.OnEmmWorldCheckCompleted">
+            <summary>
+            Calls when the emm world check finishes.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.AreRiskyFunctionsAllowed">
+            <summary>
+            Returns whether risky functions are allowed in the current world. 
+            It is recommended to use OnEmmWorldCheck over this property.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.IsUIXPresent">
+            <summary>
+            Returns whether UIExpansionKit is loaded.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.MenuControllerInstance">
+            <summary>
+            Returns the instance of the MenuController.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.WorldInfoInstance">
+            <summary>
+            Returns the instance of the WorldInfo component.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.UserInfoInstance">
+            <summary>
+            Returns the instance of the UserInfo component.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.ActiveUserInUserInfoMenu">
+            <summary>
+            Returns the active user in the user info menu.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.ActiveUserInQuickMenu">
+            <summary>
+            Returns the active user in the QuickMenu.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.ActivePlayerInQuickMenu">
+            <summary>
+            Returns the active player in the QuickMenu.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.VRCUtils.IsAvatarExplcitlyShown(VRC.Core.APIUser)">
+            <summary>
+            Returns whether the given user's avatar is explicity shown.
+            </summary>
+            <param name="user">The user to check</param>
+            <returns></returns>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.VRCUtils.IsAvatarExplcitlyHidden(VRC.Core.APIUser)">
+            <summary>
+            Returns whether the given user's avatar is explicity hidden.
+            </summary>
+            <param name="user">The user to check</param>
+            <returns></returns>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.VRCUtils.ReloadAllAvatars">
+            <summary>
+            Reloads all avatars.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.VRCUtils.ReloadAvatar(VRCPlayer)">
+            <summary>
+            Reloads the given player's avatar.
+            </summary>
+            <param name="player">The given player</param>
+        </member>
+        <member name="T:VRChatUtilityKit.Utilities.XrefUtils">
+            <summary>
+            A set of utilites for Xref scanning.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.XrefUtils.CheckMethod(System.Reflection.MethodInfo,System.String)">
+            <summary>
+            Returns if a string is contained within the given method's body.
+            </summary>
+            <param name="method">The method to check</param>
+            <param name="match">The string to check</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.XrefUtils.CheckUsedBy(System.Reflection.MethodInfo,System.String,System.Type)">
+            <summary>
+            Returns if the given method is called by the other given method.
+            </summary>
+            <param name="method">The method to check</param>
+            <param name="methodName">The name of the method that uses the given method</param>
+            <param name="type">The type of the method that uses the given method</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.XrefUtils.CheckUsing(System.Reflection.MethodInfo,System.String,System.Type)">
+            <summary>
+            Returns whether the given method is using another the other given method.
+            </summary>
+            <param name="method">The method to check</param>
+            <param name="methodName">The name of the method that is used by the given method</param>
+            <param name="type">The type of the method that is used by the given method</param>
+        </member>
+    </members>
+</doc>
