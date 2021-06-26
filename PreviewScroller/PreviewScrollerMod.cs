@@ -56,17 +56,17 @@ namespace PreviewScroller
 
                 lastPos = pos;
                 Vector2 scrollRectVelocity = scrollRect.velocity;
-                if (scrollRect.horizontalNormalizedPosition > 1 && velocity.x > 0)
+                if (scrollRect.horizontalNormalizedPosition > 0.01f && velocity.x > 0) 
                 {
-                    scrollRect.horizontalNormalizedPosition = 0;
-                    lastPos.x = 0;
+                    scrollRect.horizontalNormalizedPosition = 0f;
+                    lastPos.x = -1;
                 }
-                else if (scrollRect.horizontalNormalizedPosition < 0 && velocity.x < 0)
+                else if (scrollRect.horizontalNormalizedPosition < -0.01f && velocity.x<0)
                 {
-                    scrollRect.horizontalNormalizedPosition = 1;
+                    scrollRect.horizontalNormalizedPosition = 0f;
                     lastPos.x = 1;
                 }
-                pedestal.transform.Rotate(new Vector2(velocity.normalized.y, velocity.normalized.x), velocity.magnitude * 375 * Time.deltaTime);
+                pedestal.transform.Rotate(new Vector2(0, velocity.normalized.x),velocity.magnitude * 375 * Time.deltaTime);
                 scrollRect.velocity = scrollRectVelocity;
             }));
         }
