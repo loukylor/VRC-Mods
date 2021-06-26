@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using MelonLoader;
 using PlayerList.Entries;
-using PlayerList.Utilities;
 using UnityEngine;
+using VRChatUtilityKit.Utilities;
 
 namespace PlayerList.Config
 {
@@ -107,7 +107,7 @@ namespace PlayerList.Config
 
         public static void OnConfigChange(bool shouldSetHasConfigChanged = true)
         {
-            OnConfigChanged?.SafeInvoke();
+            OnConfigChanged?.DelegateSafeInvoke();
             hasConfigChanged = shouldSetHasConfigChanged;
         }
     }

@@ -1,5 +1,5 @@
-﻿using PlayerList.Utilities;
-using VRC;
+﻿using VRC;
+using VRChatUtilityKit.Utilities;
 
 namespace PlayerList.Entries
 {

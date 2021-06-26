@@ -3,6 +3,7 @@ using System.Reflection;
 using PlayerList.Config;
 using PlayerList.Entries;
 using PlayerList.Utilities;
+using VRChatUtilityKit.Utilities;
 
 namespace PlayerList
 {
@@ -10,10 +11,10 @@ namespace PlayerList
     {
         public static int sortStartIndex = 0;
 
-        public static PropertyInfo baseComparisonProperty;
-        public static PropertyInfo upperComparisonProperty;
-        public static PropertyInfo highestComparisonProperty;
-        public static PropertyInfo currentComparisonProperty;
+        public static FieldInfo baseComparisonProperty;
+        public static FieldInfo upperComparisonProperty;
+        public static FieldInfo highestComparisonProperty;
+        public static FieldInfo currentComparisonProperty;
 
         public static Comparison<PlayerEntry> currentBaseComparison;
         public static Comparison<PlayerEntry> currentUpperComparison;
@@ -78,12 +79,12 @@ namespace PlayerList
 
         public static void Init()
         {
-            baseComparisonProperty = typeof(PlayerListConfig).GetProperty(nameof(PlayerListConfig.currentBaseSort));
-            upperComparisonProperty = typeof(PlayerListConfig).GetProperty(nameof(PlayerListConfig.currentUpperSort));
-            highestComparisonProperty = typeof(PlayerListConfig).GetProperty(nameof(PlayerListConfig.currentHighestSort));
+            baseComparisonProperty = typeof(PlayerListConfig).GetField(nameof(PlayerListConfig.currentBaseSort));
+            upperComparisonProperty = typeof(PlayerListConfig).GetField(nameof(PlayerListConfig.currentUpperSort));
+            highestComparisonProperty = typeof(PlayerListConfig).GetField(nameof(PlayerListConfig.currentHighestSort));
 
             PlayerListConfig.OnConfigChanged += OnStaticConfigChange;
-            EntryManager.OnWorldAllowedChanged += OnWorldAllowedChanged;
+            VRCUtils.OnEmmWorldCheckCompleted += OnEmmWorldCheckCompleted;
         }
         private static void OnStaticConfigChange()
         {
@@ -99,7 +100,7 @@ namespace PlayerList
                     currentBaseComparison = avatarPerfSort;
                     break;
                 case SortType.Distance:
-                    if (EntryManager.WorldAllowed)
+                    if (VRCUtils.AreRiskyFunctionsAllowed)
                         currentBaseComparison = distanceSort;
                     else
                         currentBaseComparison = null;
@@ -130,7 +131,7 @@ namespace PlayerList
                     currentUpperComparison = avatarPerfSort;
                     break;
                 case SortType.Distance:
-                    if (EntryManager.WorldAllowed)
+                    if (VRCUtils.AreRiskyFunctionsAllowed)
                         currentUpperComparison = distanceSort;
                     else
                         currentUpperComparison = null;
@@ -161,7 +162,7 @@ namespace PlayerList
                     currentHighestComparison = avatarPerfSort;
                     break;
                 case SortType.Distance:
-                    if (EntryManager.WorldAllowed)
+                    if (VRCUtils.AreRiskyFunctionsAllowed)
                         currentHighestComparison = distanceSort;
                     else
                         currentHighestComparison = null;
@@ -217,9 +218,9 @@ namespace PlayerList
 
             SortAllPlayers();
         }
-        private static void OnWorldAllowedChanged()
+        private static void OnEmmWorldCheckCompleted(bool areRiskyFuncsAllowed)
         {
-            if (EntryManager.WorldAllowed)
+            if (areRiskyFuncsAllowed)
             { 
                 if (PlayerListConfig.currentBaseSort.Value == SortType.Distance)
                     currentBaseComparison = distanceSort;

@@ -1,6 +1,6 @@
-﻿using PlayerList.Utilities;
-using UnityEngine;
+﻿using UnityEngine;
 using VRC;
+using VRChatUtilityKit.Utilities;
 
 namespace PlayerList.Entries
 {

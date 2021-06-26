@@ -1,6 +1,6 @@
 ﻿using System;
 using MelonLoader;
-using PlayerList.Utilities;
+using VRChatUtilityKit.Utilities;
 
 namespace PlayerList.Config 
 {
@@ -8,7 +8,7 @@ namespace PlayerList.Config
     {
         public event Action OnValueChangedUntyped;
 
-        protected void RunOnValueChangedUntyped() => OnValueChangedUntyped?.SafeInvoke();
+        protected void RunOnValueChangedUntyped() => OnValueChangedUntyped?.DelegateSafeInvoke();
     }
     public class EntryWrapper<T> : EntryWrapper
     {
@@ -21,7 +21,7 @@ namespace PlayerList.Config
             {
                 if (!value.Equals(Value))
                 {
-                    OnValueChanged?.SafeInvoke(pref.Value, value);
+                    OnValueChanged?.DelegateSafeInvoke(pref.Value, value);
                     pref.Value = value;
                     RunOnValueChangedUntyped();
                 }

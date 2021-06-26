@@ -7,11 +7,12 @@ using System.Text;
 using HarmonyLib;
 using MelonLoader;
 using PlayerList.Config;
-using PlayerList.UI;
 using PlayerList.Utilities;
 using UnityEngine;
 using VRC;
 using VRC.Core;
+using VRChatUtilityKit.Ui;
+using VRChatUtilityKit.Utilities;
 using VRCSDK2.Validation.Performance;
 
 namespace PlayerList.Entries
@@ -53,7 +54,7 @@ namespace PlayerList.Entries
 
         public static void EntryInit()
         {
-            UIManager.OnQuickMenuOpenEvent += new Action(() =>
+            UiManager.OnQuickMenuOpened += new Action(() =>
             {
                 foreach (PlayerEntry entry in EntryManager.sortedPlayerEntries)
                     entry.GetPlayerColor(false);
@@ -63,7 +64,7 @@ namespace PlayerList.Entries
 
             PlayerListConfig.OnConfigChanged += OnStaticConfigChanged;
             NetworkEvents.OnFriended += OnFriended;
-            NetworkEvents.OnUnFriended += OnUnfriended;
+            NetworkEvents.OnUnfriended += OnUnfriended;
             NetworkEvents.OnSetupFlagsReceived += OnSetupFlagsReceived;
 
             PlayerListMod.Instance.HarmonyInstance.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend), BindingFlags.NonPublic | BindingFlags.Static)));        
@@ -118,7 +119,7 @@ namespace PlayerList.Entries
             if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.Distance))
                 EntrySortManager.SortPlayer(this);
         }
-        public override void OnAvatarInstantiated(VRCAvatarManager manager, GameObject avatar)
+        public override void OnAvatarInstantiated(VRCAvatarManager manager, ApiAvatar avatar, GameObject gameObject)
         {
             apiUser = player.prop_APIUser_0;
             userId = apiUser.id;
@@ -212,7 +213,7 @@ namespace PlayerList.Entries
         }
         private static void AddDistance(PlayerNet playerNet, PlayerEntry entry, ref StringBuilder tempString)
         {
-            if (EntryManager.WorldAllowed)
+            if (VRCUtils.AreRiskyFunctionsAllowed)
             {
                 if (entry.distance < 100)
                 {

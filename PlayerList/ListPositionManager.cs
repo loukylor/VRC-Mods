@@ -1,10 +1,11 @@
 ﻿using System;
 using MelonLoader;
 using PlayerList.Config;
-using PlayerList.UI;
 using PlayerList.Utilities;
 using UnhollowerRuntimeLib;
 using UnityEngine;
+using VRChatUtilityKit.Ui;
+using VRChatUtilityKit.Utilities;
 
 namespace PlayerList
 {
@@ -20,7 +21,7 @@ namespace PlayerList
         }
         public static void OnSnapToGridSizeChanged(int oldValue, int newValue)
         {
-            snapToGridSizeLabel.textComponent.text = $"Snap Grid\nSize: {newValue}";
+            snapToGridSizeLabel.TextComponent.text = $"Snap Grid\nSize: {newValue}";
         }
 
         public static void MovePlayerListToEndOfMenu()
@@ -46,10 +47,10 @@ namespace PlayerList
             {
                 PlayerListConfig.playerListPosition.Value = MenuManager.playerListRect.anchoredPosition;
                 gameObject.SetActive(!MenuManager.shouldStayHidden);
-                UIManager.OpenPage(MenuManager.playerListMenus[1].path);
+                UiManager.OpenSubMenu(MenuManager.playerListMenus[1].Path);
                 MenuManager.playerListRect.localPosition = MenuManager.playerListRect.localPosition.SetZ(25);
             })));
-            UIManager.OpenPage("UserInterface/QuickMenu/ShortcutMenu");
+            UiManager.OpenSubMenu("UserInterface/QuickMenu/ShortcutMenu");
             MenuManager.playerList.SetActive(true);
         }
         private static System.Collections.IEnumerator WaitForPress(GameObject movingGameObject, Action<GameObject> onComplete = null)
@@ -57,20 +58,20 @@ namespace PlayerList
             RectTransform movingGameObjectRect = movingGameObject.GetComponent<RectTransform>();
             Vector3 oldPosition = movingGameObjectRect.anchoredPosition3D;
 
-            while (InputManager.IsUseInputPressed && shouldMove)
+            while (CursorUtils.IsUseInputPressed && shouldMove)
             {
                 CombineQMColliderAndPlayerListRect();
-                movingGameObjectRect.transform.position = InputManager.HitPosition;
+                movingGameObjectRect.transform.position = CursorUtils.HitPosition;
                 movingGameObjectRect.transform.localPosition = movingGameObjectRect.transform.localPosition.SetZ(oldPosition.z);
                 movingGameObjectRect.anchoredPosition = movingGameObjectRect.anchoredPosition.RoundAmount(PlayerListConfig.snapToGridSize.Value);
 
                 yield return null;
             }
 
-            while (!InputManager.IsUseInputPressed && shouldMove)
+            while (!CursorUtils.IsUseInputPressed && shouldMove)
             {
                 CombineQMColliderAndPlayerListRect();
-                movingGameObjectRect.transform.position = InputManager.HitPosition;
+                movingGameObjectRect.transform.position = CursorUtils.HitPosition;
                 movingGameObjectRect.transform.localPosition = movingGameObjectRect.transform.localPosition.SetZ(oldPosition.z);
                 movingGameObjectRect.anchoredPosition = movingGameObjectRect.anchoredPosition.RoundAmount(PlayerListConfig.snapToGridSize.Value);
 
@@ -79,7 +80,7 @@ namespace PlayerList
 
             if (shouldMove)
             {
-                onComplete.SafeInvoke(movingGameObject);
+                onComplete.DelegateSafeInvoke(movingGameObject);
             }
             else
             {

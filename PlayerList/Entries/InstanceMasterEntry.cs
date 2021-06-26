@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using MelonLoader;
 using Photon.Realtime;
-using PlayerList.Utilities;
+using VRChatUtilityKit.Utilities;
 
 namespace PlayerList.Entries
 {

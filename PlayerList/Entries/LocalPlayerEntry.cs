@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
 using System.Text;
-using HarmonyLib;
 using PlayerList.Config;
 using PlayerList.Utilities;
 using UnityEngine;
 using VRC;
 using VRC.Core;
+using VRChatUtilityKit.Utilities;
 using VRCSDK2.Validation.Performance;
 
 namespace PlayerList.Entries
@@ -21,9 +19,7 @@ namespace PlayerList.Entries
         public static new UpdateEntryDelegate updateDelegate;
         public static new void EntryInit()
         {
-            MethodInfo OnShowSocialRankChangeMethod = typeof(QuickMenu).GetMethods()
-                .First(mi => mi.Name.StartsWith("Method_Public_Void_") && mi.GetParameters().Length == 0 && Xref.CheckUsing(mi, "Method_Public_Static_Void_EnumNPublicSealed", typeof(VRCInputManager))); // && (!mi.Name.EndsWith("1") && !mi.Name.EndsWith("8") && !mi.Name.EndsWith("12") && !mi.Name.EndsWith("17") && !mi.Name.EndsWith("6"))))
-            PlayerListMod.Instance.HarmonyInstance.Patch(OnShowSocialRankChangeMethod, null, new HarmonyMethod(typeof(LocalPlayerEntry).GetMethod(nameof(OnShowSocialRankChange), BindingFlags.NonPublic | BindingFlags.Static)));
+            NetworkEvents.OnShowSocialRankChanged += OnShowSocialRankChange;
         }
         public override void Init(object[] parameters)
         {

@@ -76,7 +76,7 @@ namespace PlayerList.Entries
         {
         }
 
-        public virtual void OnAvatarInstantiated(VRCAvatarManager vrcPlayer, GameObject avatar)
+        public virtual void OnAvatarInstantiated(VRCAvatarManager vrcPlayer, ApiAvatar avatar, GameObject gameObject)
         {
         }
 

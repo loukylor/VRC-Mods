@@ -1,5 +1,6 @@
 ﻿using VRC;
 using VRCSDK2.Validation.Performance;
+using VRChatUtilityKit.Ui;
 
 namespace PlayerList.Utilities
 {
@@ -18,7 +19,7 @@ namespace PlayerList.Utilities
 
         public static void OpenPlayerInQuickMenu(Player player)
         {
-            InputManager.SelectPlayer(player);
+            UiManager.OpenUserInQuickMenu(player);
             QuickMenuContextualDisplay.Method_Public_Static_Void_VRCPlayer_0(player.prop_VRCPlayer_0);
         }
 

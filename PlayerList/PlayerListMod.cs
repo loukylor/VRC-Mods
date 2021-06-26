@@ -2,14 +2,13 @@
 using System.Linq;
 using MelonLoader;
 using PlayerList.Config;
-using PlayerList.Components;
 using PlayerList.Entries;
-using PlayerList.UI;
 using PlayerList.Utilities;
 using UnhollowerRuntimeLib;
 using UnityEngine;
+using VRChatUtilityKit.Components;
 
-[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.5.4", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.5.5", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 [assembly: MelonOptionalDependencies("UIExpansionKit")]
 
@@ -26,7 +25,6 @@ namespace PlayerList
             Instance = this;
             ClassInjector.RegisterTypeInIl2Cpp<EnableDisableListener>();
             PlayerListConfig.RegisterSettings();
-            UIManager.Init();
             EntryManager.Init();
             ListPositionManager.Init();
             MenuManager.Init();
@@ -49,7 +47,6 @@ namespace PlayerList
         {
             // Initialize Constants util
             Constants.UIInit();
-            UIManager.UIInit();
 
             // TODO: Add opacity options, maybe color too, (maybe even for each stage of ping and fps??)
             // TODO: add indicator for those in hearing distance
@@ -66,9 +63,6 @@ namespace PlayerList
             EntryManager.AddGeneralInfoEntries();
             MenuManager.CreateGeneralInfoSubMenus();
             MenuManager.AdjustSubMenus();
-
-            // Initialize on network events
-            NetworkEvents.NetworkInit();
 
             PlayerListConfig.OnConfigChange(false);
 

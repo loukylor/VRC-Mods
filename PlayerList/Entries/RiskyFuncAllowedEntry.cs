@@ -1,4 +1,6 @@
-﻿namespace PlayerList.Entries
+﻿using VRChatUtilityKit.Utilities;
+
+namespace PlayerList.Entries
 {
     class RiskyFuncAllowedEntry : EntryBase
     {
@@ -6,12 +8,12 @@
 
         public override void Init(object[] parameters = null)
         {
-            EntryManager.OnWorldAllowedChanged += OnWorldAllowedChanged;
+            VRCUtils.OnEmmWorldCheckCompleted += OnEmmWorldCheckCompleted;
         }
 
-        public void OnWorldAllowedChanged()
+        public void OnEmmWorldCheckCompleted(bool areRiskyFuncsAllowed)
         {
-            textComponent.text = OriginalText.Replace("{riskyfuncallowed}", EntryManager.WorldAllowed.ToString());
+            textComponent.text = OriginalText.Replace("{riskyfuncallowed}", areRiskyFuncsAllowed.ToString());
         }
     }
 }
