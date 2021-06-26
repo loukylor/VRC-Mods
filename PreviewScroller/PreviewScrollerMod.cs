@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
-using HarmonyLib;
 using MelonLoader;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 using UnityEngine.UI;
-using VRC.UI;
 using VRChatUtilityKit.Utilities;
 
-[assembly: MelonInfo(typeof(PreviewScroller.PreviewScrollerMod), "PreviewScroller", "0.0.1", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(PreviewScroller.PreviewScrollerMod), "PreviewScroller", "1.0.0", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace PreviewScroller
