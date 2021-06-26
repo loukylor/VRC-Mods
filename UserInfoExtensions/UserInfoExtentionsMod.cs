@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using MelonLoader;
 using UIExpansionKit.API;
 using UserInfoExtentions.Modules;
-using UserInfoExtentions.Utilities;
 using VRC.UI;
+using VRChatUtilityKit.Ui;
+using VRChatUtilityKit.Utilities;
 
-[assembly: MelonInfo(typeof(UserInfoExtensions.UserInfoExtensionsMod), "UserInfoExtensions", "2.5.3", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(UserInfoExtensions.UserInfoExtensionsMod), "UserInfoExtensions", "2.5.4", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace UserInfoExtensions
@@ -27,7 +27,6 @@ namespace UserInfoExtensions
         {            
             Instance = this;
             CacheManager.Init();
-            VRCUtils.Init();
 
             foreach (MethodInfo method in typeof(MenuController).GetMethods().Where(mi => mi.Name.StartsWith("Method_Public_Void_APIUser_") && !mi.Name.Contains("_PDM_")))
                 HarmonyInstance.Patch(method, postfix: new HarmonyMethod(typeof(UserInfoExtensionsMod).GetMethod("OnUserInfoOpen", BindingFlags.Static | BindingFlags.Public)));
@@ -57,13 +56,12 @@ namespace UserInfoExtensions
             AddModule(new BioButtons());
             AddModule(new UserInformation());
 
-            ExpansionKitApi.OnUiManagerInit += OnUiManagerInit;
+            VRCUtils.OnUiManagerInit += OnUiManagerInit;
 
             MelonLogger.Msg("Initialized!");
         }
         public void OnUiManagerInit()
         {
-            VRCUtils.UiInit();
             foreach (ModuleBase module in modules)
                 module.UiInit();
 
@@ -73,10 +71,6 @@ namespace UserInfoExtensions
         {
             foreach (ModuleBase module in modules)
                 module.OnPreferencesSaved();
-        }
-        public override void OnUpdate()
-        {
-            if (AsyncUtils.toMainThreadQueue.TryDequeue(out Action action)) action();
         }
         public static void OnUserInfoOpen()
         {
@@ -92,7 +86,7 @@ namespace UserInfoExtensions
         */
         public static void HideAllPopups()
         {
-            VRCUtils.ClosePopup();
+            UiManager.ClosePopup();
             BioButtons.bioLanguagesPopup?.Close();
             BioButtons.bioLinksPopup?.Close();
             menu.Hide();

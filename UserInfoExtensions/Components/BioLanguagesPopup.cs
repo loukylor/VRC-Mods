@@ -1,13 +1,14 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.UI;
 using UserInfoExtentions.Modules;
 
 namespace UserInfoExtentions.Components
 {
     public class BioLanguagesPopup : VRCUiPopup
     {
-        public UnityEngine.UI.Button closeButton;
-        public UnityEngine.UI.Text[] languageTexts;
+        public Button closeButton;
+        public Text[] languageTexts;
         public GameObject[] languageStates;
 
         public new void OnEnable()

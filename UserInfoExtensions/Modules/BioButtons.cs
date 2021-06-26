@@ -5,8 +5,9 @@ using UnhollowerRuntimeLib;
 using UnityEngine;
 using UserInfoExtensions;
 using UserInfoExtentions.Components;
-using UserInfoExtentions.Utilities;
 using VRC.UI;
+using VRChatUtilityKit.Ui;
+using VRChatUtilityKit.Utilities;
 
 namespace UserInfoExtentions.Modules
 {
@@ -192,7 +193,7 @@ namespace UserInfoExtentions.Modules
         public override void OnUserInfoOpen()
         {
             userLanguages.Clear();
-            foreach (string tag in VRCUtils.ActiveUser.tags) //Cant use where here because Il2Cpp List and regular List
+            foreach (string tag in VRCUtils.ActiveUserInUserInfoMenu.tags) //Cant use where here because Il2Cpp List and regular List
             {
                 if (tag.StartsWith("language_")) userLanguages.Add(languageLookup[tag.Substring(9)]);
             }
@@ -202,20 +203,20 @@ namespace UserInfoExtentions.Modules
         {
             UserInfoExtensionsMod.HideAllPopups();
 
-            if (VRCUtils.ActiveUser.bioLinks == null)
+            if (VRCUtils.ActiveUserInUserInfoMenu.bioLinks == null)
             {
-                VRCUtils.OpenPopupV2("Notice:", "Cannot get user's links", "Close", new Action(VRCUtils.ClosePopup));
+                UiManager.OpenSmallPopup("Notice:", "Cannot get user's links", "Close", new Action(UiManager.ClosePopup));
             }
             else
             {
-                CheckLinks(VRCUtils.ActiveUser.bioLinks);
-                if (VRCUtils.ActiveUser.bioLinks.Count == 0)
+                CheckLinks(VRCUtils.ActiveUserInUserInfoMenu.bioLinks);
+                if (VRCUtils.ActiveUserInUserInfoMenu.bioLinks.Count == 0)
                 {
-                    VRCUtils.OpenPopupV2("Notice:", "This user has no bio links", "Close", new Action(VRCUtils.ClosePopup));
+                    UiManager.OpenSmallPopup("Notice:", "This user has no bio links", "Close", new Action(UiManager.ClosePopup));
                 }
                 else if (bioLinks.Count == 0)
                 {
-                    VRCUtils.OpenPopupV2("Notice:", "This user has invalid links", "Close", new Action(VRCUtils.ClosePopup));
+                    UiManager.OpenSmallPopup("Notice:", "This user has invalid links", "Close", new Action(UiManager.ClosePopup));
                 }
                 else
                 {
@@ -247,7 +248,7 @@ namespace UserInfoExtentions.Modules
 
             if (userLanguages == null || userLanguages.Count == 0)
             {
-                VRCUtils.OpenPopupV2("Notice:", "This user has no bio languages", "Close", new Action(VRCUtils.ClosePopup));
+                UiManager.OpenSmallPopup("Notice:", "This user has no bio languages", "Close", new Action(UiManager.ClosePopup));
             }
             else
             {

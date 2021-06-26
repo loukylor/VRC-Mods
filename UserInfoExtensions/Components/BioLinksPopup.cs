@@ -3,18 +3,20 @@ using System.IO;
 using System.Net;
 using UnhollowerBaseLib.Attributes;
 using UnityEngine;
+using UnityEngine.UI;
 using UserInfoExtentions.Modules;
-using UserInfoExtentions.Utilities;
+using VRChatUtilityKit.Ui;
+using VRChatUtilityKit.Utilities;
 
 namespace UserInfoExtentions.Components
 {
     //Learned from Knah's UIExpansionKit (https://github.com/knah/VRCMods/blob/master/UIExpansionKit/Components/EnableDisableListener.cs)
     public class BioLinksPopup : VRCUiPopup
     {
-        public UnityEngine.UI.Button openLinkButton;
-        public UnityEngine.UI.ToggleGroup toggleGroup;
-        public UnityEngine.UI.Text[] linkTexts;
-        public UnityEngine.UI.RawImage[] icons;
+        public Button openLinkButton;
+        public ToggleGroup toggleGroup;
+        public Text[] linkTexts;
+        public RawImage[] icons;
         public GameObject[] linkStates;
         public Uri currentLink;
 
@@ -70,7 +72,7 @@ namespace UserInfoExtentions.Components
             {
                 System.Diagnostics.Process.Start(currentLink.OriginalString);
                 Close();
-                VRCUtils.OpenPopupV2("Notice:", "Link has been opened in the default browser", "Close", new Action(VRCUtils.ClosePopup));
+                UiManager.OpenSmallPopup("Notice:", "Link has been opened in the default browser", "Close", new Action(UiManager.ClosePopup));
                 currentLink = null;
             }
         }
