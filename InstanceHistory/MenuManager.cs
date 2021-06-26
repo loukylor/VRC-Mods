@@ -1,9 +1,9 @@
 ﻿using System;
-using InstanceHistory.UI;
-using InstanceHistory.Utilities;
 using MelonLoader;
 using UnityEngine;
 using UnityEngine.UI;
+using VRChatUtilityKit.Ui;
+using VRChatUtilityKit.Utilities;
 
 namespace InstanceHistory
 {
@@ -20,7 +20,7 @@ namespace InstanceHistory
 
                 _instanceIndex = value;
 
-                pageNumLabel.textComponent.text = $"Page: {PageNum} of {LastPageNum}";
+                pageNumLabel.TextComponent.text = $"Page: {PageNum} of {LastPageNum}";
 
                 if (PageNum == LastPageNum || LastPageNum == 1)
                     pageDown.gameObject.SetActive(false);
@@ -48,9 +48,9 @@ namespace InstanceHistory
                     else
                     {
                         InstanceManager.WorldInstance instance = InstanceManager.instances[InstanceIndex + i];
-                        buttons[i].textComponent.text = instance.worldName + ": " + instance.instanceId.Split('~')[0];
-                        buttons[i].buttonComponent.onClick = new Button.ButtonClickedEvent();
-                        buttons[i].buttonComponent.onClick.AddListener(new Action(() => WorldManager.EnterWorld(instance.worldId + ":" + instance.instanceId)));
+                        buttons[i].TextComponent.text = instance.worldName + ": " + instance.instanceId.Split('~')[0];
+                        buttons[i].ButtonComponent.onClick = new Button.ButtonClickedEvent();
+                        buttons[i].ButtonComponent.onClick.AddListener(new Action(() => WorldManager.EnterWorld(instance.worldId + ":" + instance.instanceId)));
                         buttons[i].gameObject.SetActive(true);
                     }
                 }
@@ -87,9 +87,9 @@ namespace InstanceHistory
             if (InstanceHistoryMod.HasUIX)
                 typeof(UIXManager).GetMethod("AddOpenButtonToUIX").Invoke(null, null);
 
-            pageUp = new SingleButton(menu.gameObject, "UserInterface/QuickMenu/EmojiMenu/PageUp", new Vector3(4, 0), "", new Action(() => InstanceIndex -= 9), $"Go up a page", "UpPageButton");
-            pageDown = new SingleButton(menu.gameObject, "UserInterface/QuickMenu/EmojiMenu/PageDown", new Vector3(4, 2), "", new Action(() => InstanceIndex += 9), $"Go down a page", "DownPageButton");
-            backButton = new SingleButton(menu.gameObject, new Vector3(4, 0), "Back", new Action(() => UIManager.OpenPage("UserInterface/QuickMenu/ShortcutMenu")), "Press to go back to the Shortcut Menu", "BackButton", color: Color.yellow);
+            pageUp = new SingleButton(menu.gameObject, GameObject.Find("UserInterface/QuickMenu/EmojiMenu/PageUp"), new Vector3(4, 0), "", new Action(() => InstanceIndex -= 9), $"Go up a page", "UpPageButton");
+            pageDown = new SingleButton(menu.gameObject, GameObject.Find("UserInterface/QuickMenu/EmojiMenu/PageDown"), new Vector3(4, 2), "", new Action(() => InstanceIndex += 9), $"Go down a page", "DownPageButton");
+            backButton = new SingleButton(menu.gameObject, new Vector3(4, 0), "Back", new Action(() => UiManager.OpenSubMenu("UserInterface/QuickMenu/ShortcutMenu")), "Press to go back to the Shortcut Menu", "BackButton", textColor: Color.yellow);
             backButton.gameObject.SetActive(false);
             pageNumLabel = new Label(menu.gameObject, new Vector3(4, 1), $"Page: 1 of {LastPageNum}", "PageNumberLabel");
 
@@ -101,7 +101,7 @@ namespace InstanceHistory
 
         public static void OpenInstanceHistoryMenu()
         {
-            UIManager.OpenPage(menu.path);
+            menu.OpenSubMenu();
             InstanceIndex = 0;
         }
 

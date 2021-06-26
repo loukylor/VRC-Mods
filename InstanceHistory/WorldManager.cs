@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
-using InstanceHistory.Utilities;
 using MelonLoader;
 using VRC.Core;
+using VRChatUtilityKit.Ui;
 
 namespace InstanceHistory
 {
@@ -41,7 +41,7 @@ namespace InstanceHistory
         {
             object currentPortalInfo = Activator.CreateInstance(typeof(WorldTransitionInfo), new object[2] { Enum.Parse(transitionInfoEnum, "Menu"), "WorldInfo_Go" });
             currentPortalInfo.GetType().GetProperty($"field_Public_{transitionInfoEnum.Name}_0").SetValue(currentPortalInfo, transitionInfoEnum.GetEnumValues().GetValue(3)); //I hate reflection
-            enterWorldMethod.Invoke(VRCFlowManager.prop_VRCFlowManager_0, new object[5] { roomId.Split(':')[0], roomId.Split(':')[1], currentPortalInfo, (Il2CppSystem.Action<string>)new Action<string>((str) => VRCUtils.OpenPopupV2("Alert", "Cannot Join World", "Close", new Action(VRCUtils.ClosePopup))), false }); //Just kill me
+            enterWorldMethod.Invoke(VRCFlowManager.prop_VRCFlowManager_0, new object[5] { roomId.Split(':')[0], roomId.Split(':')[1], currentPortalInfo, (Il2CppSystem.Action<string>)new Action<string>((str) => UiManager.OpenAlertPopup("Cannot Join World")), false }); //Just kill me
         }
     }
 }
