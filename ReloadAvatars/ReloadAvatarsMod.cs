@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
 using MelonLoader;
 using UIExpansionKit.API;
 using UnityEngine;
+using VRChatUtilityKit.Utilities;
 
-[assembly: MelonInfo(typeof(ReloadAvatars.ReloadAvatarsMod), "ReloadAvatars", "1.0.3", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(ReloadAvatars.ReloadAvatarsMod), "ReloadAvatars", "1.0.4", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace ReloadAvatars
@@ -24,14 +23,14 @@ namespace ReloadAvatars
             reloadAvatarPref = category.CreateEntry("ReloadAvatar", true, "Enable/Disable Reload Avatar Button");
             reloadAllAvatarsPref = category.CreateEntry("ReloadAllAvatars", true, "Enable/Disable Reload All Avatars Button");
 
-            MethodInfo reloadAvatarMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.Name.StartsWith("Method_Private_Void_Boolean_") && mi.Name.Length < 31 && mi.GetParameters().Any(pi => pi.IsOptional));
-            MethodInfo reloadAllAvatarsMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.Name.StartsWith("Method_Public_Void_Boolean_") && mi.Name.Length < 30 && mi.GetParameters().Any(pi => pi.IsOptional));// Both methods seem to do the same thing
+            foreach (MelonPreferences_Entry entry in category.Entries)
+                entry.OnValueChangedUntyped += OnPrefChanged;
 
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.UserQuickMenu).AddSimpleButton("Reload Avatar", new Action(() =>
             {
                 try
                 {
-                    reloadAvatarMethod.Invoke(QuickMenu.prop_QuickMenu_0.field_Private_Player_0.prop_VRCPlayer_0, new object[] { true });
+                    VRCUtils.ReloadAvatar(VRCUtils.ActivePlayerInQuickMenu.prop_VRCPlayer_0);
                 }
                 catch (Exception ex)
                 {
@@ -43,8 +42,8 @@ namespace ReloadAvatars
             {
                 try
                 {
-                    reloadAllAvatarsMethod.Invoke(VRCPlayer.field_Internal_Static_VRCPlayer_0, new object[] { true });
-                    reloadAvatarMethod.Invoke(VRCPlayer.field_Internal_Static_VRCPlayer_0, new object[] { true }); // Ensure self is also reloaded (reload is not networked)
+                    VRCUtils.ReloadAllAvatars();
+                    VRCUtils.ReloadAvatar(VRCPlayer.field_Internal_Static_VRCPlayer_0);
                 }
                 catch (Exception ex)
                 {
@@ -53,7 +52,7 @@ namespace ReloadAvatars
             }), new Action<GameObject>((gameObject) => { reloadAllAvatarsButton = gameObject; reloadAllAvatarsButton.SetActive(reloadAvatarPref.Value); }));
             MelonLogger.Msg("Initialized!");
         }
-        public override void OnPreferencesSaved()
+        public void OnPrefChanged()
         {
             reloadAvatarButton?.SetActive(reloadAvatarPref.Value);
             reloadAllAvatarsButton?.SetActive(reloadAllAvatarsPref.Value);
