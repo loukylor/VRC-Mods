@@ -1,10 +1,13 @@
-﻿using HarmonyLib;
+﻿using System.Collections.Generic;
+using HarmonyLib;
 using MelonLoader;
 using UnityEngine;
 using VRC.Core;
+using VRChatUtilityKit.Utilities;
 
-[assembly: MelonInfo(typeof(CloningBeGone.CloningBeGoneMod), "CloningBeGone", "1.1.4", "loukylor (https://github.com/loukylor/CloningBeGone)")]
+[assembly: MelonInfo(typeof(CloningBeGone.CloningBeGoneMod), "CloningBeGone", "1.2.0", "loukylor (https://github.com/loukylor/CloningBeGone)")]
 [assembly: MelonGame("VRChat", "VRChat")]
+[assembly: MelonOptionalDependencies("UIExpansionKit")]
 
 namespace CloningBeGone
 {
@@ -16,23 +19,36 @@ namespace CloningBeGone
         public static MelonPreferences_Entry<bool> InvitePlusCloningSetting;
         public static MelonPreferences_Entry<bool> InviteCloningSetting;
 
+        public static MelonPreferences_Entry<List<string>> cloningOnAvatars;
+        public static MelonPreferences_Entry<List<string>> cloningOffAvatars;
+
         public static InstanceAccessType currentAccessType;
         public static UiSettingConfig cloningSetting;
-        public static bool isClosing = false;
 
         public override void OnApplicationStart()
         {
-            MelonPreferences.CreateCategory("CloningBeGone", "CloningBeGone Settings");
-            PublicCloningSetting = MelonPreferences.CreateEntry("CloningBeGone", nameof(PublicCloningSetting), false, "Cloning setting in public instances");
-            FriendsPlusCloningSetting = MelonPreferences.CreateEntry("CloningBeGone", nameof(FriendsPlusCloningSetting), false, "Cloning setting in friends+ instances");
-            FriendsCloningSetting = MelonPreferences.CreateEntry("CloningBeGone", nameof(FriendsCloningSetting), false, "Cloning setting in friend only instances");
-            InvitePlusCloningSetting = MelonPreferences.CreateEntry("CloningBeGone", nameof(InvitePlusCloningSetting), false, "Cloning setting in invite+ instances");
-            InviteCloningSetting = MelonPreferences.CreateEntry("CloningBeGone", nameof(InviteCloningSetting), false, "Cloning setting in invite only instances");
+            MelonPreferences_Category category = MelonPreferences.CreateCategory("CloningBeGone", "CloningBeGone Settings");
+            PublicCloningSetting = category.CreateEntry(nameof(PublicCloningSetting), false, "Cloning setting in public instances");
+            FriendsPlusCloningSetting = category.CreateEntry(nameof(FriendsPlusCloningSetting), false, "Cloning setting in friends+ instances");
+            FriendsCloningSetting = category.CreateEntry(nameof(FriendsCloningSetting), false, "Cloning setting in friend only instances");
+            InvitePlusCloningSetting = category.CreateEntry(nameof(InvitePlusCloningSetting), false, "Cloning setting in invite+ instances");
+            InviteCloningSetting = category.CreateEntry(nameof(InviteCloningSetting), false, "Cloning setting in invite only instances");
 
-            HarmonyInstance.Patch(typeof(RoomManager).GetMethod("Method_Public_Static_Boolean_ApiWorld_ApiWorldInstance_String_Int32_0"), new HarmonyMethod(typeof(CloningBeGoneMod).GetMethod(nameof(OnInstanceChange))));
+            foreach (MelonPreferences_Entry entry in category.Entries)
+                entry.OnValueChangedUntyped += OnPrefValueChanged;
+
+            cloningOnAvatars = category.CreateEntry(nameof(cloningOnAvatars), new List<string>(), null, null, true);
+            cloningOffAvatars = category.CreateEntry(nameof(cloningOffAvatars), new List<string>(), null, null, true);
+
             HarmonyInstance.Patch(typeof(NetworkManager).GetMethod("OnJoinedRoom"), new HarmonyMethod(typeof(CloningBeGoneMod).GetMethod(nameof(OnJoinedRoom))));
+
+            NetworkEvents.OnInstanceChanged += OnInstanceChange;
+            NetworkEvents.OnAvatarInstantiated += OnAvatarInstantiated;
+
+            if (VRCUtils.IsUIXPresent)
+                typeof(UIXManager).GetMethod("Init").Invoke(null, null);
         }
-        public override void OnPreferencesSaved()
+        public static void OnPrefValueChanged()
         {
             if (RoomManager.field_Internal_Static_ApiWorldInstance_0 != null) CheckAccessType(RoomManager.field_Internal_Static_ApiWorldInstance_0.type);
         }
@@ -41,13 +57,27 @@ namespace CloningBeGone
         {
             CheckAccessType(currentAccessType);
         }
-        public static void OnInstanceChange(ApiWorldInstance __1)
+        public static void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
         {
-            if (__1 != null) currentAccessType = __1.type;
+            if (instance != null) currentAccessType = instance.type;
         }
-        public override void OnApplicationQuit()
+
+        internal static void OnAvatarInstantiated(VRCAvatarManager manager, ApiAvatar avatar, GameObject gameObject)
         {
-            isClosing = true;
+            if (!manager.field_Private_VRCPlayer_0.prop_Player_0.prop_APIUser_0.IsSelf)
+                return;
+
+            OnAvatarInstantiated(avatar);
+        }
+        internal static void OnAvatarInstantiated(ApiAvatar avatar)
+        {
+            if (cloningOnAvatars.Value.Contains(avatar.id))
+                SetCloning(true);
+            else if (cloningOffAvatars.Value.Contains(avatar.id))
+                SetCloning(false);
+
+            if (VRCUtils.IsUIXPresent)
+                typeof(UIXManager).GetMethod("OnAvatarInstantiated").Invoke(null, new object[] { avatar });
         }
 
         public static void CheckAccessType(InstanceAccessType accessType)
@@ -76,7 +106,7 @@ namespace CloningBeGone
             if (cloningSetting == null)
                 cloningSetting = GameObject.Find("UserInterface/MenuContent/Screens/Settings/OtherOptionsPanel/AllowAvatarCopyingToggle").GetComponent<UiSettingConfig>();
 
-            if (Photon.Pun.PhotonNetwork.field_Public_Static_LoadBalancingClient_0.prop_Room_0 != null && !isClosing)
+            if (Photon.Pun.PhotonNetwork.field_Public_Static_LoadBalancingClient_0.prop_Room_0 != null)
                 cloningSetting.SetEnable(value);
         }
     }
