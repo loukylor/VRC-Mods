@@ -25,7 +25,7 @@ namespace AskToPortal
             autoAcceptHome = MelonPreferences.CreateEntry(catagory, nameof(autoAcceptHome), false, "Automatically enter home portals");
             autoAcceptSelf = MelonPreferences.CreateEntry(catagory, nameof(autoAcceptSelf), true, "Automatically enter your own portals");
             onlyPortalDrop = MelonPreferences.CreateEntry(catagory, nameof(onlyPortalDrop), false, "Only ask if a portal dropper is detected");
-            //startOnDetailed = (MelonPreferences_Entry<bool>)MelonPreferences.CreateEntry(catagory, nameof(startOnDetailed), false, "Only ask if a portal dropper is detected");
+            startOnDetailed = MelonPreferences.CreateEntry(catagory, nameof(startOnDetailed), false, "Open the detailed page when entering a portal");
         }
     }
 }

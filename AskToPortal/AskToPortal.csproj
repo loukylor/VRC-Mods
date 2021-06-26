@@ -6,13 +6,13 @@
     <RootNamespace>AskToPortal</RootNamespace>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="asktoportalui.assetbundle" />
+  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
@@ -47,6 +47,9 @@
     </Reference>
     <Reference Include="VRCCore-Standalone">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\VRCCore-Standalone.dll</HintPath>
+    </Reference>
+    <Reference Include="VRChatUtilityKit">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\Mods\VRChatUtilityKit.dll</HintPath>
     </Reference>
   </ItemGroup>
 
