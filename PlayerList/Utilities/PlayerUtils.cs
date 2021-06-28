@@ -17,12 +17,6 @@ namespace PlayerList.Utilities
                 return "Q".PadRight(2);
         }
 
-        public static void OpenPlayerInQuickMenu(Player player)
-        {
-            UiManager.OpenUserInQuickMenu(player);
-            QuickMenuContextualDisplay.Method_Public_Static_Void_VRCPlayer_0(player.prop_VRCPlayer_0);
-        }
-
         public static string GetPingColor(int ping)
         {
             if (ping <= 75)

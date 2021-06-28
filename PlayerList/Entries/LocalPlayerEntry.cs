@@ -5,6 +5,7 @@ using PlayerList.Utilities;
 using UnityEngine;
 using VRC;
 using VRC.Core;
+using VRChatUtilityKit.Ui;
 using VRChatUtilityKit.Utilities;
 using VRCSDK2.Validation.Performance;
 
@@ -29,7 +30,7 @@ namespace PlayerList.Entries
             apiUser = APIUser.CurrentUser;
             userId = apiUser.id;
 
-            gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new Action(() => PlayerUtils.OpenPlayerInQuickMenu(player)));
+            gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new Action(() => UiManager.OpenUserInQuickMenu(player)));
 
             platform = PlayerUtils.GetPlatform(player).PadRight(2);
             // Join event runs after avatar instantiation event so perf calculations *should* be finished (also not sure if this will throw null refs so gonna release without a check and hope for the best)
