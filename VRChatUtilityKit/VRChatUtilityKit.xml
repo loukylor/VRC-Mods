@@ -170,6 +170,13 @@
             </summary>
             <param name="index">The index to set it to</param>
         </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenUserInUserInfoPage(VRC.Core.APIUser)">
+            <summary>
+            Opens the given user in the user info page. 
+            Make sure the big menu itself is open before calling this.
+            </summary>
+            <param name="user">The user to open</param>
+        </member>
         <member name="M:VRChatUtilityKit.Ui.UiManager.CloseBigMenu">
             <summary>
             Closes the big menu.

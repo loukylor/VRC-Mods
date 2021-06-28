@@ -8,6 +8,7 @@ using UnhollowerBaseLib;
 using UnityEngine;
 using UnityEngine.UI;
 using VRC;
+using VRC.Core;
 using VRC.UI;
 using VRChatUtilityKit.Utilities;
 
@@ -36,6 +37,7 @@ namespace VRChatUtilityKit.Ui
         private static MethodInfo _setBigMenuIndex;
         private static MethodInfo _closeBigMenu;
         private static MethodInfo _openBigMenu;
+        private static MethodInfo _setupUserInfo;
         /// <summary>
         /// The type of the enum that is used for the big menu index.
         /// </summary>
@@ -172,6 +174,8 @@ namespace VRChatUtilityKit.Ui
                 .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_Boolean_") && !mb.Name.Contains("_PDM_") && XrefUtils.CheckUsedBy(mb, "ExitStation"));
             _openBigMenu = typeof(QuickMenu).GetMethods()
                 .First(mb => mb.Name.StartsWith("Method_Public_Void_" + BigMenuIndexEnum.Name + "_") && mb.GetParameters().Length == 1 && XrefUtils.CheckUsedBy(mb, "OpenSubscribeToVRCPlusPage"));
+            _setupUserInfo = typeof(PageUserInfo).GetMethods()
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_APIUser_") && !mb.Name.Contains("_PDM_") && mb.GetParameters().Length == 3 && mb.GetParameters()[1].ParameterType.IsEnum);
 
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_openBigMenu, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnBigMenuOpen), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_closeBigMenu, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnBigMenuClose), BindingFlags.NonPublic | BindingFlags.Static)));
@@ -360,6 +364,30 @@ namespace VRChatUtilityKit.Ui
         /// </summary>
         /// <param name="index">The index to set it to</param>
         public static void OpenBigMenuWithIndex(int index) => _setBigMenuIndex.Invoke(QuickMenu.prop_QuickMenu_0, new object[2] { index, true });
+        // The equivelent of the PDM APIUser method in the UserInfoPage. Didn't wanna rely on a PDM method tho
+        /// <summary>
+        /// Opens the given user in the user info page. 
+        /// Make sure the big menu itself is open before calling this.
+        /// </summary>
+        /// <param name="user">The user to open</param>
+        public static void OpenUserInUserInfoPage(APIUser user)
+        {
+            int enumValue;
+            if (APIUser.IsFriendsWith(user.id))
+            {
+                if ((int)user.statusValue == 3)
+                    enumValue = 2;
+                else
+                    enumValue = 1;
+            }
+            else
+            { 
+                enumValue = 0;
+            }
+
+            _setupUserInfo.Invoke(VRCUtils.UserInfoInstance, new object[] { user, enumValue, 0 });
+            SetBigMenuIndex(4);
+        }
         /// <summary>
         /// Closes the big menu.
         /// </summary>
