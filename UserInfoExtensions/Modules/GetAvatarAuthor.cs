@@ -126,8 +126,7 @@ namespace UserInfoExtentions.Modules
                 return;
             }
 
-            QuickMenu.prop_QuickMenu_0.field_Private_APIUser_0 = user;
-            UiManager.SetBigMenuIndex(4);
+            UiManager.OpenUserInUserInfoPage(user);
             if (isFromSocialPage)
                 isFromSocialPage = false;
         }
