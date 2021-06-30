@@ -22,7 +22,7 @@ namespace SelectYourself
 
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.QuickMenu).AddSimpleButton("Select Yourself",
                 new Action(() => UiManager.OpenUserInQuickMenu(Player.prop_Player_0)),
-                new Action<GameObject>((gameObject) => selectYourselfButton = gameObject));
+                new Action<GameObject>((gameObject) => { selectYourselfButton = gameObject; OnPrefChange(); }));
         }
         public static void OnPrefChange()
         {

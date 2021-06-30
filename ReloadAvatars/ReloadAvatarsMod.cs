@@ -36,7 +36,7 @@ namespace ReloadAvatars
                 {
                     MelonLogger.Error("Error while reloading single avatar:\n" + ex.ToString());
                 } // Ignore
-            }), new Action<GameObject>((gameObject) => { reloadAvatarButton = gameObject; reloadAvatarButton.SetActive(reloadAllAvatarsPref.Value); }));
+            }), new Action<GameObject>((gameObject) => { reloadAvatarButton = gameObject; reloadAvatarButton.SetActive(reloadAllAvatarsPref.Value); OnPrefChanged(); }));
 
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.QuickMenu).AddSimpleButton("Reload All Avatars", new Action(() =>
             {
@@ -49,7 +49,7 @@ namespace ReloadAvatars
                 {
                     MelonLogger.Error("Error while reloading all avatars:\n" + ex.ToString());
                 } // Ignore
-            }), new Action<GameObject>((gameObject) => { reloadAllAvatarsButton = gameObject; reloadAllAvatarsButton.SetActive(reloadAvatarPref.Value); }));
+            }), new Action<GameObject>((gameObject) => { reloadAllAvatarsButton = gameObject; reloadAllAvatarsButton.SetActive(reloadAvatarPref.Value); OnPrefChanged(); }));
             MelonLogger.Msg("Initialized!");
         }
         public void OnPrefChanged()
