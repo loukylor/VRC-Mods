@@ -20,10 +20,7 @@ namespace PlayerList.Utilities
         public static void OnSceneWasLoaded()
         {
             if (quickMenuColliderSize != null)
-            {
                 quickMenuColliderSize = quickMenu.GetComponent<BoxCollider>().size;
-                ListPositionManager.CombineQMColliderAndPlayerListRect();
-            }
         }
     }
 }

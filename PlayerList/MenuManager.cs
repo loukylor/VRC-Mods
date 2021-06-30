@@ -10,6 +10,7 @@ using PlayerList.Utilities;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 using UnityEngine.UI;
+using VRCSDK2;
 using VRChatUtilityKit.Components;
 using VRChatUtilityKit.Ui;
 using VRChatUtilityKit.Utilities;
@@ -43,12 +44,12 @@ namespace PlayerList
         }
         public static void OnSceneWasLoaded()
         {
-            if (tabButton == null)
-            {
-                tabButton = new TabButton(menuButton.GetComponent<Image>().sprite, playerListMenus[0]);
-                tabButton.ButtonComponent.onClick.AddListener(new Action(() => tabButton.OpenTabMenu()));
-                tabButton.gameObject.SetActive(PlayerListConfig.useTabMenu.Value);
-            }
+            if (tabButton != null)
+                return;
+            
+            tabButton = new TabButton(menuButton.GetComponent<Image>().sprite, playerListMenus[0]);
+            tabButton.ButtonComponent.onClick.AddListener(new Action(() => tabButton.OpenTabMenu()));
+            tabButton.gameObject.SetActive(PlayerListConfig.useTabMenu.Value);
         }
         public static void OnConfigChanged()
         {
@@ -110,6 +111,7 @@ namespace PlayerList
             tooltip.field_Public_String_1 = "Open PlayerList menu";
 
             playerList.SetLayerRecursive(12);
+            playerList.AddComponent<VRC_UiShape>();
             playerListRect = playerList.GetComponent<RectTransform>();
             playerListRect.anchoredPosition = PlayerListConfig.playerListPosition.Value;
             playerListRect.localPosition = playerListRect.localPosition.SetZ(25); // Do this or else it looks off for whatever reason

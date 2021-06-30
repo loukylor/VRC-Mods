@@ -61,6 +61,9 @@
 		<Reference Include="UnityEngine.UI">
 			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.UI.dll</HintPath>
 		</Reference>
+		<Reference Include="UnityEngine.UIModule">
+		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.UIModule.dll</HintPath>
+		</Reference>
 		<Reference Include="UnityEngine.UnityWebRequestWWWModule">
 		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
 		</Reference>
@@ -69,6 +72,9 @@
 		</Reference>
 		<Reference Include="VRChatUtilityKit">
 		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\Mods\VRChatUtilityKit.dll</HintPath>
+		</Reference>
+		<Reference Include="VRCSDK2">
+		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\VRCSDK2.dll</HintPath>
 		</Reference>
 		<Reference Include="VRCSDKBase">
 			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\VRCSDKBase.dll</HintPath>

@@ -78,15 +78,12 @@ namespace PlayerList
                 yield return null;
             }
 
+            Constants.quickMenu.GetComponent<BoxCollider>().size = Constants.quickMenuColliderSize;
+
             if (shouldMove)
-            {
                 onComplete.DelegateSafeInvoke(movingGameObject);
-            }
             else
-            {
                 movingGameObjectRect.anchoredPosition3D = oldPosition;
-                CombineQMColliderAndPlayerListRect();
-            }
             shouldMove = false;
         }
         public static void CombineQMColliderAndPlayerListRect(bool useConfigValues = false)
