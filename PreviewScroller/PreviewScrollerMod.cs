@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using VRChatUtilityKit.Utilities;
 
-[assembly: MelonInfo(typeof(PreviewScroller.PreviewScrollerMod), "PreviewScroller", "1.0.1", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(PreviewScroller.PreviewScrollerMod), "PreviewScroller", "1.0.1", "loukylor and Potato", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace PreviewScroller
@@ -61,12 +61,12 @@ namespace PreviewScroller
                     scrollRect.horizontalNormalizedPosition = 0f;
                     lastPos.x = -1;
                 }
-                else if (scrollRect.horizontalNormalizedPosition < -0.01f && velocity.x<0)
+                else if (scrollRect.horizontalNormalizedPosition < -0.01f && velocity.x < 0)
                 {
                     scrollRect.horizontalNormalizedPosition = 0f;
                     lastPos.x = 1;
                 }
-                pedestal.transform.Rotate(new Vector2(0, velocity.normalized.x),velocity.magnitude * 375 * Time.deltaTime);
+                pedestal.transform.Rotate(new Vector2(0, velocity.normalized.x), velocity.magnitude * 375 * Time.deltaTime);
                 scrollRect.velocity = scrollRectVelocity;
             }));
         }
