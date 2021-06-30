@@ -21,6 +21,8 @@ namespace TriggerESP
     {
 		internal static bool isOn;
 
+		internal static TriggerESPRenderManager controller;
+
 		internal static Shader wireframeShader;
 
 		internal static Mesh sphere;
@@ -32,12 +34,14 @@ namespace TriggerESP
 		internal static MelonPreferences_Entry<float> espColorR;
 		internal static MelonPreferences_Entry<float> espColorG;
 		internal static MelonPreferences_Entry<float> espColorB;
+		internal static MelonPreferences_Entry<float> espStrength;
 
 		private static string sceneName;
 
 		public override void OnApplicationStart()
         {
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.QuickMenu).AddSimpleButton("Toggle Trigger ESP", OnESPToggle);
+
 			category = MelonPreferences.CreateCategory("TriggerESP", "TriggerESP Config");
 			randomESPColor = category.CreateEntry(nameof(randomESPColor), false, "Enable/Disable random color of ESP");
 			espColorR = category.CreateEntry(nameof(espColorR), 0f, "The red color of the ESP. Will be ignored if random ESP color is on");
@@ -46,6 +50,9 @@ namespace TriggerESP
 
 			foreach (MelonPreferences_Entry entry in category.Entries)
 				entry.OnValueChangedUntyped += TriggerESPComponent.OnColorPrefChanged;
+
+			espStrength = category.CreateEntry(nameof(espStrength), 0.75f, "The strength of the ESP itself");
+			espStrength.OnValueChangedUntyped += TriggerESPComponent.OnThicknessPrefChanged;
 
 			sphere = Resources.Load("PrimitiveMeshes/sphere").Cast<Mesh>();
 			cube = Resources.Load("PrimitiveMeshes/cube").Cast<Mesh>();
@@ -57,7 +64,7 @@ namespace TriggerESP
 				{
 					stream.CopyTo(memoryStream);
 					AssetBundle assetBundle = AssetBundle.LoadFromMemory_Internal(memoryStream.ToArray(), 0);
-					wireframeShader = assetBundle.LoadAsset_Internal("Assets/Shaders/Wireframe.shader", Il2CppType.Of<Shader>()).Cast<Shader>();
+					wireframeShader = assetBundle.LoadAsset_Internal("Assets/Shaders/Outline.shader", Il2CppType.Of<Shader>()).Cast<Shader>();
 					wireframeShader.hideFlags |= HideFlags.DontUnloadUnusedAsset;
 				}
 			}
@@ -104,10 +111,20 @@ namespace TriggerESP
 			if (buildIndex != -1)
 				return;
 
-			TriggerESPComponent.currentESPs.Clear();
-			isOn = false;
+			if (controller == null)
+				controller = HighlightsFX.prop_HighlightsFX_0.gameObject.AddComponent<TriggerESPRenderManager>();
+
 
 			TriggerESPMod.sceneName = sceneName;
+		}
+
+        public override void OnSceneWasUnloaded(int buildIndex, string sceneName)
+        {
+			if (buildIndex != -1)
+				return;
+
+			TriggerESPComponent.currentESPs.Clear();
+			isOn = false;
 		}
 
 		private static void AddESPComponent(Component trigger)
@@ -118,16 +135,6 @@ namespace TriggerESP
 		}
 
 
-        private static void OnESPToggle()
-        {
-			isOn = !isOn;
-			for (int i = 0; i < TriggerESPComponent.currentESPs.Count; i++)
-			{
-				if (isOn && TriggerESPComponent.currentESPs[i].trigger.gameObject.active)
-					TriggerESPComponent.currentESPs[i].renderer.enabled = true;
-				else
-					TriggerESPComponent.currentESPs[i].renderer.enabled = false;
-			}
-		}
+        private static void OnESPToggle() => isOn = !isOn;
 	}
 }

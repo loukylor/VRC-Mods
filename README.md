@@ -201,16 +201,20 @@ The button can be toggled on and off using UIX
 A trigger ESP that will highlight all VRChat interactables as well as any Unity UI buttons.
 
 ## Features
-The color the ESP is is customizable, and you can also set the color as random.
+The color the ESP is customizable, and you can also set the color as random.
+The strength of the ESP is customizable as well.
 
 Note that it disables itself in worlds that don't allow risky functions.
 
 ## Picture of the ESP
-![Picture of the List](https://i.imgur.com/nnTN4na.jpg)
+![Picture of the List](https://i.imgur.com/QnawlKb.jpg)
 
 ## Requirements
  - [UIExpansionKit](https://github.com/knah/VRCMods/)
  - [VRChatUtilityKit](https://github.com/loukylor/VRC-Mods/releases)
+
+## Credites
+ - The shader used was a heavily modified version of the "Distance Fade Outline Shader" found in https://github.com/netri/Neitri-Unity-Shaders
 
 # UserInfoExtensions
 A mod that adds buttons to the to make VRChat more convenient
