@@ -9,7 +9,7 @@ using VRC.UI;
 using VRChatUtilityKit.Ui;
 using VRChatUtilityKit.Utilities;
 
-[assembly: MelonInfo(typeof(UserInfoExtensions.UserInfoExtensionsMod), "UserInfoExtensions", "2.5.4", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(UserInfoExtensions.UserInfoExtensionsMod), "UserInfoExtensions", "2.5.5", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace UserInfoExtensions
