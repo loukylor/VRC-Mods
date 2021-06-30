@@ -68,7 +68,7 @@ namespace VRChatUtilityKit.Utilities
         /// <summary>
         /// Returns the active player in the QuickMenu.
         /// </summary>
-        public static Player ActivePlayerInQuickMenu => QuickMenu.prop_QuickMenu_0.field_Private_Player_0;
+        public static Player ActivePlayerInQuickMenu => QuickMenu.prop_QuickMenu_0.field_Private_Player_0; 
 
         private static MethodInfo _reloadAvatarMethod;
         private static MethodInfo _reloadAllAvatarsMethod;
