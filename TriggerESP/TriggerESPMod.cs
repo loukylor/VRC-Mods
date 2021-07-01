@@ -24,17 +24,20 @@ namespace TriggerESP
 		internal static TriggerESPRenderManager controller;
 
 		internal static Shader wireframeShader;
+		internal static Shader outlineShader;
 
 		internal static Mesh sphere;
 		internal static Mesh cube;
 		internal static Mesh capsule;
 
 		internal static MelonPreferences_Category category;
+		internal static MelonPreferences_Entry<bool> shouldUseOutline;
 		internal static MelonPreferences_Entry<bool> randomESPColor;
 		internal static MelonPreferences_Entry<float> espColorR;
 		internal static MelonPreferences_Entry<float> espColorG;
 		internal static MelonPreferences_Entry<float> espColorB;
-		internal static MelonPreferences_Entry<float> espStrength;
+		internal static MelonPreferences_Entry<float> wireframeWidth;
+		internal static MelonPreferences_Entry<float> outlineStrength;
 
 		private static string sceneName;
 
@@ -51,8 +54,13 @@ namespace TriggerESP
 			foreach (MelonPreferences_Entry entry in category.Entries)
 				entry.OnValueChangedUntyped += TriggerESPComponent.OnColorPrefChanged;
 
-			espStrength = category.CreateEntry(nameof(espStrength), 0.75f, "The strength of the ESP itself");
-			espStrength.OnValueChangedUntyped += TriggerESPComponent.OnThicknessPrefChanged;
+			shouldUseOutline = category.CreateEntry(nameof(shouldUseOutline), false, "Enable = use outline shader/Disable = use wireframe shader");
+			shouldUseOutline.OnValueChanged += TriggerESPComponent.OnShouldUseOutlineChanged;
+
+			wireframeWidth = category.CreateEntry(nameof(wireframeWidth), 0.1f, "The width of the wireframe");
+			wireframeWidth.OnValueChangedUntyped += TriggerESPComponent.OnThicknessPrefChanged;
+			outlineStrength = category.CreateEntry(nameof(outlineStrength), 0.9f, "The strength of the outline");
+			outlineStrength.OnValueChangedUntyped += TriggerESPComponent.OnThicknessPrefChanged;
 
 			sphere = Resources.Load("PrimitiveMeshes/sphere").Cast<Mesh>();
 			cube = Resources.Load("PrimitiveMeshes/cube").Cast<Mesh>();
@@ -64,8 +72,10 @@ namespace TriggerESP
 				{
 					stream.CopyTo(memoryStream);
 					AssetBundle assetBundle = AssetBundle.LoadFromMemory_Internal(memoryStream.ToArray(), 0);
-					wireframeShader = assetBundle.LoadAsset_Internal("Assets/Shaders/Outline.shader", Il2CppType.Of<Shader>()).Cast<Shader>();
+					wireframeShader = assetBundle.LoadAsset_Internal("Assets/Shaders/Wireframe.shader", Il2CppType.Of<Shader>()).Cast<Shader>();
 					wireframeShader.hideFlags |= HideFlags.DontUnloadUnusedAsset;
+					outlineShader = assetBundle.LoadAsset_Internal("Assets/Shaders/Outline.shader", Il2CppType.Of<Shader>()).Cast<Shader>();
+					outlineShader.hideFlags |= HideFlags.DontUnloadUnusedAsset;
 				}
 			}
 

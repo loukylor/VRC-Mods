@@ -26,9 +26,7 @@ namespace TriggerESP.Components
 			renderer = gameObject.AddComponent<MeshRenderer>();
 			filter = gameObject.AddComponent<MeshFilter>();
 
-			renderer.material = new Material(TriggerESPMod.wireframeShader);
-			OnColorPrefChanged();
-			OnThicknessPrefChanged();
+			OnShouldUseOutlineChanged(!TriggerESPMod.shouldUseOutline.Value, TriggerESPMod.shouldUseOutline.Value);
 
 			this.trigger = trigger;
 			Clone();
@@ -36,30 +34,60 @@ namespace TriggerESP.Components
 			renderer.enabled = false;
 		}
 
+		internal static void OnShouldUseOutlineChanged(bool oldValue, bool newValue)
+        {
+			if (oldValue == newValue)
+				return;
+
+			if (newValue)
+				foreach (TriggerESPComponent espComponent in currentESPs)
+					espComponent.renderer.material = new Material(TriggerESPMod.outlineShader);
+			else
+				foreach (TriggerESPComponent espComponent in currentESPs)
+					espComponent.renderer.material = new Material(TriggerESPMod.wireframeShader);
+
+			OnThicknessPrefChanged();
+			OnColorPrefChanged();
+		}
+
 		internal static void OnColorPrefChanged()
         {
+			TriggerESPMod.espColorR.Value = Mathf.Clamp(TriggerESPMod.espColorR.Value, 0f, 255f);
+			TriggerESPMod.espColorG.Value = Mathf.Clamp(TriggerESPMod.espColorG.Value, 0f, 255f);
+			TriggerESPMod.espColorB.Value = Mathf.Clamp(TriggerESPMod.espColorB.Value, 0f, 255f);
+
+
 			foreach (TriggerESPComponent espComponent in currentESPs)
             {
 				if (TriggerESPMod.randomESPColor.Value)
-					espComponent.renderer.material.SetColor("_OutlineColor", new Color(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f)));
+					espComponent.renderer.material.color = new Color(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f));
 				else
-					espComponent.renderer.material.SetColor("_OutlineColor", new Color(TriggerESPMod.espColorR.Value, TriggerESPMod.espColorG.Value, TriggerESPMod.espColorB.Value));
+					espComponent.renderer.material.color = new Color(TriggerESPMod.espColorR.Value, TriggerESPMod.espColorG.Value, TriggerESPMod.espColorB.Value);
 				espComponent.renderer.enabled = false;
 			}
 		}
 
 		internal static void OnThicknessPrefChanged() 
 		{
-			if (TriggerESPMod.espStrength.Value > 1)
-				TriggerESPMod.espStrength.Value = 1;
-			else if (TriggerESPMod.espStrength.Value < 0)
-				TriggerESPMod.espStrength.Value = 0;
+			TriggerESPMod.wireframeWidth.Value = Mathf.Clamp(TriggerESPMod.wireframeWidth.Value, 0f, 1f);
 
-			foreach (TriggerESPComponent espComponent in currentESPs)
-			{
-				espComponent.renderer.material.SetFloat("_OutlineWidth", (TriggerESPMod.espStrength.Value * 0.2f) + 0.8f);
-				espComponent.renderer.enabled = false;
+			if (TriggerESPMod.shouldUseOutline.Value)
+            {
+				foreach (TriggerESPComponent espComponent in currentESPs)
+				{
+					espComponent.renderer.material.SetFloat("_Width", TriggerESPMod.outlineStrength.Value);
+					espComponent.renderer.enabled = false;
+				}
 			}
+            else
+            {
+				foreach (TriggerESPComponent espComponent in currentESPs)
+				{
+					espComponent.renderer.material.SetFloat("_Width", TriggerESPMod.wireframeWidth.Value);
+					espComponent.renderer.enabled = false;
+				}
+			}
+
 		}
 
         internal void OnDestroy()

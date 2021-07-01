@@ -207,7 +207,8 @@ The strength of the ESP is customizable as well.
 Note that it disables itself in worlds that don't allow risky functions.
 
 ## Picture of the ESP
-![Picture of the List](https://i.imgur.com/QnawlKb.jpg)
+![Picture of Outline](https://i.imgur.com/QnawlKb.jpg)
+![Picture of Wireframe](https://i.imgur.com/nnTN4na.jpg)
 
 ## Requirements
  - [UIExpansionKit](https://github.com/knah/VRCMods/)
