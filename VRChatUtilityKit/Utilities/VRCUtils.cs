@@ -73,7 +73,6 @@ namespace VRChatUtilityKit.Utilities
         private static MethodInfo _reloadAvatarMethod;
         private static MethodInfo _reloadAllAvatarsMethod;
 
-
         internal static void Init()
         {
             NetworkEvents.OnInstanceChanged += new Action<ApiWorld, ApiWorldInstance>((world, instance) => MelonCoroutines.Start(StartEmmCheck(world)));

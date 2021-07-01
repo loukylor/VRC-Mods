@@ -148,17 +148,20 @@ namespace VRChatUtilityKit.Utilities
         }
         private static void OnSetupFlagsReceive(VRCPlayer __instance, object __result)
         {
+            if (__result == null)
+                return;
+
             OnSetupFlagsReceived?.DelegateSafeInvoke(__instance, __result);
         }
         private static void OnShowSocialRankChange()
         {
             OnShowSocialRankChanged?.DelegateSafeInvoke();
         }
-        private static void OnPlayerModerationSend(string __0, ApiPlayerModeration.ModerationType __1)
+        private static void OnPlayerModerationSend(string __1, ApiPlayerModeration.ModerationType __2)
         {
-            if (__0 == null) return;
+            if (__1 == null) return;
 
-            OnPlayerModerationSent?.DelegateSafeInvoke(__0, __1);
+            OnPlayerModerationSent?.DelegateSafeInvoke(__1, __2);
         }
         private static void OnPlayerModerationRemove(string __0, ApiPlayerModeration.ModerationType __1)
         {
@@ -181,7 +184,7 @@ namespace VRChatUtilityKit.Utilities
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(NetworkManager).GetMethod("OnMasterClientSwitched"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnMasterChange), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(VRCAvatarManager).GetMethods().First(mb => mb.Name.StartsWith("Method_Private_Boolean_GameObject_String_Single_String_")), null, new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnAvatarChange), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(VRCAvatarManager).GetMethods().First(mb => mb.Name.StartsWith("Method_Private_Void_ApiAvatar_GameObject_Action_1_Boolean_")), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnAvatarInstantiate), BindingFlags.NonPublic | BindingFlags.Static)));
-            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(ModerationManager).GetMethod("Method_Private_Void_String_ModerationType_Action_1_ApiPlayerModeration_Action_1_String_0"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnPlayerModerationSend), BindingFlags.NonPublic | BindingFlags.Static)));
+            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(ModerationManager).GetMethod("Method_Private_ApiPlayerModeration_String_String_ModerationType_0"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnPlayerModerationSend), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(ModerationManager).GetMethod("Method_Private_Void_String_ModerationType_0"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnPlayerModerationRemove), BindingFlags.NonPublic | BindingFlags.Static)));
 
             foreach (MethodInfo method in typeof(AvatarLoadingBar).GetMethods().Where(mb => mb.Name.Contains("Method_Public_Void_Single_Int64_")))
