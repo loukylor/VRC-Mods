@@ -401,6 +401,16 @@
             The first call of this may contain a null APIUser.
             </summary>
         </member>
+        <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnInstanceLeft">
+            <summary>
+            Calls when the local user leaves an instance.
+            </summary>
+        </member>
+        <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnInstanceJoined">
+            <summary>
+            Calls when the local user joins an instance.
+            </summary>
+        </member>
         <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnFriended">
             <summary>
             Calls when a new friend is added.
