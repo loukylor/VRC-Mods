@@ -31,14 +31,14 @@ namespace VRChatUtilityKit.Utilities
         public static event Action<Player> OnPlayerJoined;
 
         /// <summary>
-        /// Calls when the local user leaves an instance.
+        /// Calls when the local user leaves an room.
         /// </summary>
-        public static event Action OnInstanceLeft;
+        public static event Action OnRoomLeft;
 
         /// <summary>
-        /// Calls when the local user joins an instance.
+        /// Calls when the local user joins an room.
         /// </summary>
-        public static event Action OnInstanceJoined;
+        public static event Action OnRoomJoined;
 
         /// <summary>
         /// Calls when a new friend is added.
@@ -109,9 +109,9 @@ namespace VRChatUtilityKit.Utilities
         /// </summary>
         public static event Action<string, ApiPlayerModeration.ModerationType> OnPlayerModerationRemoved;
 
-        private static void OnInstanceLeave() => OnInstanceLeft?.DelegateSafeInvoke();
+        private static void OnRoomLeave() => OnRoomLeft?.DelegateSafeInvoke();
         
-        private static void OnInstanceJoin() => OnInstanceJoined?.DelegateSafeInvoke();
+        private static void OnRoomJoin() => OnRoomJoined?.DelegateSafeInvoke();
 
         private static void OnFriend(APIUser __0)
         {
@@ -196,8 +196,8 @@ namespace VRChatUtilityKit.Utilities
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(APIUser).GetMethod("UnfriendUser"), null, new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnUnfriend), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(RoomManager).GetMethod("Method_Public_Static_Boolean_ApiWorld_ApiWorldInstance_String_Int32_0"), null, new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnInstanceChange), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(NetworkManager).GetMethod("OnMasterClientSwitched"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnMasterChange), BindingFlags.NonPublic | BindingFlags.Static)));
-            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(NetworkManager).GetMethod("OnLeftRoom"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnInstanceLeave), BindingFlags.NonPublic | BindingFlags.Static)));
-            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(NetworkManager).GetMethod("OnJoinedRoom"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnInstanceJoin), BindingFlags.NonPublic | BindingFlags.Static)));
+            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(NetworkManager).GetMethod("OnLeftRoom"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnRoomLeave), BindingFlags.NonPublic | BindingFlags.Static)));
+            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(NetworkManager).GetMethod("OnJoinedRoom"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnRoomJoin), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(VRCAvatarManager).GetMethods().First(mb => mb.Name.StartsWith("Method_Private_Boolean_GameObject_String_Single_String_")), null, new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnAvatarChange), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(VRCAvatarManager).GetMethods().First(mb => mb.Name.StartsWith("Method_Private_Void_ApiAvatar_GameObject_Action_1_Boolean_")), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnAvatarInstantiate), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(ModerationManager).GetMethod("Method_Private_ApiPlayerModeration_String_String_ModerationType_0"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnPlayerModerationSend), BindingFlags.NonPublic | BindingFlags.Static)));

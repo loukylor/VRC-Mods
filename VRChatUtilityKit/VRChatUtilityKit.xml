@@ -401,14 +401,14 @@
             The first call of this may contain a null APIUser.
             </summary>
         </member>
-        <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnInstanceLeft">
+        <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnRoomLeft">
             <summary>
-            Calls when the local user leaves an instance.
+            Calls when the local user leaves an room.
             </summary>
         </member>
-        <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnInstanceJoined">
+        <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnRoomJoined">
             <summary>
-            Calls when the local user joins an instance.
+            Calls when the local user joins an room.
             </summary>
         </member>
         <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnFriended">
