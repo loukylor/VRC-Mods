@@ -34,10 +34,12 @@ namespace VRChatUtilityKit.Ui
         /// </summary>
         public static event Action OnBigMenuClosed;
 
-        private static MethodInfo _setBigMenuIndex;
         private static MethodInfo _closeBigMenu;
-        private static MethodInfo _openBigMenu;
-        private static MethodInfo _setupUserInfo;
+        private static MethodBase _openBigMenu;
+        private static MethodInfo _mainMenu;
+        private static bool _shouldSkipPlaceUiAfterPause;
+        private static bool _shouldChangeScreenStackValue;
+        private static bool _newScreenStackValue;
         /// <summary>
         /// The type of the enum that is used for the big menu index.
         /// </summary>
@@ -146,8 +148,8 @@ namespace VRChatUtilityKit.Ui
         }
         private static PropertyInfo currentTabMenuField;
 
-        private static Type quickMenuContextualDisplayEnum;
-        private static MethodBase setContextMethod;
+        private static Type _quickMenuContextualDisplayEnum;
+        private static MethodBase _setContextMethod;
 
         internal static void Init()
         {
@@ -168,25 +170,38 @@ namespace VRChatUtilityKit.Ui
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_closeQuickMenu, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnQuickMenuClose), BindingFlags.NonPublic | BindingFlags.Static)));
 
             BigMenuIndexEnum = quickMenuNestedEnums.First(type => type.IsEnum && type != QuickMenuIndexEnum);
-            _setBigMenuIndex = typeof(QuickMenu).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_Enum") && mb.GetParameters().Length == 2 && mb.GetParameters()[0].ParameterType == BigMenuIndexEnum && mb.GetParameters()[1].ParameterType == typeof(bool));
             _closeBigMenu = typeof(VRCUiManager).GetMethods()
                 .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_Boolean_") && !mb.Name.Contains("_PDM_") && XrefUtils.CheckUsedBy(mb, "ExitStation"));
-            _openBigMenu = typeof(QuickMenu).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_" + BigMenuIndexEnum.Name + "_") && mb.GetParameters().Length == 1 && XrefUtils.CheckUsedBy(mb, "OpenSubscribeToVRCPlusPage"));
-            _setupUserInfo = typeof(PageUserInfo).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_APIUser_") && !mb.Name.Contains("_PDM_") && mb.GetParameters().Length == 3 && mb.GetParameters()[1].ParameterType.IsEnum);
+            _mainMenu = typeof(QuickMenu).GetMethods()
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Enum") && mb.GetParameters().Length == 2 && mb.GetParameters()[0].ParameterType == BigMenuIndexEnum && mb.GetParameters()[1].ParameterType == typeof(bool));
+            MethodBase _placeUiAfterPause = null;
+            foreach (XrefInstance instance in XrefScanner.XrefScan(_mainMenu))
+            {
+                if (instance.Type != XrefType.Method || instance.TryResolve() == null)
+                    continue;
+
+                if (_openBigMenu == null && instance.TryResolve().Name.StartsWith("Method_Public_Void_Boolean_Boolean_"))
+                    _openBigMenu = instance.TryResolve();
+                
+                if (_placeUiAfterPause == null && instance.TryResolve().Name.StartsWith(".ctor"))
+                    _placeUiAfterPause = instance.TryResolve().DeclaringType.GetMethod("MoveNext");
+
+                if (_openBigMenu != null && _placeUiAfterPause != null)
+                    break;
+            }
 
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_openBigMenu, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnBigMenuOpen), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_closeBigMenu, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnBigMenuClose), BindingFlags.NonPublic | BindingFlags.Static)));
+            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_placeUiAfterPause, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnPlaceUiAfterPause), BindingFlags.NonPublic | BindingFlags.Static)));
+            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(VRCUiManager).GetMethod("Method_Public_Void_String_Boolean_0"), new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnShowScreen), BindingFlags.NonPublic | BindingFlags.Static)));
 
             foreach (MethodInfo method in typeof(MenuController).GetMethods().Where(mi => mi.Name.StartsWith("Method_Public_Void_APIUser_") && !mi.Name.Contains("_PDM_")))
                 VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(method, postfix: new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnUserInfoOpen), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(AccessTools.Method(typeof(PageUserInfo), "Back"), postfix: new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnUserInfoClose), BindingFlags.NonPublic | BindingFlags.Static)));
 
-            quickMenuContextualDisplayEnum = typeof(QuickMenuContextualDisplay).GetNestedTypes()
+            _quickMenuContextualDisplayEnum = typeof(QuickMenuContextualDisplay).GetNestedTypes()
                 .First(type => type.Name.StartsWith("Enum"));
-            setContextMethod = typeof(QuickMenuContextualDisplay).GetMethod($"Method_Public_Void_{quickMenuContextualDisplayEnum.Name}_APIUser_String_0");
+            _setContextMethod = typeof(QuickMenuContextualDisplay).GetMethod($"Method_Public_Void_{_quickMenuContextualDisplayEnum.Name}_APIUser_String_0");
 
             _popupV2Small = typeof(VRCUiPopupManager).GetMethods()
                 .First(mb => mb.Name.StartsWith("Method_Public_Void_String_String_String_Action_Action_1_VRCUiPopup_") && !mb.Name.Contains("PDM") && XrefUtils.CheckMethod(mb, "UserInterface/MenuContent/Popups/StandardPopupV2") && XrefUtils.CheckUsedBy(mb, "OpenSaveSearchPopup"));
@@ -305,7 +320,7 @@ namespace VRChatUtilityKit.Ui
                 CurrentTabMenu = page;
 
             QuickMenuContextualDisplay quickMenuContextualDisplay = QuickMenu.prop_QuickMenu_0.field_Private_QuickMenuContextualDisplay_0;
-            setContextMethod.Invoke(quickMenuContextualDisplay, new object[3] { 0, null, null });
+            _setContextMethod.Invoke(quickMenuContextualDisplay, new object[3] { 0, null, null });
 
             page.SetActive(true);
         }
@@ -348,45 +363,79 @@ namespace VRChatUtilityKit.Ui
 
         private static void OnBigMenuOpen() => OnBigMenuOpened?.DelegateSafeInvoke();
         private static void OnBigMenuClose() => OnBigMenuClosed?.DelegateSafeInvoke();
+        private static bool OnPlaceUiAfterPause(ref bool __result)
+        {
+            if (_shouldSkipPlaceUiAfterPause)
+            {
+                _shouldSkipPlaceUiAfterPause = false;
+                __result = false;
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        private static void OnShowScreen(ref bool __1)
+        {
+            if (_shouldChangeScreenStackValue)
+            {
+                __1 = _newScreenStackValue;
+                _shouldChangeScreenStackValue = false;
+            }
+        }
+        /// <summary>
+        /// Sets the index of the big menu.
+        /// </summary>
+        /// <param name="index">The index to set it to</param>
+        public static void SetBigMenuIndex(int index) => MainMenuInternal(index, true, false, false);
         /// <summary>
         /// Sets the index of the big menu.
         /// </summary>
         /// <param name="index">The index to set it to</param>
         /// <param name="addToScreenStack">Whether the new screen opened should be added to the screen stack</param>
-        public static void SetBigMenuIndex(int index, bool addToScreenStack = false)
-        {
-            if (index < 0 || index >= BigMenuIndexToPathTable.Count)
-                throw new ArgumentException("Big menu index too large or too small");
-            VRCUiManager.prop_VRCUiManager_0.Method_Public_Void_String_Boolean_0(BigMenuIndexToPathTable[index], addToScreenStack);
-        }
+        public static void SetBigMenuIndex(int index, bool addToScreenStack) => MainMenuInternal(index, addToScreenStack, false, false);
+        /// <summary>
+        /// Sets the index of the big menu.
+        /// </summary>
+        /// <param name="index">The index to set it to</param>
+        /// <param name="addToScreenStack">Whether the new screen opened should be added to the screen stack</param>
+        /// <param name="rePlaceUi">Whether to recalculate and reposition the UI</param>
+        public static void SetBigMenuIndex(int index, bool addToScreenStack, bool rePlaceUi) => MainMenuInternal(index, addToScreenStack, rePlaceUi, false);
         /// <summary>
         /// Opens a new instance of the big menu with the given index.
         /// </summary>
         /// <param name="index">The index to set it to</param>
-        public static void OpenBigMenuWithIndex(int index) => _setBigMenuIndex.Invoke(QuickMenu.prop_QuickMenu_0, new object[2] { index, true });
-        // The equivelent of the PDM APIUser method in the UserInfoPage. Didn't wanna rely on a PDM method tho
+        public static void OpenBigMenuWithIndex(int index) => MainMenuInternal(index, true, true, true);
+        /// <summary>
+        /// Opens a new instance of the big menu with the given index.
+        /// </summary>
+        /// <param name="index">The index to set it to</param>
+        /// <param name="addToScreenStack">Whether the new screen opened should be added to the screen stack</param>
+        public static void OpenBigMenuWithIndex(int index, bool addToScreenStack) => MainMenuInternal(index, addToScreenStack, true, true);
+        /// <summary>
+        /// Opens a new instance of the big menu with the given index.
+        /// </summary>
+        /// <param name="index">The index to set it to</param>
+        /// <param name="addToScreenStack">Whether the new screen opened should be added to the screen stack</param>
+        /// <param name="rePlaceUi">Whether to recalculate and reposition the UI</param>
+        public static void OpenBigMenuWithIndex(int index, bool addToScreenStack, bool rePlaceUi) => MainMenuInternal(index, addToScreenStack, rePlaceUi, true);
+        private static void MainMenuInternal(int index, bool addToScreenStack, bool rePlaceUi, bool openUi)
+        {
+            _shouldChangeScreenStackValue = true;
+            _newScreenStackValue = addToScreenStack;
+            _shouldSkipPlaceUiAfterPause = !rePlaceUi;
+            _mainMenu.Invoke(QuickMenu.prop_QuickMenu_0, new object[2] { index, !openUi });
+        }
         /// <summary>
         /// Opens the given user in the user info page. 
-        /// Make sure the big menu itself is open before calling this.
+        /// Does not open with big menu along with the page.
         /// </summary>
         /// <param name="user">The user to open</param>
         public static void OpenUserInUserInfoPage(APIUser user)
         {
-            int enumValue;
-            if (APIUser.IsFriendsWith(user.id))
-            {
-                if ((int)user.statusValue == 3)
-                    enumValue = 2;
-                else
-                    enumValue = 1;
-            }
-            else
-            { 
-                enumValue = 0;
-            }
-
-            _setupUserInfo.Invoke(VRCUtils.UserInfoInstance, new object[] { user, enumValue, 0 });
-            SetBigMenuIndex(4);
+            QuickMenu.prop_QuickMenu_0.prop_APIUser_0 = user;
+            SetBigMenuIndex(4, false);
         }
         /// <summary>
         /// Closes the big menu.
@@ -395,7 +444,12 @@ namespace VRChatUtilityKit.Ui
         /// <summary>
         /// Opens the big menu.
         /// </summary>
-        public static void OpenBigMenu() => _openBigMenu.Invoke(QuickMenu.prop_QuickMenu_0, new object[1] { 0 });
+        public static void OpenBigMenu() => OpenBigMenu(true);
+        /// <summary>
+        /// Opens the big menu
+        /// </summary>
+        /// <param name="showDefaultScreen">Whether to show the world menu after opening the big menu</param>
+        public static void OpenBigMenu(bool showDefaultScreen) => _openBigMenu.Invoke(VRCUiManager.prop_VRCUiManager_0, new object[2] { showDefaultScreen, true });
 
         private static void OnUserInfoOpen() => OnUserInfoMenuOpened?.DelegateSafeInvoke();
         private static void OnUserInfoClose() => OnUserInfoMenuClosed?.DelegateSafeInvoke();
@@ -417,7 +471,8 @@ namespace VRChatUtilityKit.Ui
             QuickMenu.prop_QuickMenu_0.field_Private_Player_0 = playerToSelect;
             CursorUtils.CurrentCursor.Method_Public_Void_VRCPlayer_PDM_0(playerToSelect.prop_VRCPlayer_0);
             QuickMenuContextualDisplay quickMenuContextualDisplay = QuickMenu.prop_QuickMenu_0.field_Private_QuickMenuContextualDisplay_0;
-            setContextMethod.Invoke(quickMenuContextualDisplay, new object[3] { 3, playerToSelect.prop_APIUser_0, null });
+            QuickMenuContextualDisplay.Method_Public_Static_Void_VRCPlayer_0(playerToSelect.prop_VRCPlayer_0);
+            _setContextMethod.Invoke(quickMenuContextualDisplay, new object[3] { 3, playerToSelect.prop_APIUser_0, null });
             SetQuickMenuIndex(3);
         }
         /// <summary>

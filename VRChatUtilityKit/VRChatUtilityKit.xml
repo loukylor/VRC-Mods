@@ -157,6 +157,12 @@
             <param name="setCurrentMenu">Whether to set the current menu stored by VRChat to the page given</param>
             <param name="setCurrentTab">Whether to set the current tab menu stored by VRChat to the page given</param>
         </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.SetBigMenuIndex(System.Int32)">
+            <summary>
+            Sets the index of the big menu.
+            </summary>
+            <param name="index">The index to set it to</param>
+        </member>
         <member name="M:VRChatUtilityKit.Ui.UiManager.SetBigMenuIndex(System.Int32,System.Boolean)">
             <summary>
             Sets the index of the big menu.
@@ -164,16 +170,39 @@
             <param name="index">The index to set it to</param>
             <param name="addToScreenStack">Whether the new screen opened should be added to the screen stack</param>
         </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.SetBigMenuIndex(System.Int32,System.Boolean,System.Boolean)">
+            <summary>
+            Sets the index of the big menu.
+            </summary>
+            <param name="index">The index to set it to</param>
+            <param name="addToScreenStack">Whether the new screen opened should be added to the screen stack</param>
+            <param name="rePlaceUi">Whether to recalculate and reposition the UI</param>
+        </member>
         <member name="M:VRChatUtilityKit.Ui.UiManager.OpenBigMenuWithIndex(System.Int32)">
             <summary>
             Opens a new instance of the big menu with the given index.
             </summary>
             <param name="index">The index to set it to</param>
         </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenBigMenuWithIndex(System.Int32,System.Boolean)">
+            <summary>
+            Opens a new instance of the big menu with the given index.
+            </summary>
+            <param name="index">The index to set it to</param>
+            <param name="addToScreenStack">Whether the new screen opened should be added to the screen stack</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenBigMenuWithIndex(System.Int32,System.Boolean,System.Boolean)">
+            <summary>
+            Opens a new instance of the big menu with the given index.
+            </summary>
+            <param name="index">The index to set it to</param>
+            <param name="addToScreenStack">Whether the new screen opened should be added to the screen stack</param>
+            <param name="rePlaceUi">Whether to recalculate and reposition the UI</param>
+        </member>
         <member name="M:VRChatUtilityKit.Ui.UiManager.OpenUserInUserInfoPage(VRC.Core.APIUser)">
             <summary>
             Opens the given user in the user info page. 
-            Make sure the big menu itself is open before calling this.
+            Does not open with big menu along with the page.
             </summary>
             <param name="user">The user to open</param>
         </member>
@@ -186,6 +215,12 @@
             <summary>
             Opens the big menu.
             </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenBigMenu(System.Boolean)">
+            <summary>
+            Opens the big menu
+            </summary>
+            <param name="showDefaultScreen">Whether to show the world menu after opening the big menu</param>
         </member>
         <member name="M:VRChatUtilityKit.Ui.UiManager.SetQuickMenuIndex(System.Int32)">
             <summary>
