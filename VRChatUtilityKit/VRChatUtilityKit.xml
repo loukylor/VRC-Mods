@@ -157,45 +157,33 @@
             <param name="setCurrentMenu">Whether to set the current menu stored by VRChat to the page given</param>
             <param name="setCurrentTab">Whether to set the current tab menu stored by VRChat to the page given</param>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.SetBigMenuIndex(System.Int32)">
+        <member name="M:VRChatUtilityKit.Ui.UiManager.MainMenu(System.Int32)">
             <summary>
             Sets the index of the big menu.
             </summary>
             <param name="index">The index to set it to</param>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.SetBigMenuIndex(System.Int32,System.Boolean)">
+        <member name="M:VRChatUtilityKit.Ui.UiManager.MainMenu(System.Int32,System.Boolean)">
             <summary>
             Sets the index of the big menu.
             </summary>
             <param name="index">The index to set it to</param>
-            <param name="addToScreenStack">Whether the new screen opened should be added to the screen stack</param>
+            <param name="openUi">Whether to open the Ui along with setting the index</param>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.SetBigMenuIndex(System.Int32,System.Boolean,System.Boolean)">
+        <member name="M:VRChatUtilityKit.Ui.UiManager.MainMenu(System.Int32,System.Boolean,System.Boolean)">
             <summary>
             Sets the index of the big menu.
             </summary>
             <param name="index">The index to set it to</param>
-            <param name="addToScreenStack">Whether the new screen opened should be added to the screen stack</param>
-            <param name="rePlaceUi">Whether to recalculate and reposition the UI</param>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenBigMenuWithIndex(System.Int32)">
-            <summary>
-            Opens a new instance of the big menu with the given index.
-            </summary>
-            <param name="index">The index to set it to</param>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenBigMenuWithIndex(System.Int32,System.Boolean)">
-            <summary>
-            Opens a new instance of the big menu with the given index.
-            </summary>
-            <param name="index">The index to set it to</param>
+            <param name="openUi">Whether to open the Ui along with setting the index</param>
             <param name="addToScreenStack">Whether the new screen opened should be added to the screen stack</param>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenBigMenuWithIndex(System.Int32,System.Boolean,System.Boolean)">
+        <member name="M:VRChatUtilityKit.Ui.UiManager.MainMenu(System.Int32,System.Boolean,System.Boolean,System.Boolean)">
             <summary>
-            Opens a new instance of the big menu with the given index.
+            Sets the index of the big menu.
             </summary>
             <param name="index">The index to set it to</param>
+            <param name="openUi">Whether to open the Ui along with setting the index</param>
             <param name="addToScreenStack">Whether the new screen opened should be added to the screen stack</param>
             <param name="rePlaceUi">Whether to recalculate and reposition the UI</param>
         </member>
@@ -205,6 +193,14 @@
             Does not open with big menu along with the page.
             </summary>
             <param name="user">The user to open</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenUserInUserInfoPage(VRC.Core.APIUser,System.Boolean)">
+            <summary>
+            Opens the given user in the user info page. 
+            Does not open with big menu along with the page.
+            </summary>
+            <param name="user">The user to open</param>
+            <param name="addToScreenStack"></param>
         </member>
         <member name="M:VRChatUtilityKit.Ui.UiManager.CloseBigMenu">
             <summary>

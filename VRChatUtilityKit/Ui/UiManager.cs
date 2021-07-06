@@ -174,21 +174,19 @@ namespace VRChatUtilityKit.Ui
                 .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_Boolean_") && !mb.Name.Contains("_PDM_") && XrefUtils.CheckUsedBy(mb, "ExitStation"));
             _mainMenu = typeof(QuickMenu).GetMethods()
                 .First(mb => mb.Name.StartsWith("Method_Public_Void_Enum") && mb.GetParameters().Length == 2 && mb.GetParameters()[0].ParameterType == BigMenuIndexEnum && mb.GetParameters()[1].ParameterType == typeof(bool));
-            MethodBase _placeUiAfterPause = null;
             foreach (XrefInstance instance in XrefScanner.XrefScan(_mainMenu))
             {
                 if (instance.Type != XrefType.Method || instance.TryResolve() == null)
                     continue;
 
                 if (_openBigMenu == null && instance.TryResolve().Name.StartsWith("Method_Public_Void_Boolean_Boolean_"))
+                {
                     _openBigMenu = instance.TryResolve();
-                
-                if (_placeUiAfterPause == null && instance.TryResolve().Name.StartsWith(".ctor"))
-                    _placeUiAfterPause = instance.TryResolve().DeclaringType.GetMethod("MoveNext");
-
-                if (_openBigMenu != null && _placeUiAfterPause != null)
                     break;
+                }
             }
+
+            MethodInfo _placeUiAfterPause = typeof(QuickMenu).GetNestedTypes().First(type => type.Name.Contains("IEnumerator")).GetMethod("MoveNext");
 
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_openBigMenu, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnBigMenuOpen), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_closeBigMenu, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnBigMenuClose), BindingFlags.NonPublic | BindingFlags.Static)));
@@ -365,16 +363,12 @@ namespace VRChatUtilityKit.Ui
         private static void OnBigMenuClose() => OnBigMenuClosed?.DelegateSafeInvoke();
         private static bool OnPlaceUiAfterPause(ref bool __result)
         {
-            if (_shouldSkipPlaceUiAfterPause)
-            {
-                _shouldSkipPlaceUiAfterPause = false;
-                __result = false;
-                return false;
-            }
-            else
-            {
+            if (!_shouldSkipPlaceUiAfterPause)
                 return true;
-            }
+
+            _shouldSkipPlaceUiAfterPause = false;
+            __result = false;
+            return false;
         }
         private static void OnShowScreen(ref bool __1)
         {
@@ -388,39 +382,28 @@ namespace VRChatUtilityKit.Ui
         /// Sets the index of the big menu.
         /// </summary>
         /// <param name="index">The index to set it to</param>
-        public static void SetBigMenuIndex(int index) => MainMenuInternal(index, true, false, false);
+        public static void MainMenu(int index) => MainMenu(index, true, true, true);
         /// <summary>
         /// Sets the index of the big menu.
         /// </summary>
         /// <param name="index">The index to set it to</param>
-        /// <param name="addToScreenStack">Whether the new screen opened should be added to the screen stack</param>
-        public static void SetBigMenuIndex(int index, bool addToScreenStack) => MainMenuInternal(index, addToScreenStack, false, false);
+        /// <param name="openUi">Whether to open the Ui along with setting the index</param>
+        public static void MainMenu(int index, bool openUi) => MainMenu(index, openUi, true, true);
         /// <summary>
         /// Sets the index of the big menu.
         /// </summary>
         /// <param name="index">The index to set it to</param>
+        /// <param name="openUi">Whether to open the Ui along with setting the index</param>
+        /// <param name="addToScreenStack">Whether the new screen opened should be added to the screen stack</param>
+        public static void MainMenu(int index, bool openUi, bool addToScreenStack) => MainMenu(index, addToScreenStack, openUi, true);
+        /// <summary>
+        /// Sets the index of the big menu.
+        /// </summary>
+        /// <param name="index">The index to set it to</param>
+        /// <param name="openUi">Whether to open the Ui along with setting the index</param>
         /// <param name="addToScreenStack">Whether the new screen opened should be added to the screen stack</param>
         /// <param name="rePlaceUi">Whether to recalculate and reposition the UI</param>
-        public static void SetBigMenuIndex(int index, bool addToScreenStack, bool rePlaceUi) => MainMenuInternal(index, addToScreenStack, rePlaceUi, false);
-        /// <summary>
-        /// Opens a new instance of the big menu with the given index.
-        /// </summary>
-        /// <param name="index">The index to set it to</param>
-        public static void OpenBigMenuWithIndex(int index) => MainMenuInternal(index, true, true, true);
-        /// <summary>
-        /// Opens a new instance of the big menu with the given index.
-        /// </summary>
-        /// <param name="index">The index to set it to</param>
-        /// <param name="addToScreenStack">Whether the new screen opened should be added to the screen stack</param>
-        public static void OpenBigMenuWithIndex(int index, bool addToScreenStack) => MainMenuInternal(index, addToScreenStack, true, true);
-        /// <summary>
-        /// Opens a new instance of the big menu with the given index.
-        /// </summary>
-        /// <param name="index">The index to set it to</param>
-        /// <param name="addToScreenStack">Whether the new screen opened should be added to the screen stack</param>
-        /// <param name="rePlaceUi">Whether to recalculate and reposition the UI</param>
-        public static void OpenBigMenuWithIndex(int index, bool addToScreenStack, bool rePlaceUi) => MainMenuInternal(index, addToScreenStack, rePlaceUi, true);
-        private static void MainMenuInternal(int index, bool addToScreenStack, bool rePlaceUi, bool openUi)
+        public static void MainMenu(int index, bool openUi, bool addToScreenStack, bool rePlaceUi)
         {
             _shouldChangeScreenStackValue = true;
             _newScreenStackValue = addToScreenStack;
@@ -434,8 +417,25 @@ namespace VRChatUtilityKit.Ui
         /// <param name="user">The user to open</param>
         public static void OpenUserInUserInfoPage(APIUser user)
         {
+            if (user == null)
+                throw new ArgumentNullException("Given APIUser was null.");
+
             QuickMenu.prop_QuickMenu_0.prop_APIUser_0 = user;
-            SetBigMenuIndex(4, false);
+            MainMenu(4, false, false, false);
+        }
+        /// <summary>
+        /// Opens the given user in the user info page. 
+        /// Does not open with big menu along with the page.
+        /// </summary>
+        /// <param name="user">The user to open</param>
+        /// <param name="addToScreenStack"></param>
+        public static void OpenUserInUserInfoPage(APIUser user, bool addToScreenStack)
+        {
+            if (user == null)
+                throw new ArgumentNullException("Given APIUser was null.");
+
+            QuickMenu.prop_QuickMenu_0.prop_APIUser_0 = user;
+            MainMenu(4, false, addToScreenStack, false);
         }
         /// <summary>
         /// Closes the big menu.
@@ -467,6 +467,13 @@ namespace VRChatUtilityKit.Ui
         /// <param name="playerToSelect">The player to select</param>
         public static void OpenUserInQuickMenu(Player playerToSelect)
         {
+            if (playerToSelect == null)
+                throw new ArgumentNullException("Given Player was null.");
+            if (playerToSelect.prop_APIUser_0 == null)
+                throw new ArgumentNullException("Given Player's APIUser was null.");
+            if (playerToSelect.prop_VRCPlayer_0 == null)
+                throw new ArgumentNullException("Given Player's VRCPlayer was null.");
+
             QuickMenu.prop_QuickMenu_0.prop_APIUser_0 = playerToSelect.prop_APIUser_0;
             QuickMenu.prop_QuickMenu_0.field_Private_Player_0 = playerToSelect;
             CursorUtils.CurrentCursor.Method_Public_Void_VRCPlayer_PDM_0(playerToSelect.prop_VRCPlayer_0);
