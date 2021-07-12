@@ -1,11 +1,16 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using MelonLoader;
 using VRC;
 using VRChatUtilityKit.Utilities;
 
 namespace PlayerList.Entries
 {
-    class CoordinatePositionEntry : EntryBase
+    [RegisterTypeInIl2Cpp]
+    public class CoordinatePositionEntry : EntryBase
     {
+        public CoordinatePositionEntry(IntPtr obj0) : base(obj0) { }
+
         public override string Name { get { return "Coordinate Position"; } }
 
         private Vector3 lastPos;

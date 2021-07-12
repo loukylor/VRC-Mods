@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using MelonLoader;
 using PlayerList.Config;
@@ -9,19 +10,19 @@ using VRC;
 using VRC.Core;
 using VRChatUtilityKit.Utilities;
 
+using Object = UnityEngine.Object;
+
 namespace PlayerList
 {
-    class EntryManager
+    public class EntryManager
     {
         internal static LocalPlayerEntry localPlayerEntry = null;
 
         public static List<PlayerEntry> playerEntries = new List<PlayerEntry>(); // This will not be sorted
-        public static List<PlayerEntry> sortedPlayerEntries = new List<PlayerEntry>(); // This will be sorted
-        public static List<LeftSidePlayerEntry> leftSidePlayerEntries = new List<LeftSidePlayerEntry>();
+        public static List<PlayerLeftPairEntry> playerLeftPairsEntries = new List<PlayerLeftPairEntry>();
+        public static Dictionary<string, PlayerLeftPairEntry> idToEntryTable = new Dictionary<string, PlayerLeftPairEntry>();
         public static List<EntryBase> generalInfoEntries = new List<EntryBase>();
         public static List<EntryBase> entries = new List<EntryBase>();
-
-        private static string localUserId;
 
         public static void Init()
         {
@@ -58,16 +59,15 @@ namespace PlayerList
                 {
                     if (playerEntries[i].player == null)
                     {
-                        Object.DestroyImmediate(playerEntries[i].gameObject.transform.parent.gameObject);
-                        RemovePlayerEntry(playerEntries[i]);
-                        RemoveLeftPlayerEntry(leftSidePlayerEntries[i + 1]); // Skip first entry
+                        MelonLogger.Msg(playerEntries[i].apiUser.displayName);
+                        playerEntries[i].playerLeftPairEntry.Remove();
                         continue;
                     }
 
                     if (playerEntries[i].timeSinceLastUpdate.ElapsedMilliseconds > 100)
                         PlayerEntry.UpdateEntry(playerEntries[i].player.prop_PlayerNet_0, playerEntries[i]);
                 }
-                catch (System.Exception ex)
+                catch (Exception ex)
                 {
                     MelonLogger.Error(ex.ToString());
                 }
@@ -82,11 +82,7 @@ namespace PlayerList
         public static void OnSceneWasLoaded()
         {
             for (int i = playerEntries.Count - 1; i >= 0; i--)
-            {
-                Object.DestroyImmediate(playerEntries[i].gameObject.transform.parent.gameObject);   
-                RemovePlayerEntry(playerEntries[i]);
-                RemoveLeftPlayerEntry(leftSidePlayerEntries[i + 1]); // Skip first entry
-            }
+                playerEntries[i].playerLeftPairEntry.Remove();
         }
         public static void OnInstanceChanged(ApiWorld world, ApiWorldInstance instance)
         {
@@ -114,46 +110,47 @@ namespace PlayerList
 
         public static void OnPlayerJoined(Player player)
         {
-            if (GetEntryFromPlayer(sortedPlayerEntries, player, out _)) return; // If already in list
-
-            GameObject template;
-
-            if (player.prop_APIUser_0 == null || player.prop_APIUser_0.IsSelf) // The apiuser in player will only be null on the first join of the first instance of the client, and only occasionally. So it can be garunteed to be local player
-            {
-                if (localPlayerEntry != null) return;
-
-                localUserId = APIUser.CurrentUser.id;
-
-                template = Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform);
-                template.SetActive(true);
-                
-                EntryBase.CreateInstance<LocalPlayerEntry>(template.transform.Find("RightPart").gameObject);
-                sortedPlayerEntries.Add(localPlayerEntry);
-                AddEntry(localPlayerEntry);
-
-                AddLeftSidePlayerEntry(EntryBase.CreateInstance<LeftSidePlayerEntry>(template.transform.Find("LeftPart").gameObject));
-
+            if (player.prop_APIUser_0 == null)
                 return;
+
+            if (idToEntryTable.ContainsKey(player.prop_APIUser_0.id))
+                return; // If already in list
+
+            if (player.prop_APIUser_0.IsSelf)
+            {
+                if (localPlayerEntry != null)
+                    return;
+
+                GameObject template = Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform);
+                template.SetActive(true);
+
+                LeftSidePlayerEntry leftSidePlayerEntry = EntryBase.CreateInstance<LeftSidePlayerEntry>(template.transform.Find("LeftPart").gameObject);
+                EntryBase.CreateInstance<LocalPlayerEntry>(template.transform.Find("RightPart").gameObject);
+                AddPlayerLeftPairEntry(EntryBase.CreateInstance<PlayerLeftPairEntry>(template, new object[] { leftSidePlayerEntry, localPlayerEntry }));
             }
+            else
+            {
+                GameObject template = Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform);
+                template.SetActive(true);
 
-            template = Object.Instantiate(Constants.playerListLayout.transform.Find("Template").gameObject, Constants.playerListLayout.transform);
-            template.SetActive(true);
-
-            AddPlayerEntry(EntryBase.CreateInstance<PlayerEntry>(template.transform.Find("RightPart").gameObject, new object[] { player }));
-            AddLeftSidePlayerEntry(EntryBase.CreateInstance<LeftSidePlayerEntry>(template.transform.Find("LeftPart").gameObject));
+                LeftSidePlayerEntry leftSidePlayerEntry = EntryBase.CreateInstance<LeftSidePlayerEntry>(template.transform.Find("LeftPart").gameObject);
+                PlayerEntry playerEntry = EntryBase.CreateInstance<PlayerEntry>(template.transform.Find("RightPart").gameObject, new object[] { player });
+                AddPlayerLeftPairEntry(EntryBase.CreateInstance<PlayerLeftPairEntry>(template, new object[] { leftSidePlayerEntry, playerEntry }));
+            }
         }
         public static void OnPlayerLeft(Player player)
         {
-            if (player.prop_APIUser_0.id == localUserId) return;
+            if (player.prop_APIUser_0.IsSelf)
+                return;
 
-            int index = GetEntryFromPlayerWithIndex(sortedPlayerEntries, player, out PlayerEntry entry);
-            if (index < 0) return;
+            MelonLogger.Msg(ConsoleColor.Green, player.prop_APIUser_0.displayName);
+            if (!idToEntryTable.TryGetValue(player.prop_APIUser_0.id, out PlayerLeftPairEntry entry))
+                return;
+            MelonLogger.Msg(ConsoleColor.Green, player.prop_APIUser_0.displayName);
 
-            RemovePlayerEntry(entry);
-            RemoveLeftPlayerEntry(leftSidePlayerEntries[index]);
-            Object.DestroyImmediate(Constants.playerListLayout.transform.GetChild(index + 2).gameObject);
+            entry.Remove();
 
-            RefreshLeftPlayerEntries(leftSidePlayerEntries.Count + 1, leftSidePlayerEntries.Count, true);
+            RefreshLeftPlayerEntries(0, 0, true);
         }
 
         public static void AddGeneralInfoEntries()
@@ -171,79 +168,38 @@ namespace PlayerList
             AddGeneralInfoEntry(EntryBase.CreateInstance<InstanceCreatorEntry>(Constants.generalInfoLayout.transform.Find("InstanceCreator").gameObject, includeConfig: true));
             AddGeneralInfoEntry(EntryBase.CreateInstance<RiskyFuncAllowedEntry>(Constants.generalInfoLayout.transform.Find("RiskyFuncAllowed").gameObject, includeConfig: true));
         }
-        public static int GetEntryFromPlayerWithIndex(List<PlayerEntry> list, Player player, out PlayerEntry entry)
-        {
-            if (player == null || player.prop_APIUser_0 == null)
-            {
-                entry = null;
-                return -1;
-            }
-
-            string playerId = player.prop_APIUser_0.id;
-            for (int i = 0; i < list.Count; i++)
-            {
-                if (playerId == list[i].userId)
-                {
-                    entry = list[i];
-                    return i;
-                }
-            }
-            entry = null;
-            return -1;
-        }
-        public static bool GetEntryFromPlayer(List<PlayerEntry> list, Player player, out PlayerEntry entry)
-        {
-            return GetEntryFromPlayerWithIndex(list, player, out entry) >= 0;
-        }
         public static void AddEntry(EntryBase entry)
         {
-            entry.textComponent.fontSize = PlayerListConfig.fontSize.Value;
+            if (entry.textComponent != null)
+                entry.textComponent.fontSize = PlayerListConfig.fontSize.Value;
             entries.Add(entry);
         }
-        public static void AddLeftSidePlayerEntry(LeftSidePlayerEntry entry)
+        public static void AddPlayerLeftPairEntry(PlayerLeftPairEntry entry)
         {
+            playerLeftPairsEntries.Add(entry);
+            idToEntryTable.Add(entry.playerEntry.userId, entry);
+            if (!entry.playerEntry.isSelf)
+                playerEntries.Add(entry.playerEntry);
             AddEntry(entry);
-            leftSidePlayerEntries.Add(entry);
+            AddEntry(entry.leftSidePlayerEntry);
+            AddEntry(entry.playerEntry);
 
-            RefreshLeftPlayerEntries(leftSidePlayerEntries.Count - 1, leftSidePlayerEntries.Count);
-        }
-        public static void AddPlayerEntry(PlayerEntry entry)
-        {
-            AddEntry(entry);
-            playerEntries.Add(entry);
-            entry.gameObject.SetActive(true);
-            sortedPlayerEntries.Add(entry);
-            EntrySortManager.SortPlayer(entry); 
+            entry.playerEntry.gameObject.SetActive(true);
+            EntrySortManager.SortPlayer(entry);
+
+            RefreshLeftPlayerEntries(0, 0, true);
         }
         public static void AddGeneralInfoEntry(EntryBase entry)
         {
             AddEntry(entry);
             generalInfoEntries.Add(entry);
         }
-
-        public static void RemoveEntry(EntryBase entry)
-        {
-            entries.Remove(entry);
-            entry.Remove();
-        }
-        public static void RemoveLeftPlayerEntry(LeftSidePlayerEntry entry)
-        {
-            RemoveEntry(entry);
-            leftSidePlayerEntries.Remove(entry);
-        }
-        public static void RemovePlayerEntry(PlayerEntry entry)
-        {
-            sortedPlayerEntries.Remove(entry);
-            playerEntries.Remove(entry);
-            RemoveEntry(entry);
-        }
-
         public static void RefreshLeftPlayerEntries(int oldCount, int newCount, bool bypassCount = false)
         {
             // If new digit reached (like 9 - 10)
             if (oldCount.ToString().Length != newCount.ToString().Length || bypassCount)
-                foreach (LeftSidePlayerEntry updateEntry in leftSidePlayerEntries)
-                    updateEntry.CalculateLeftPart();
+                foreach (PlayerLeftPairEntry playerLeftPairEntry in playerLeftPairsEntries)
+                    playerLeftPairEntry.leftSidePlayerEntry.CalculateLeftPart();
         }
         public static void RefreshPlayerEntries(bool bypassActive = false)
         {
@@ -271,7 +227,8 @@ namespace PlayerList
         {
             MenuManager.fontSizeLabel.TextComponent.text = $"Font\nSize: {fontSize}";
             foreach (EntryBase entry in entries)
-                entry.textComponent.fontSize = fontSize;
+                if (entry.textComponent != null)
+                    entry.textComponent.fontSize = fontSize;
         }
     }
 }

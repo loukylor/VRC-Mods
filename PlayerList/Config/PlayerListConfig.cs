@@ -7,7 +7,7 @@ using VRChatUtilityKit.Utilities;
 
 namespace PlayerList.Config
 {
-    static class PlayerListConfig
+    public static class PlayerListConfig
     {
         public static event Action OnConfigChanged;
         private static bool hasConfigChanged = false;

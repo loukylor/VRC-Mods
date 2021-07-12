@@ -9,7 +9,7 @@ using VRChatUtilityKit.Utilities;
 
 namespace PlayerList
 {
-    class ListPositionManager
+    public class ListPositionManager
     {
         public static bool shouldMove = false;
 

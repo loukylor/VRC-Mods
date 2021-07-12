@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace PlayerList.Utilities
 {
-    class Constants
+    public class Constants
     {
         public static GameObject shortcutMenu;
         public static GameObject quickMenu;

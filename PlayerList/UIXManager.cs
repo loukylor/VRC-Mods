@@ -1,11 +1,10 @@
 ﻿using System;
 using PlayerList.Utilities;
 using UIExpansionKit.Components;
-using UIExpansionKit.API;
 
 namespace PlayerList
 {
-    class UIXManager
+    public class UIXManager
     {
         public static void AddListenerToShortcutMenu(Action onEnable, Action onDisable)
         {

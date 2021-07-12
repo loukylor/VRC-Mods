@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections;
+using MelonLoader;
 using VRC.Core;
 using UnityEngine;
-using MelonLoader;
 
 namespace PlayerList.Entries
 {
-    class InstanceCreatorEntry : EntryBase
+    [RegisterTypeInIl2Cpp]
+    public class InstanceCreatorEntry : EntryBase
     {
+        public InstanceCreatorEntry(IntPtr obj0) : base(obj0) { }
+
         public override string Name { get { return "Instance Creator"; } }
 
         public override void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)

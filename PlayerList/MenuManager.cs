@@ -17,7 +17,7 @@ using VRChatUtilityKit.Utilities;
 
 namespace PlayerList
 {
-    class MenuManager
+    public class MenuManager
     {
         public static List<SubMenu> playerListMenus = new List<SubMenu>();
         public static SubMenu sortMenu;

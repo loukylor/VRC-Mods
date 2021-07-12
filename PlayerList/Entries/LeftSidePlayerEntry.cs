@@ -1,9 +1,14 @@
-﻿using PlayerList.Config;
+﻿using System;
+using MelonLoader;
+using PlayerList.Config;
 
 namespace PlayerList.Entries
 {
-    class LeftSidePlayerEntry : EntryBase
+    [RegisterTypeInIl2Cpp]
+    public class LeftSidePlayerEntry : EntryBase
     {
+        public LeftSidePlayerEntry(IntPtr obj0) : base(obj0) { }
+
         public override void Init(object[] parameters = null)
         {
             OnConfigChanged();

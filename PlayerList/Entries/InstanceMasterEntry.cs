@@ -1,12 +1,16 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using MelonLoader;
 using Photon.Realtime;
 using VRChatUtilityKit.Utilities;
 
 namespace PlayerList.Entries
 {
-    class InstanceMasterEntry : EntryBase
+    [RegisterTypeInIl2Cpp]
+    public class InstanceMasterEntry : EntryBase
     {
+        public InstanceMasterEntry(IntPtr obj0) : base(obj0) { }
+
         public override string Name { get { return "Instance Master"; } }
 
         public override void Init(object[] parameters = null)
@@ -17,7 +21,7 @@ namespace PlayerList.Entries
         public void OnPlayerJoined(VRC.Player player)
         {
             // This will handle getting the master on instance join
-            if (player.prop_VRCPlayerApi_0.isMaster)
+            if (player.prop_VRCPlayerApi_0 != null && player.prop_VRCPlayerApi_0.isMaster)
                 textComponent.text = OriginalText.Replace("{instancemaster}", player.prop_APIUser_0.displayName);
         }
 

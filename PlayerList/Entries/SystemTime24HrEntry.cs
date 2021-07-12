@@ -1,9 +1,13 @@
 ﻿using System;
+using MelonLoader;
 
 namespace PlayerList.Entries
 {
-    class SystemTime24HrEntry : EntryBase
+    [RegisterTypeInIl2Cpp]
+    public class SystemTime24HrEntry : EntryBase
     {
+        public SystemTime24HrEntry(IntPtr obj0) : base(obj0) { }
+
         public override string Name { get { return "System Time 24Hr"; } }
 
         public string lastTime;

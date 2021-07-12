@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using PlayerList.Config;
 using PlayerList.Entries;
-using PlayerList.Utilities;
 using VRChatUtilityKit.Utilities;
 
 namespace PlayerList
 {
-    class EntrySortManager
+    public class EntrySortManager
     {
         public static int sortStartIndex = 0;
 
@@ -198,16 +199,8 @@ namespace PlayerList
 
             if (PlayerListConfig.showSelfAtTop.Value)
             {
-                if (EntryManager.localPlayerEntry != null)
-                { 
-                    EntryManager.sortedPlayerEntries.Remove(EntryManager.localPlayerEntry);
-                    EntryManager.sortedPlayerEntries.Insert(0, EntryManager.localPlayerEntry);
-                    for (int i = 1; i < EntryManager.sortedPlayerEntries.Count; i++)
-                    { 
-                        EntryManager.sortedPlayerEntries[i].gameObject.transform.SetParent(Constants.playerListLayout.transform.GetChild(i + 2));
-                        EntryManager.sortedPlayerEntries[i].gameObject.transform.localPosition = EntryManager.sortedPlayerEntries[i].gameObject.transform.localPosition.SetZ(0);
-                    }
-                }
+                if (EntryManager.playerLeftPairsEntries.Count != 0)
+                    PlayerLeftPairEntry.SwapPlayerEntries(EntryManager.playerLeftPairsEntries[0], EntryManager.localPlayerEntry.playerLeftPairEntry);
 
                 sortStartIndex = 1;
             }
@@ -242,54 +235,65 @@ namespace PlayerList
 
         public static void SortAllPlayers() // This only runs when sort type is changed and when the qm is opened (takes around 1-2ms in a full BClub)
         {
-            if (!IsSortTypeInAllUses(SortType.None))
-                EntryManager.sortedPlayerEntries.Sort(sort);
+            if (EntryManager.playerLeftPairsEntries.Count == 0)
+                return;
 
-            if (PlayerListConfig.showSelfAtTop.Value)
-                if (EntryManager.sortedPlayerEntries.Remove(EntryManager.localPlayerEntry))
-                    EntryManager.sortedPlayerEntries.Insert(0, EntryManager.localPlayerEntry);
-
-            for (int i = 0; i < EntryManager.sortedPlayerEntries.Count; i++)
-            {
-                EntryManager.sortedPlayerEntries[i].gameObject.transform.SetParent(Constants.playerListLayout.transform.GetChild(i + 2));
-                EntryManager.sortedPlayerEntries[i].gameObject.transform.localPosition = EntryManager.sortedPlayerEntries[i].gameObject.transform.localPosition.SetZ(0);
-            }
-        }
-        public static void SortPlayer(PlayerEntry sortEntry)
-        {
             if (IsSortTypeInAllUses(SortType.None))
                 return;
 
-            // This function takes around 0.01 - 0.1 ms in a full BC (excluding garbage collection)
-            int oldIndex = EntryManager.sortedPlayerEntries.IndexOf(sortEntry);
+            List<PlayerEntry> playerEntries = EntryManager.playerLeftPairsEntries.Select(pairEntry => pairEntry.playerEntry).ToList();
+
+            int num = 0;
+            if (PlayerListConfig.showSelfAtTop.Value)
+            {
+                PlayerLeftPairEntry.SwapPlayerEntries(EntryManager.playerLeftPairsEntries[0], EntryManager.localPlayerEntry.playerLeftPairEntry);
+                playerEntries.Remove(EntryManager.localPlayerEntry);
+                num = 1;
+            }
+
+            playerEntries.Sort(sort);
+            for (int i = 0; i < playerEntries.Count; i++)
+                EntryManager.playerLeftPairsEntries[i + num].playerEntry = playerEntries[i];
+        }
+        public static void SortPlayer(PlayerLeftPairEntry sortEntry)
+        {
+            if (IsSortTypeInAllUses(SortType.None) || (PlayerListConfig.showSelfAtTop.Value && sortEntry.playerEntry.isSelf))
+                return;
+
+            // This method is good like 0.2ms
+            int oldIndex = EntryManager.playerLeftPairsEntries.IndexOf(sortEntry);
             if (oldIndex < 0)
                 return;
 
-            int finalIndex = sortStartIndex;
+            int forwardSort = oldIndex < EntryManager.playerLeftPairsEntries.Count - 1 ? sort(sortEntry.playerEntry, EntryManager.playerLeftPairsEntries[oldIndex + 1].playerEntry) : 0;
+            int backwardSort = oldIndex > sortStartIndex ? sort(EntryManager.playerLeftPairsEntries[oldIndex - 1].playerEntry, sortEntry.playerEntry) : 0;
+
             int sortResult;
-            for (int i = sortStartIndex; i < EntryManager.sortedPlayerEntries.Count; i++)
+            if (backwardSort == 1)
             {
-                if (i == oldIndex)
-                    continue;
+                PlayerLeftPairEntry.SwapPlayerEntries(sortEntry, EntryManager.playerLeftPairsEntries[oldIndex - 1]);
 
-                sortResult = sort(sortEntry, EntryManager.sortedPlayerEntries[i]);
-                if (sortResult > 0)
-                    finalIndex += sortResult;
-                else
-                    break;
+                for (int i = oldIndex - 1; i > sortStartIndex; i--)
+                {
+                    sortResult = sort(EntryManager.playerLeftPairsEntries[i - 1].playerEntry, EntryManager.playerLeftPairsEntries[i].playerEntry);
+                    if (sortResult == 1)
+                        PlayerLeftPairEntry.SwapPlayerEntries(EntryManager.playerLeftPairsEntries[i], EntryManager.playerLeftPairsEntries[i - 1]);
+                    else
+                        break;
+                }
             }
+            else if (forwardSort == 1)
+            {
+                PlayerLeftPairEntry.SwapPlayerEntries(sortEntry, EntryManager.playerLeftPairsEntries[oldIndex + 1]);
 
-            EntryManager.sortedPlayerEntries.RemoveAt(oldIndex);
-            if (finalIndex < EntryManager.sortedPlayerEntries.Count)
-                EntryManager.sortedPlayerEntries.Insert(finalIndex, sortEntry);
-            else
-                EntryManager.sortedPlayerEntries.Add(sortEntry);
-
-            // Believe it or not but this is faster than changing the text of all the components every sort
-            for (int i = Math.Min(finalIndex, oldIndex); i < EntryManager.sortedPlayerEntries.Count; i++)
-            { 
-                EntryManager.sortedPlayerEntries[i].gameObject.transform.SetParent(Constants.playerListLayout.transform.GetChild(i + 2));
-                EntryManager.sortedPlayerEntries[i].gameObject.transform.localPosition = EntryManager.sortedPlayerEntries[i].gameObject.transform.localPosition.SetZ(0);
+                for (int i = oldIndex + 1; i < EntryManager.playerLeftPairsEntries.Count - 1; i++)
+                {
+                    sortResult = sort(EntryManager.playerLeftPairsEntries[i].playerEntry, EntryManager.playerLeftPairsEntries[i + 1].playerEntry);
+                    if (sortResult == 1)
+                        PlayerLeftPairEntry.SwapPlayerEntries(EntryManager.playerLeftPairsEntries[i], EntryManager.playerLeftPairsEntries[i + 1]);
+                    else
+                        break;
+                }
             }
         }
 

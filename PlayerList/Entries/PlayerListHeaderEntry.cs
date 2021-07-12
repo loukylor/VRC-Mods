@@ -1,10 +1,15 @@
-﻿using VRC;
+﻿using System;
+using MelonLoader;
+using VRC;
 using VRChatUtilityKit.Utilities;
 
 namespace PlayerList.Entries
 {
-    class PlayerListHeaderEntry : EntryBase
+    [RegisterTypeInIl2Cpp]
+    public class PlayerListHeaderEntry : EntryBase
     {
+        public PlayerListHeaderEntry(IntPtr obj0) : base(obj0) { }
+
         public override string Name { get { return "PlayerList Header"; } }
 
         public override void Init(object[] parameters = null)

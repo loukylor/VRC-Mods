@@ -1,10 +1,9 @@
 ﻿using VRC;
 using VRCSDK2.Validation.Performance;
-using VRChatUtilityKit.Ui;
 
 namespace PlayerList.Utilities
 {
-    static class PlayerUtils
+    public static class PlayerUtils
     {
         public static string GetPlatform(Player player)
         {

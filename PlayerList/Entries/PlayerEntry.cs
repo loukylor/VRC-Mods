@@ -17,12 +17,17 @@ using VRCSDK2.Validation.Performance;
 
 namespace PlayerList.Entries
 {
+    [RegisterTypeInIl2Cpp]
     public class PlayerEntry : EntryBase
     {
+        public PlayerEntry(IntPtr obj0) : base(obj0) { }
+
         // - <color={pingcolor}>{ping}ms</color> | <color={fpscolor}>{fps}</color> | {platform} | <color={perfcolor}>{perf}</color> | {relationship} | <color={rankcolor}>{displayname}</color>
         public override string Name { get { return "Player"; } }
 
         public bool isSelf = false;
+
+        public PlayerLeftPairEntry playerLeftPairEntry;
 
         public Player player;
         public APIUser apiUser;
@@ -56,8 +61,8 @@ namespace PlayerList.Entries
         {
             UiManager.OnQuickMenuOpened += new Action(() =>
             {
-                foreach (PlayerEntry entry in EntryManager.sortedPlayerEntries)
-                    entry.GetPlayerColor(false);
+                foreach (PlayerLeftPairEntry entry in EntryManager.playerLeftPairsEntries)
+                    entry.playerEntry.GetPlayerColor(false);
                 EntrySortManager.SortAllPlayers();
                 EntryManager.RefreshPlayerEntries();
             });
@@ -104,7 +109,7 @@ namespace PlayerList.Entries
             if (PlayerListConfig.displayNameToggle.Value)
                 updateDelegate += AddDisplayName;
             if (PlayerListConfig.distanceToggle.Value && EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.Distance) || PlayerListConfig.pingToggle.Value && EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.Ping))
-                updateDelegate += (PlayerNet playerNet, PlayerEntry entry, ref StringBuilder tempString) => EntrySortManager.SortPlayer(entry);
+                updateDelegate += (PlayerNet playerNet, PlayerEntry entry, ref StringBuilder tempString) => EntrySortManager.SortPlayer(entry.playerLeftPairEntry);
 
             if (PlayerListConfig.condensedText.Value)
                 separator = "|";
@@ -117,7 +122,7 @@ namespace PlayerList.Entries
         {
             GetPlayerColor(false);
             if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.Distance))
-                EntrySortManager.SortPlayer(this);
+                EntrySortManager.SortPlayer(playerLeftPairEntry);
         }
         public override void OnAvatarInstantiated(VRCAvatarManager manager, ApiAvatar avatar, GameObject gameObject)
         {
@@ -133,13 +138,14 @@ namespace PlayerList.Entries
                 UpdateEntry(player.prop_PlayerNet_0, this, true);
             
             if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.AvatarPerf))
-                EntrySortManager.SortPlayer(this);
+                EntrySortManager.SortPlayer(playerLeftPairEntry);
         }
         public override void OnAvatarDownloadProgressed(AvatarLoadingBar loadingBar, float downloadPercentage, long fileSize)
         {
             if (loadingBar.field_Public_PlayerNameplate_0.field_Private_VRCPlayer_0.prop_Player_0.prop_APIUser_0?.id != userId)
                 return;
 
+            perf = PerformanceRating.None;
             if (downloadPercentage < 1)
                 perfString = ((downloadPercentage * 100).ToString("N1") + "%").PadRight(5);
             else
@@ -150,10 +156,7 @@ namespace PlayerList.Entries
         private static void OnSetupFlagsReceived(VRCPlayer vrcPlayer, int SetupFlagType)
         {
             if (SetupFlagType == 64)
-            {
-                EntryManager.GetEntryFromPlayer(EntryManager.sortedPlayerEntries, vrcPlayer.prop_Player_0, out PlayerEntry entry);
-                entry.GetPlayerColor();
-            }
+                EntryManager.idToEntryTable[vrcPlayer.prop_Player_0.prop_APIUser_0.id].playerEntry.GetPlayerColor();
         }
         public static void UpdateEntry(PlayerNet playerNet, PlayerEntry entry, bool bypassActive = false)
         {
@@ -282,7 +285,7 @@ namespace PlayerList.Entries
                     break;
             }
             if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.NameColor) && shouldSort)
-                EntrySortManager.SortPlayer(this);
+                EntrySortManager.SortPlayer(playerLeftPairEntry);
         }
         protected string TrimExtra(string tempString)
         {

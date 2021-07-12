@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using MelonLoader;
 using PlayerList.Config;
 using PlayerList.Utilities;
 using UnityEngine;
@@ -11,8 +12,11 @@ using VRCSDK2.Validation.Performance;
 
 namespace PlayerList.Entries
 {
-    class LocalPlayerEntry : PlayerEntry
+    [RegisterTypeInIl2Cpp]
+    public class LocalPlayerEntry : PlayerEntry
     {
+        public LocalPlayerEntry(IntPtr obj0) : base(obj0) { }
+
         // " - <color={pingcolor}>{ping}ms</color> | <color={fpscolor}>{fps}</color> | {platform} | <color={perfcolor}>{perf}</color> | {relationship} | <color={rankcolor}>{displayname}</color>"
         public override string Name { get { return "Local Player"; } }
 
@@ -165,7 +169,7 @@ namespace PlayerList.Entries
                     break;
             }
             if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.NameColor))
-                EntrySortManager.SortPlayer(this);
+                EntrySortManager.SortPlayer(playerLeftPairEntry);
         }
     }
 }
