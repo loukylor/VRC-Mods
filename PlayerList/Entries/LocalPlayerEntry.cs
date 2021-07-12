@@ -20,6 +20,9 @@ namespace PlayerList.Entries
         // " - <color={pingcolor}>{ping}ms</color> | <color={fpscolor}>{fps}</color> | {platform} | <color={perfcolor}>{perf}</color> | {relationship} | <color={rankcolor}>{displayname}</color>"
         public override string Name { get { return "Local Player"; } }
 
+        public static bool emmNameSpoofEnabled = false;
+        public static string emmSpoofedName = "";
+
         public new delegate void UpdateEntryDelegate(Player player, LocalPlayerEntry entry, ref StringBuilder tempString);
         public static new UpdateEntryDelegate updateDelegate;
         public static new void EntryInit()
@@ -70,7 +73,12 @@ namespace PlayerList.Entries
             if (PlayerListConfig.photonIdToggle.Value)
                 updateDelegate += AddPhotonId;
             if (PlayerListConfig.displayNameToggle.Value)
-                updateDelegate += AddDisplayName;
+            {
+                if (!emmNameSpoofEnabled)
+                    updateDelegate += AddDisplayName;
+                else
+                    typeof(EmmManager).GetMethod("AddSelfToUpdateDelegate").Invoke(null, null);
+            }
 
             GetPlayerColor();
         }

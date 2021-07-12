@@ -23,9 +23,12 @@ namespace PlayerList.Entries
 
             if (creator != null)
             { 
-                if (creator == APIUser.CurrentUser.id)
+                if (creator == APIUser.CurrentUser? .id)
                 {
-                    textComponent.text = OriginalText.Replace("{instancecreator}", APIUser.CurrentUser.displayName);
+                    if (LocalPlayerEntry.emmNameSpoofEnabled)
+                        textComponent.text = OriginalText.Replace("{instancecreator}", LocalPlayerEntry.emmSpoofedName);
+                    else
+                        textComponent.text = OriginalText.Replace("{instancecreator}", APIUser.CurrentUser.displayName);
                     yield break;
                 }
 

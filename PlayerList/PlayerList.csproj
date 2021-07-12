@@ -22,6 +22,9 @@
 		<Reference Include="Assembly-CSharp">
 			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\Assembly-CSharp.dll</HintPath>
 		</Reference>
+		<Reference Include="emmVRC">
+		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\Dependencies\emmVRC.dll</HintPath>
+		</Reference>
 		<Reference Include="Il2Cppmscorlib">
 			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\Il2Cppmscorlib.dll</HintPath>
 		</Reference>

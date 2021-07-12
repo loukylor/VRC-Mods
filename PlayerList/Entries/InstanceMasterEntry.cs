@@ -2,6 +2,7 @@
 using System.Collections;
 using MelonLoader;
 using Photon.Realtime;
+using VRC.Core;
 using VRChatUtilityKit.Utilities;
 
 namespace PlayerList.Entries
@@ -22,7 +23,12 @@ namespace PlayerList.Entries
         {
             // This will handle getting the master on instance join
             if (player.prop_VRCPlayerApi_0 != null && player.prop_VRCPlayerApi_0.isMaster)
-                textComponent.text = OriginalText.Replace("{instancemaster}", player.prop_APIUser_0.displayName);
+            {
+                if (APIUser.CurrentUser != null && player.prop_APIUser_0.id == APIUser.CurrentUser.id && LocalPlayerEntry.emmNameSpoofEnabled)
+                    textComponent.text = OriginalText.Replace("{instancemaster}", LocalPlayerEntry.emmSpoofedName);
+                else
+                    textComponent.text = OriginalText.Replace("{instancemaster}", player.prop_APIUser_0.displayName);
+            }
         }
 
         private void OnMasterChanged(Player player)
@@ -34,7 +40,10 @@ namespace PlayerList.Entries
             while (player.field_Public_Player_0 == null)
                 yield return null;
 
-            textComponent.text = OriginalText.Replace("{instancemaster}", player.field_Public_Player_0.prop_APIUser_0.displayName);
+            if (APIUser.CurrentUser != null && player.field_Public_Player_0.prop_APIUser_0.id == APIUser.CurrentUser.id && LocalPlayerEntry.emmNameSpoofEnabled)
+                textComponent.text = OriginalText.Replace("{instancemaster}", LocalPlayerEntry.emmSpoofedName);
+            else
+                textComponent.text = OriginalText.Replace("{instancemaster}", player.field_Public_Player_0.prop_APIUser_0.displayName);
             yield break;
         }
     }

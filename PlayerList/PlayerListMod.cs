@@ -10,7 +10,7 @@ using VRChatUtilityKit.Components;
 
 [assembly: MelonInfo(typeof(PlayerList.PlayerListMod), "PlayerList", "1.5.6", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
-[assembly: MelonOptionalDependencies("UIExpansionKit")]
+[assembly: MelonOptionalDependencies("UIExpansionKit", "emmVRC")]
 
 namespace PlayerList
 {
@@ -77,6 +77,9 @@ namespace PlayerList
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
             if (buildIndex != -1) return;
+
+            if (MelonHandler.Mods.Any(mod => mod.Info.Name == "emmVRCLoader"))
+                typeof(EmmManager).GetMethod("OnSceneWasLoaded").Invoke(null, null);
 
             MenuManager.OnSceneWasLoaded();
             Constants.OnSceneWasLoaded();
