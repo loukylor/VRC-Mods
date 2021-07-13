@@ -94,6 +94,11 @@
             Called when the QuickMenu is closed.
             </summary>
         </member>
+        <member name="E:VRChatUtilityKit.Ui.UiManager.OnQuickMenuIndexSet">
+            <summary>
+            Called when the QuickMenu index is set.
+            </summary>
+        </member>
         <member name="P:VRChatUtilityKit.Ui.UiManager.QuickMenuIndexEnum">
             <summary>
             The type of the enum that is used for the QuickMenu index.
