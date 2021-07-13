@@ -173,7 +173,7 @@ namespace VRChatUtilityKit.Ui
 
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_openQuickMenu, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnQuickMenuOpen), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_closeQuickMenu, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnQuickMenuClose), BindingFlags.NonPublic | BindingFlags.Static)));
-            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_setQuickMenuIndex, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnQuickMenuIndexAssigned), BindingFlags.NonPublic | BindingFlags.Static)), null, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnQuickMenuIndexAssignedErrorSuppressor), BindingFlags.NonPublic | BindingFlags.Static)), null);
+            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_setQuickMenuIndex, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnQuickMenuIndexAssigned), BindingFlags.NonPublic | BindingFlags.Static)), null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnQuickMenuIndexAssignedErrorSuppressor), BindingFlags.NonPublic | BindingFlags.Static)), null);
 
             BigMenuIndexEnum = quickMenuNestedEnums.First(type => type.IsEnum && type != QuickMenuIndexEnum);
             _closeBigMenu = typeof(VRCUiManager).GetMethods()
