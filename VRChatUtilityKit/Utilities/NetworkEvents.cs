@@ -141,20 +141,12 @@ namespace VRChatUtilityKit.Utilities
         {
             OnAvatarChanged?.DelegateSafeInvoke(__instance, __instance.prop_GameObject_0);
         }
-        private static void OnAvatarInstantiate(VRCAvatarManager __instance, ApiAvatar __0, ref Il2CppSystem.Delegate __2)
+        private static void OnAvatarInstantiate(VRCAvatarManager __instance, ApiAvatar __0, GameObject __1)
         {
-            Il2CppSystem.Action<bool> action = new Action<bool>((flag) =>
-            {
-                if (__instance == null || __instance.prop_GameObject_0 == null || !flag)
-                    return;
+            if (__0 == null || __1 == null)
+                return;
 
-                OnAvatarInstantiated?.DelegateSafeInvoke(__instance, __0, __instance.prop_GameObject_0);
-            });
-
-            if (__2 == null)
-                __2 = action;
-            else
-                __2 = __2.CombineImpl(action);
+            OnAvatarInstantiated.DelegateSafeInvoke(__instance, __0, __1);
         }
         private static void OnAvatarDownloadProgress(AvatarLoadingBar __instance, float __0, long __1)
         {
@@ -199,7 +191,7 @@ namespace VRChatUtilityKit.Utilities
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(NetworkManager).GetMethod("OnLeftRoom"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnRoomLeave), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(NetworkManager).GetMethod("OnJoinedRoom"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnRoomJoin), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(VRCAvatarManager).GetMethods().First(mb => mb.Name.StartsWith("Method_Private_Boolean_GameObject_String_Single_String_")), null, new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnAvatarChange), BindingFlags.NonPublic | BindingFlags.Static)));
-            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(VRCAvatarManager).GetMethods().First(mb => mb.Name.StartsWith("Method_Private_Void_ApiAvatar_GameObject_Action_1_Boolean_")), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnAvatarInstantiate), BindingFlags.NonPublic | BindingFlags.Static)));
+            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(VRCAvatarManager).GetMethods().First(mb => mb.Name.StartsWith("Method_Private_Boolean_ApiAvatar_GameObject_")), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnAvatarInstantiate), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(ModerationManager).GetMethod("Method_Private_ApiPlayerModeration_String_String_ModerationType_0"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnPlayerModerationSend), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(ModerationManager).GetMethod("Method_Private_Void_String_ModerationType_0"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnPlayerModerationRemove), BindingFlags.NonPublic | BindingFlags.Static)));
 
