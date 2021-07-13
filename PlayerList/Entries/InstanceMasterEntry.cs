@@ -2,6 +2,7 @@
 using System.Collections;
 using MelonLoader;
 using Photon.Realtime;
+using UnhollowerBaseLib.Attributes;
 using VRC.Core;
 using VRChatUtilityKit.Utilities;
 
@@ -12,8 +13,10 @@ namespace PlayerList.Entries
     {
         public InstanceMasterEntry(IntPtr obj0) : base(obj0) { }
 
-        public override string Name { get { return "Instance Master"; } }
+        [HideFromIl2Cpp]
+        public override string Name => "Instance Master";
 
+        [HideFromIl2Cpp]
         public override void Init(object[] parameters = null)
         {
             NetworkEvents.OnPlayerJoined += OnPlayerJoined;
@@ -35,6 +38,7 @@ namespace PlayerList.Entries
         {
             MelonCoroutines.Start(GetOnMasterChanged(player));
         }
+        [HideFromIl2Cpp]
         private IEnumerator GetOnMasterChanged(Player player)
         {
             while (player.field_Public_Player_0 == null)

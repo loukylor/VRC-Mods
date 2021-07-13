@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using HarmonyLib;
 using MelonLoader;
 using PlayerList.Config;
 using PlayerList.Utilities;
+using UnhollowerBaseLib.Attributes;
 using UnityEngine;
 using VRC;
 using VRC.Core;
@@ -23,7 +22,8 @@ namespace PlayerList.Entries
         public PlayerEntry(IntPtr obj0) : base(obj0) { }
 
         // - <color={pingcolor}>{ping}ms</color> | <color={fpscolor}>{fps}</color> | {platform} | <color={perfcolor}>{perf}</color> | {relationship} | <color={rankcolor}>{displayname}</color>
-        public override string Name { get { return "Player"; } }
+        [HideFromIl2Cpp]
+        public override string Name => "Player";
 
         public bool isSelf = false;
 
@@ -53,10 +53,6 @@ namespace PlayerList.Entries
         public delegate void UpdateEntryDelegate(PlayerNet playerNet, PlayerEntry entry, ref StringBuilder tempString);
         public static UpdateEntryDelegate updateDelegate;
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate IntPtr OnPlayerNetDecodeDelegate(IntPtr instancePointer, IntPtr objectsPointer, int objectIndex, float sendTime, IntPtr nativeMethodPointer);
-        private static readonly List<OnPlayerNetDecodeDelegate> dontGarbageCollectDelegates = new List<OnPlayerNetDecodeDelegate>();
-
         public static void EntryInit()
         {
             UiManager.OnQuickMenuOpened += new Action(() =>
@@ -74,6 +70,7 @@ namespace PlayerList.Entries
 
             PlayerListMod.Instance.HarmonyInstance.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend), BindingFlags.NonPublic | BindingFlags.Static)));        
         }
+        [HideFromIl2Cpp]
         public override void Init(object[] parameters)
         {
             player = (Player)parameters[0];
@@ -140,6 +137,7 @@ namespace PlayerList.Entries
             if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.AvatarPerf))
                 EntrySortManager.SortPlayer(playerLeftPairEntry);
         }
+        [HideFromIl2Cpp]
         public override void OnAvatarDownloadProgressed(AvatarLoadingBar loadingBar, float downloadPercentage, long fileSize)
         {
             if (loadingBar.field_Public_PlayerNameplate_0.field_Private_VRCPlayer_0.prop_Player_0.prop_APIUser_0?.id != userId)
@@ -264,6 +262,7 @@ namespace PlayerList.Entries
                     entry.isFriend = false;
         }
 
+        [HideFromIl2Cpp]
         private void GetPlayerColor(bool shouldSort = true)
         {
             playerColor = "";
@@ -287,6 +286,7 @@ namespace PlayerList.Entries
             if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.NameColor) && shouldSort)
                 EntrySortManager.SortPlayer(playerLeftPairEntry);
         }
+        [HideFromIl2Cpp]
         protected string TrimExtra(string tempString)
         {
             if (tempString.Length > 0)

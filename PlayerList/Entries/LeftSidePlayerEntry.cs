@@ -1,6 +1,7 @@
 ﻿using System;
 using MelonLoader;
 using PlayerList.Config;
+using UnhollowerBaseLib.Attributes;
 
 namespace PlayerList.Entries
 {
@@ -9,6 +10,10 @@ namespace PlayerList.Entries
     {
         public LeftSidePlayerEntry(IntPtr obj0) : base(obj0) { }
 
+        [HideFromIl2Cpp]
+        public override string Name => "LeftSidePlayerEntry";
+
+        [HideFromIl2Cpp]
         public override void Init(object[] parameters = null)
         {
             OnConfigChanged();

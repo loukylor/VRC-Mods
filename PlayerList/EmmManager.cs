@@ -35,7 +35,7 @@ namespace PlayerList
                 foreach (EntryBase entry in EntryManager.generalInfoEntries)
                     entry.textComponent.text = entry.textComponent.text.Replace(APIUser.CurrentUser.displayName, spoofedName); // I'm lazy ok
             });
-                infoSpoofing.OffAction += new Action(() =>
+            infoSpoofing.OffAction += new Action(() =>
             {
                 typeof(LocalPlayerEntry).GetField("emmNameSpoofEnabled").SetValue(null, false);
                 EntryManager.localPlayerEntry?.OnConfigChanged();

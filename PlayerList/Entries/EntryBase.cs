@@ -1,6 +1,7 @@
 ﻿using System;
 using MelonLoader;
 using PlayerList.Config;
+using UnhollowerBaseLib.Attributes;
 using UnityEngine;
 using UnityEngine.UI;
 using VRC.Core;
@@ -13,7 +14,8 @@ namespace PlayerList.Entries
         public EntryBase(IntPtr obj0) : base(obj0) { }
 
         public EntryBase() { }
-
+        
+        [HideFromIl2Cpp]
         public virtual string Name { get; }
 
         public MelonPreferences_Entry<bool> prefEntry;
@@ -21,6 +23,7 @@ namespace PlayerList.Entries
         public Text textComponent;
 
         private string _originalText;
+        [HideFromIl2Cpp]
         public string OriginalText
         {
             get { return _originalText; }
@@ -29,32 +32,37 @@ namespace PlayerList.Entries
         private static int globalIdentifier = 0;
 
         private int _identifier;
+        [HideFromIl2Cpp]
         public int Identifier
         {
             get { return _identifier; }
         }
 
+        [HideFromIl2Cpp]
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj is null)
                 return false;
             EntryBase objAsEntry = obj as EntryBase;
-            if (objAsEntry == null)
+            if (objAsEntry is null)
                 return false;
             else
                 return Equals(objAsEntry);
         }
+        [HideFromIl2Cpp]
         public bool Equals(EntryBase entry)
         {
-            if (entry == null)
+            if (entry is null)
                 return false;
             return entry._identifier == _identifier;
         }
 
+        [HideFromIl2Cpp]
         public virtual void Init(object[] parameters = null)
         {
         }
 
+        [HideFromIl2Cpp]
         public void Refresh(object[] parameters = null)
         {
             if (!gameObject.active)
@@ -63,6 +71,7 @@ namespace PlayerList.Entries
             ProcessText(parameters);
         }
 
+        [HideFromIl2Cpp]
         protected virtual void ProcessText(object[] parameters = null)
         {
         }
@@ -83,6 +92,7 @@ namespace PlayerList.Entries
         {
         }
 
+        [HideFromIl2Cpp]
         public virtual void OnAvatarDownloadProgressed(AvatarLoadingBar loadingBar, float downloadPercentage, long fileSize)
         {
         }

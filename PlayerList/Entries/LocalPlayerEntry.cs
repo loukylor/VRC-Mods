@@ -3,6 +3,7 @@ using System.Text;
 using MelonLoader;
 using PlayerList.Config;
 using PlayerList.Utilities;
+using UnhollowerBaseLib.Attributes;
 using UnityEngine;
 using VRC;
 using VRC.Core;
@@ -18,7 +19,7 @@ namespace PlayerList.Entries
         public LocalPlayerEntry(IntPtr obj0) : base(obj0) { }
 
         // " - <color={pingcolor}>{ping}ms</color> | <color={fpscolor}>{fps}</color> | {platform} | <color={perfcolor}>{perf}</color> | {relationship} | <color={rankcolor}>{displayname}</color>"
-        public override string Name { get { return "Local Player"; } }
+        public override string Name => "Local Player";
 
         public static bool emmNameSpoofEnabled = false;
         public static string emmSpoofedName = "";
@@ -29,6 +30,7 @@ namespace PlayerList.Entries
         {
             NetworkEvents.OnShowSocialRankChanged += OnShowSocialRankChange;
         }
+        [HideFromIl2Cpp]
         public override void Init(object[] parameters)
         {
             isSelf = true;
@@ -82,6 +84,7 @@ namespace PlayerList.Entries
 
             GetPlayerColor();
         }
+        [HideFromIl2Cpp]
         protected override void ProcessText(object[] parameters)
         {
             /*

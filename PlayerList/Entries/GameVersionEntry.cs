@@ -1,5 +1,6 @@
 ﻿using System;
 using MelonLoader;
+using UnhollowerBaseLib.Attributes;
 using UnityEngine;
 
 namespace PlayerList.Entries
@@ -9,8 +10,10 @@ namespace PlayerList.Entries
     {
         public GameVersionEntry(IntPtr obj0) : base(obj0) { }
 
-        public override string Name { get { return "Game Version"; } }
+        [HideFromIl2Cpp]
+        public override string Name => "Game Version";
 
+        [HideFromIl2Cpp]
         public override void Init(object[] parameters = null)
         {
             int buildNumber = GameObject.Find("_Application/ApplicationSetup").GetComponent<VRCApplicationSetup>().field_Public_Int32_0;

@@ -1,5 +1,6 @@
 ﻿using System;
 using MelonLoader;
+using UnhollowerBaseLib.Attributes;
 using VRC;
 using VRChatUtilityKit.Utilities;
 
@@ -10,8 +11,10 @@ namespace PlayerList.Entries
     {
         public PlayerListHeaderEntry(IntPtr obj0) : base(obj0) { }
 
-        public override string Name { get { return "PlayerList Header"; } }
+        [HideFromIl2Cpp]
+        public override string Name => "PlayerList Header";
 
+        [HideFromIl2Cpp]
         public override void Init(object[] parameters = null)
         {
             NetworkEvents.OnPlayerJoined += OnPlayerCountChanged;

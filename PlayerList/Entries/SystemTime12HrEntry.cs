@@ -1,5 +1,6 @@
 ﻿using System;
 using MelonLoader;
+using UnhollowerBaseLib.Attributes;
 
 namespace PlayerList.Entries
 {
@@ -8,10 +9,12 @@ namespace PlayerList.Entries
     {
         public SystemTime12HrEntry(IntPtr obj0) : base(obj0) { }
 
-        public override string Name { get { return "System Time 12Hr"; } }
+        [HideFromIl2Cpp]
+        public override string Name => "System Time 12Hr";
 
         public string lastTime;
 
+        [HideFromIl2Cpp]
         protected override void ProcessText(object[] parameters = null)
         {
             string timeString = DateTime.Now.ToString(@"hh\:mm\:ss tt");

@@ -59,7 +59,6 @@ namespace PlayerList
                 {
                     if (playerEntries[i].player == null)
                     {
-                        MelonLogger.Msg(playerEntries[i].apiUser.displayName);
                         playerEntries[i].playerLeftPairEntry.Remove();
                         continue;
                     }
@@ -143,10 +142,8 @@ namespace PlayerList
             if (player.prop_APIUser_0.IsSelf)
                 return;
 
-            MelonLogger.Msg(ConsoleColor.Green, player.prop_APIUser_0.displayName);
             if (!idToEntryTable.TryGetValue(player.prop_APIUser_0.id, out PlayerLeftPairEntry entry))
                 return;
-            MelonLogger.Msg(ConsoleColor.Green, player.prop_APIUser_0.displayName);
 
             entry.Remove();
 

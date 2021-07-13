@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections;
 using MelonLoader;
-using VRC.Core;
+using UnhollowerBaseLib.Attributes;
 using UnityEngine;
+using VRC.Core;
 
 namespace PlayerList.Entries
 {
@@ -11,12 +12,14 @@ namespace PlayerList.Entries
     {
         public InstanceCreatorEntry(IntPtr obj0) : base(obj0) { }
 
-        public override string Name { get { return "Instance Creator"; } }
+        [HideFromIl2Cpp]
+        public override string Name => "Instance Creator";
 
         public override void OnInstanceChange(ApiWorld world, ApiWorldInstance instance)
         {
             MelonCoroutines.Start(GetInstanceCreator(instance));
         }
+        [HideFromIl2Cpp]
         public IEnumerator GetInstanceCreator(ApiWorldInstance instance)
         {
             string creator = instance.ownerId;

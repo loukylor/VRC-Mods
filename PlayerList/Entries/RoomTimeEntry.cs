@@ -1,5 +1,6 @@
 ﻿using System;
 using MelonLoader;
+using UnhollowerBaseLib.Attributes;
 
 namespace PlayerList.Entries
 {
@@ -8,10 +9,12 @@ namespace PlayerList.Entries
     {
         public RoomTimeEntry(IntPtr obj0) : base(obj0) { }
 
-        public override string Name { get { return "Room Time"; } }
+        [HideFromIl2Cpp]
+        public override string Name => "Room Time";
 
         public string lastTime;
 
+        [HideFromIl2Cpp]
         protected override void ProcessText(object[] parameters = null)
         {
             TimeSpan time = TimeSpan.FromSeconds(RoomManager.prop_Single_0);

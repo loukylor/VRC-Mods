@@ -1,5 +1,6 @@
 ﻿using System;
 using MelonLoader;
+using UnhollowerBaseLib.Attributes;
 using VRChatUtilityKit.Utilities;
 
 namespace PlayerList.Entries
@@ -9,8 +10,10 @@ namespace PlayerList.Entries
     {
         public RiskyFuncAllowedEntry(IntPtr obj0) : base(obj0) { }
 
-        public override string Name { get { return "Risky Functions Allowed"; } }
+        [HideFromIl2Cpp]
+        public override string Name => "Risky Functions Allowed";
 
+        [HideFromIl2Cpp]
         public override void Init(object[] parameters = null)
         {
             VRCUtils.OnEmmWorldCheckCompleted += OnEmmWorldCheckCompleted;

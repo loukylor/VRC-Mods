@@ -10,8 +10,10 @@ namespace PlayerList.Entries
     {
         public PlayerLeftPairEntry(IntPtr obj0) : base(obj0) { }
 
+        public override string Name => "PlayerLeftPairEntry";
+
         private PlayerEntry _playerEntry;
-        [property: HideFromIl2Cpp]
+        [HideFromIl2Cpp]
         public PlayerEntry playerEntry
         {
             get => _playerEntry;
@@ -25,7 +27,7 @@ namespace PlayerList.Entries
         }
 
         private LeftSidePlayerEntry _leftSidePlayerEntry;
-        [property: HideFromIl2Cpp]
+        [HideFromIl2Cpp]
         public LeftSidePlayerEntry leftSidePlayerEntry
         {
             get => _leftSidePlayerEntry;
@@ -36,6 +38,7 @@ namespace PlayerList.Entries
             }
         }
 
+        [HideFromIl2Cpp]
         public override void Init(object[] parameters = null)
         {
             leftSidePlayerEntry = (LeftSidePlayerEntry)parameters[0];
