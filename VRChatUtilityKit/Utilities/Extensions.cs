@@ -80,6 +80,9 @@ namespace VRChatUtilityKit.Utilities
         /// <param name="args">The params of the delegate</param>
         public static void DelegateSafeInvoke(this Delegate @delegate, params object[] args)
         {
+            if (@delegate == null)
+                return;
+
             foreach (Delegate @delegates in @delegate.GetInvocationList())
             {
                 try
