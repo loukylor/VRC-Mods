@@ -44,7 +44,8 @@ namespace PlayerList.Entries
         private static bool spoofFriend;
         protected static int highestPhotonIdLength = 0;
         protected static int highestOwnedObjectsLength = 0;
-
+        protected static int totalObjects = 0;
+        
         public PerformanceRating perf;
         public string perfString;
         public int ping;
@@ -73,6 +74,7 @@ namespace PlayerList.Entries
             NetworkEvents.OnFriended += OnFriended;
             NetworkEvents.OnUnfriended += OnUnfriended;
             NetworkEvents.OnSetupFlagsReceived += OnSetupFlagsReceived;
+            VRCUtils.OnEmmWorldCheckCompleted += (allowed) => OnStaticConfigChanged();
 
             PlayerListMod.Instance.HarmonyInstance.Patch(typeof(PhotonView).GetMethods().First(mb => mb.Name.StartsWith("Method_FamOrAssem_set_Void_Int32_")), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnOwnerShipTransferred), BindingFlags.NonPublic | BindingFlags.Static)));
             PlayerListMod.Instance.HarmonyInstance.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend), BindingFlags.NonPublic | BindingFlags.Static)));        
@@ -112,7 +114,12 @@ namespace PlayerList.Entries
             if (PlayerListConfig.photonIdToggle.Value)
                 updateDelegate += AddPhotonId;
             if (PlayerListConfig.ownedObjectsToggle.Value)
-                updateDelegate += AddOwnedObjects;
+            {
+                if (VRCUtils.AreRiskyFunctionsAllowed)
+                    updateDelegate += AddOwnedObjects;
+                else
+                    updateDelegate += AddOwnedObjectsSafe;
+            }
             if (PlayerListConfig.displayNameToggle.Value)
                 updateDelegate += AddDisplayName;
             if (PlayerListConfig.distanceToggle.Value && EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.Distance) || PlayerListConfig.pingToggle.Value && EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.Ping))
@@ -257,6 +264,13 @@ namespace PlayerList.Entries
         {
             tempString.Append(entry.ownedObjects.ToString().PadRight(highestOwnedObjectsLength) + separator);
         }
+        private static void AddOwnedObjectsSafe(PlayerNet playerNet, PlayerEntry entry, ref StringBuilder tempString)
+        {
+            if (entry.ownedObjects > (int)(totalObjects * 0.75))
+                tempString.Append(entry.ownedObjects.ToString().PadRight(highestOwnedObjectsLength) + separator);
+            else
+                tempString.Append("0".PadRight(highestOwnedObjectsLength) + separator);
+        }
         private static void AddDisplayName(PlayerNet playerNet, PlayerEntry entry, ref StringBuilder tempString)
         {
             tempString.Append("<color=" + entry.playerColor + ">" + entry.apiUser.displayName + "</color>" + separator);
@@ -279,7 +293,8 @@ namespace PlayerList.Entries
         {
             if (__instance.GetComponent<VRC_Pickup>() == null)
                 return;
-
+            
+            // Its really important that this actually fires so everything in try catch
             try
             {
                 Room room = Player.prop_Player_0?.prop_PlayerNet_0?.field_Private_PhotonView_0?.prop_Player_0?.field_Private_Room_0;
@@ -295,6 +310,7 @@ namespace PlayerList.Entries
                     newOwner = room.field_Private_Dictionary_2_Int32_Player_0[__0].field_Public_Player_0?.prop_APIUser_0?.id;
                 
                 int highestOwnedObjects = 0;
+                totalObjects = 0;
                 foreach (PlayerLeftPairEntry entry in EntryManager.playerLeftPairsEntries)
                 {
                     if (entry.playerEntry.userId == oldOwner)
@@ -309,9 +325,16 @@ namespace PlayerList.Entries
 
                     if (entry.playerEntry.ownedObjects > highestOwnedObjects)
                         highestOwnedObjects = entry.playerEntry.ownedObjects;
+
+                    totalObjects += entry.playerEntry.ownedObjects;
                 }
 
-                highestOwnedObjectsLength = highestOwnedObjects.ToString().Length;
+                MelonLogger.Msg(totalObjects * 0.75);
+                MelonLogger.Msg(highestOwnedObjects);
+                if (highestOwnedObjects > (int)(totalObjects * 0.75) || VRCUtils.AreRiskyFunctionsAllowed)
+                    highestOwnedObjectsLength = highestOwnedObjects.ToString().Length;
+                else
+                    highestOwnedObjectsLength = 1;
             }
             catch (Exception ex)
             {

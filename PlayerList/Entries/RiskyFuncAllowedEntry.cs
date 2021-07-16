@@ -19,6 +19,7 @@ namespace PlayerList.Entries
             VRCUtils.OnEmmWorldCheckCompleted += OnEmmWorldCheckCompleted;
         }
 
+        [HideFromIl2Cpp]
         public void OnEmmWorldCheckCompleted(bool areRiskyFuncsAllowed)
         {
             textComponent.text = OriginalText.Replace("{riskyfuncallowed}", areRiskyFuncsAllowed.ToString());

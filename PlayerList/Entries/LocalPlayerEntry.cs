@@ -30,6 +30,7 @@ namespace PlayerList.Entries
         public static new void EntryInit()
         {
             NetworkEvents.OnShowSocialRankChanged += OnShowSocialRankChange;
+            VRCUtils.OnEmmWorldCheckCompleted += (allowed) => OnStaticConfigChanged();
         }
         [HideFromIl2Cpp]
         public override void Init(object[] parameters)
@@ -76,7 +77,12 @@ namespace PlayerList.Entries
             if (PlayerListConfig.photonIdToggle.Value)
                 updateDelegate += AddPhotonId;
             if (PlayerListConfig.ownedObjectsToggle.Value)
-                updateDelegate += AddOwnedObjects;
+            {
+                if (VRCUtils.AreRiskyFunctionsAllowed)
+                    updateDelegate += AddOwnedObjects;
+                else
+                    updateDelegate += AddOwnedObjectsSafe;
+            }
             if (PlayerListConfig.displayNameToggle.Value)
             {
                 if (!emmNameSpoofEnabled)
@@ -124,6 +130,11 @@ namespace PlayerList.Entries
             textComponent.text = TrimExtra(tempString.ToString());
         }
 
+        public override void OnSceneWasLoaded()
+        {
+            ownedObjects = 0;
+        }
+
         private static void AddPing(Player player, LocalPlayerEntry entry, ref StringBuilder tempString)
         {
             entry.ping = (short)Photon.Pun.PhotonNetwork.field_Public_Static_LoadBalancingClient_0.prop_LoadBalancingPeer_0.RoundTripTime;
@@ -163,6 +174,14 @@ namespace PlayerList.Entries
         private static void AddOwnedObjects(Player player, LocalPlayerEntry entry, ref StringBuilder tempString)
         {
             tempString.Append(entry.ownedObjects.ToString().PadRight(highestOwnedObjectsLength) + separator);
+        }
+        private static void AddOwnedObjectsSafe(Player player, LocalPlayerEntry entry, ref StringBuilder tempString)
+        {
+            int num = entry.ownedObjects;
+            if (num > (int)(totalObjects * 0.75))
+                tempString.Append(entry.ownedObjects.ToString().PadRight(highestOwnedObjectsLength) + separator);
+            else
+                tempString.Append("0".PadRight(highestOwnedObjectsLength) + separator);
         }
         private static void AddDisplayName(Player player, LocalPlayerEntry entry, ref StringBuilder tempString)
         {
