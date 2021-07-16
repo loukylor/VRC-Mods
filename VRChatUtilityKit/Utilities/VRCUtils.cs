@@ -157,7 +157,7 @@ namespace VRChatUtilityKit.Utilities
         public static bool IsAvatarExplcitlyShown(APIUser user)
         {
             if (ModerationManager.prop_ModerationManager_0.field_Private_Dictionary_2_String_List_1_ApiPlayerModeration_0.ContainsKey(user.id))
-                foreach (ApiPlayerModeration moderation in ModerationManager.prop_ModerationManager_0.field_Private_Dictionary_2_String_List_1_ApiPlayerModeration_0.get_Item(user.id))
+                foreach (ApiPlayerModeration moderation in ModerationManager.prop_ModerationManager_0.field_Private_Dictionary_2_String_List_1_ApiPlayerModeration_0[user.id])
                     if (moderation.moderationType == ApiPlayerModeration.ModerationType.ShowAvatar)
                         return true;
 
@@ -172,7 +172,7 @@ namespace VRChatUtilityKit.Utilities
         public static bool IsAvatarExplcitlyHidden(APIUser user)
         {
             if (ModerationManager.prop_ModerationManager_0.field_Private_Dictionary_2_String_List_1_ApiPlayerModeration_0.ContainsKey(user.id))
-                foreach (ApiPlayerModeration moderation in ModerationManager.prop_ModerationManager_0.field_Private_Dictionary_2_String_List_1_ApiPlayerModeration_0.get_Item(user.id))
+                foreach (ApiPlayerModeration moderation in ModerationManager.prop_ModerationManager_0.field_Private_Dictionary_2_String_List_1_ApiPlayerModeration_0[user.id])
                     if (moderation.moderationType == ApiPlayerModeration.ModerationType.HideAvatar)
                         return true;
 
