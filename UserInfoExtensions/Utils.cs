@@ -26,6 +26,7 @@ namespace UserInfoExtentions
         {
             if (_canMakeRequest) // This bool can double as a check for if the coroutine is running
             {
+                _canMakeRequest = false;
                 MelonCoroutines.Start(GetStartTimerCoroutine(canMakeRequestCallback));
                 return true;
             }
