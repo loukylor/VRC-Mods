@@ -19,6 +19,7 @@ namespace PlayerList.Entries
         public LocalPlayerEntry(IntPtr obj0) : base(obj0) { }
 
         // " - <color={pingcolor}>{ping}ms</color> | <color={fpscolor}>{fps}</color> | {platform} | <color={perfcolor}>{perf}</color> | {relationship} | <color={rankcolor}>{displayname}</color>"
+        [HideFromIl2Cpp]
         public override string Name => "Local Player";
 
         public static bool emmNameSpoofEnabled = false;
@@ -74,6 +75,8 @@ namespace PlayerList.Entries
                 updateDelegate += AddDistance;
             if (PlayerListConfig.photonIdToggle.Value)
                 updateDelegate += AddPhotonId;
+            if (PlayerListConfig.ownedObjectsToggle.Value)
+                updateDelegate += AddOwnedObjects;
             if (PlayerListConfig.displayNameToggle.Value)
             {
                 if (!emmNameSpoofEnabled)
@@ -156,6 +159,10 @@ namespace PlayerList.Entries
         private static void AddPhotonId(Player player, LocalPlayerEntry entry, ref StringBuilder tempString)
         {
             tempString.Append(player.prop_VRCPlayer_0.prop_PhotonView_0.field_Private_Int32_0.ToString().PadRight(highestPhotonIdLength) + separator);
+        }
+        private static void AddOwnedObjects(Player player, LocalPlayerEntry entry, ref StringBuilder tempString)
+        {
+            tempString.Append(entry.ownedObjects.ToString().PadRight(highestOwnedObjectsLength) + separator);
         }
         private static void AddDisplayName(Player player, LocalPlayerEntry entry, ref StringBuilder tempString)
         {

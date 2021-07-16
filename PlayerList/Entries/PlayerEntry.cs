@@ -1,18 +1,23 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using HarmonyLib;
 using MelonLoader;
+using Photon.Pun;
+using Photon.Realtime;
 using PlayerList.Config;
 using PlayerList.Utilities;
 using UnhollowerBaseLib.Attributes;
 using UnityEngine;
-using VRC;
 using VRC.Core;
+using VRC.SDKBase;
 using VRChatUtilityKit.Ui;
 using VRChatUtilityKit.Utilities;
 using VRCSDK2.Validation.Performance;
+
+using Player = VRC.Player;
 
 namespace PlayerList.Entries
 {
@@ -38,6 +43,7 @@ namespace PlayerList.Entries
 
         private static bool spoofFriend;
         protected static int highestPhotonIdLength = 0;
+        protected static int highestOwnedObjectsLength = 0;
 
         public PerformanceRating perf;
         public string perfString;
@@ -46,7 +52,7 @@ namespace PlayerList.Entries
         public float distance;
         public bool isFriend;
         public string playerColor;
-        public bool isFrozen;
+        public int ownedObjects = 0;
 
         public readonly Stopwatch timeSinceLastUpdate = Stopwatch.StartNew();
 
@@ -68,8 +74,10 @@ namespace PlayerList.Entries
             NetworkEvents.OnUnfriended += OnUnfriended;
             NetworkEvents.OnSetupFlagsReceived += OnSetupFlagsReceived;
 
+            PlayerListMod.Instance.HarmonyInstance.Patch(typeof(PhotonView).GetMethods().First(mb => mb.Name.StartsWith("Method_FamOrAssem_set_Void_Int32_")), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnOwnerShipTransferred), BindingFlags.NonPublic | BindingFlags.Static)));
             PlayerListMod.Instance.HarmonyInstance.Patch(typeof(APIUser).GetMethod("IsFriendsWith"), new HarmonyMethod(typeof(PlayerEntry).GetMethod(nameof(OnIsFriend), BindingFlags.NonPublic | BindingFlags.Static)));        
         }
+
         [HideFromIl2Cpp]
         public override void Init(object[] parameters)
         {
@@ -103,6 +111,8 @@ namespace PlayerList.Entries
                 updateDelegate += AddDistance;
             if (PlayerListConfig.photonIdToggle.Value)
                 updateDelegate += AddPhotonId;
+            if (PlayerListConfig.ownedObjectsToggle.Value)
+                updateDelegate += AddOwnedObjects;
             if (PlayerListConfig.displayNameToggle.Value)
                 updateDelegate += AddDisplayName;
             if (PlayerListConfig.distanceToggle.Value && EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.Distance) || PlayerListConfig.pingToggle.Value && EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.Ping))
@@ -159,7 +169,6 @@ namespace PlayerList.Entries
         public static void UpdateEntry(PlayerNet playerNet, PlayerEntry entry, bool bypassActive = false)
         {
             entry.timeSinceLastUpdate.Restart();
-            entry.isFrozen = false;
 
             // Update values but not text even if playerlist not active and before decode
             entry.distance = (entry.player.transform.position - Player.prop_Player_0.transform.position).magnitude;
@@ -244,6 +253,10 @@ namespace PlayerList.Entries
         {
             tempString.Append(playerNet.prop_PhotonView_0.field_Private_Int32_0.ToString().PadRight(highestPhotonIdLength) + separator);
         }
+        private static void AddOwnedObjects(PlayerNet playerNet, PlayerEntry entry, ref StringBuilder tempString)
+        {
+            tempString.Append(entry.ownedObjects.ToString().PadRight(highestOwnedObjectsLength) + separator);
+        }
         private static void AddDisplayName(PlayerNet playerNet, PlayerEntry entry, ref StringBuilder tempString)
         {
             tempString.Append("<color=" + entry.playerColor + ">" + entry.apiUser.displayName + "</color>" + separator);
@@ -260,6 +273,50 @@ namespace PlayerList.Entries
             foreach (PlayerEntry entry in EntryManager.playerEntries)
                 if (entry.userId == userId)
                     entry.isFriend = false;
+        }
+
+        private static void OnOwnerShipTransferred(PhotonView __instance, int __0)
+        {
+            if (__instance.GetComponent<VRC_Pickup>() == null)
+                return;
+
+            try
+            {
+                Room room = Player.prop_Player_0?.prop_PlayerNet_0?.field_Private_PhotonView_0?.prop_Player_0?.field_Private_Room_0;
+                if (room == null)
+                    return;
+
+                // something is up with the  photon player constructor that makes me have to not use trygetvalue
+                string oldOwner = null;
+                if (room.field_Private_Dictionary_2_Int32_Player_0.ContainsKey(__instance.field_Private_Int32_0))
+                    oldOwner = room.field_Private_Dictionary_2_Int32_Player_0[__instance.field_Private_Int32_0].field_Public_Player_0?.prop_APIUser_0?.id;
+                string newOwner = null;
+                if (room.field_Private_Dictionary_2_Int32_Player_0.ContainsKey(__0))
+                    newOwner = room.field_Private_Dictionary_2_Int32_Player_0[__0].field_Public_Player_0?.prop_APIUser_0?.id;
+                
+                int highestOwnedObjects = 0;
+                foreach (PlayerLeftPairEntry entry in EntryManager.playerLeftPairsEntries)
+                {
+                    if (entry.playerEntry.userId == oldOwner)
+                    {
+                        if (entry.playerEntry.ownedObjects > 0)
+                            entry.playerEntry.ownedObjects -= 1;
+                    }
+                    else if (entry.playerEntry.userId == newOwner)
+                    {
+                        entry.playerEntry.ownedObjects += 1;
+                    }
+
+                    if (entry.playerEntry.ownedObjects > highestOwnedObjects)
+                        highestOwnedObjects = entry.playerEntry.ownedObjects;
+                }
+
+                highestOwnedObjectsLength = highestOwnedObjects.ToString().Length;
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error(ex.ToString());
+            }
         }
 
         [HideFromIl2Cpp]

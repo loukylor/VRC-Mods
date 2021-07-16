@@ -29,6 +29,7 @@ namespace PlayerList.Config
         public static EntryWrapper<bool> perfToggle;
         public static EntryWrapper<bool> distanceToggle;
         public static EntryWrapper<bool> photonIdToggle;
+        public static EntryWrapper<bool> ownedObjectsToggle;
         public static EntryWrapper<bool> displayNameToggle;
 
         public static EntryWrapper<PlayerEntry.DisplayNameColorMode> displayNameColorMode;
@@ -62,6 +63,7 @@ namespace PlayerList.Config
             perfToggle = CreateEntry(nameof(perfToggle), true, is_hidden: true);
             distanceToggle = CreateEntry(nameof(distanceToggle), true, is_hidden: true);
             photonIdToggle = CreateEntry(nameof(photonIdToggle), false, is_hidden: true);
+            ownedObjectsToggle = CreateEntry(nameof(ownedObjectsToggle), false, is_hidden: true);
             displayNameToggle = CreateEntry(nameof(displayNameToggle), true, is_hidden: true);
             displayNameColorMode = CreateEntry(nameof(displayNameColorMode), PlayerEntry.DisplayNameColorMode.TrustAndFriends, is_hidden: true);
 
