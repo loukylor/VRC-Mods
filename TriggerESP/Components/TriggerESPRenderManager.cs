@@ -3,8 +3,6 @@ using MelonLoader;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-using System.Diagnostics;
-
 namespace TriggerESP.Components
 {
     [RegisterTypeInIl2Cpp]
