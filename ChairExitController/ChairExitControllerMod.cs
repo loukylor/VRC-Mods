@@ -3,7 +3,6 @@ using HarmonyLib;
 using MelonLoader;
 using UnityEngine;
 using VRC;
-using VRC.SDKBase;
 
 [assembly: MelonInfo(typeof(ChairExitController.ChairExitControllerMod), "ChairExitController", "1.0.0", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
