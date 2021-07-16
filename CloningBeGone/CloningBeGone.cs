@@ -5,7 +5,7 @@ using UnityEngine;
 using VRC.Core;
 using VRChatUtilityKit.Utilities;
 
-[assembly: MelonInfo(typeof(CloningBeGone.CloningBeGoneMod), "CloningBeGone", "1.2.0", "loukylor (https://github.com/loukylor/CloningBeGone)")]
+[assembly: MelonInfo(typeof(CloningBeGone.CloningBeGoneMod), "CloningBeGone", "1.2.1", "loukylor (https://github.com/loukylor/CloningBeGone)")]
 [assembly: MelonGame("VRChat", "VRChat")]
 [assembly: MelonOptionalDependencies("UIExpansionKit")]
 
@@ -13,6 +13,7 @@ namespace CloningBeGone
 {
     class CloningBeGoneMod : MelonMod
     {
+        public static MelonPreferences_Category category;
         public static MelonPreferences_Entry<bool> PublicCloningSetting;
         public static MelonPreferences_Entry<bool> FriendsPlusCloningSetting;
         public static MelonPreferences_Entry<bool> FriendsCloningSetting;
@@ -27,7 +28,7 @@ namespace CloningBeGone
 
         public override void OnApplicationStart()
         {
-            MelonPreferences_Category category = MelonPreferences.CreateCategory("CloningBeGone", "CloningBeGone Settings");
+            category = MelonPreferences.CreateCategory("CloningBeGone", "CloningBeGone Settings");
             PublicCloningSetting = category.CreateEntry(nameof(PublicCloningSetting), false, "Cloning setting in public instances");
             FriendsPlusCloningSetting = category.CreateEntry(nameof(FriendsPlusCloningSetting), false, "Cloning setting in friends+ instances");
             FriendsCloningSetting = category.CreateEntry(nameof(FriendsCloningSetting), false, "Cloning setting in friend only instances");
@@ -75,9 +76,6 @@ namespace CloningBeGone
                 SetCloning(true);
             else if (cloningOffAvatars.Value.Contains(avatar.id))
                 SetCloning(false);
-
-            if (VRCUtils.IsUIXPresent)
-                typeof(UIXManager).GetMethod("OnAvatarInstantiated").Invoke(null, new object[] { avatar });
         }
 
         public static void CheckAccessType(InstanceAccessType accessType)
