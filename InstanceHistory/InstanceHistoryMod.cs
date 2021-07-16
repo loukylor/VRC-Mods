@@ -4,7 +4,7 @@ using MelonLoader;
 
 [assembly: MelonInfo(typeof(InstanceHistory.InstanceHistoryMod), "InstanceHistory", "1.0.5", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
-[assembly: MelonOptionalDependencies(new string[1] { "UIExpansionKit" })]
+[assembly: MelonAdditionalDependencies("UIExpansionKit")]
 
 namespace InstanceHistory
 {
