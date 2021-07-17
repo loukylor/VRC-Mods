@@ -82,6 +82,7 @@ namespace PlayerList
         {
             for (int i = playerEntries.Count - 1; i >= 0; i--)
                 playerEntries[i].playerLeftPairEntry.Remove();
+            localPlayerEntry?.OnSceneWasLoaded();
         }
         public static void OnInstanceChanged(ApiWorld world, ApiWorldInstance instance)
         {
@@ -109,13 +110,13 @@ namespace PlayerList
 
         public static void OnPlayerJoined(Player player)
         {
-            if (player.prop_APIUser_0 == null)
-                return;
+            if (player.name.Contains("Local") && player.prop_APIUser_0 == null)
+                player.prop_APIUser_0 = APIUser.CurrentUser;
 
             if (idToEntryTable.ContainsKey(player.prop_APIUser_0.id))
                 return; // If already in list
 
-            if (player.prop_APIUser_0.IsSelf)
+            if (player.name.Contains("Local"))
             {
                 if (localPlayerEntry != null)
                     return;

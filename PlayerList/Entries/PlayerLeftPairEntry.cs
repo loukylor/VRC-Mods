@@ -10,6 +10,7 @@ namespace PlayerList.Entries
     {
         public PlayerLeftPairEntry(IntPtr obj0) : base(obj0) { }
 
+        [HideFromIl2Cpp]
         public override string Name => "PlayerLeftPairEntry";
 
         private PlayerEntry _playerEntry;
@@ -56,7 +57,6 @@ namespace PlayerList.Entries
         {
             EntryManager.playerLeftPairsEntries.Remove(this);
             EntryManager.idToEntryTable.Remove(playerEntry.userId);
-            EntryManager.entries.Remove(this);
             EntryManager.playerEntries.Remove(_playerEntry);
             EntryManager.entries.Remove(_playerEntry);
             EntryManager.entries.Remove(_leftSidePlayerEntry);

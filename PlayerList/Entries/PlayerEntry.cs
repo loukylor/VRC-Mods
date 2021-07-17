@@ -329,8 +329,6 @@ namespace PlayerList.Entries
                     totalObjects += entry.playerEntry.ownedObjects;
                 }
 
-                MelonLogger.Msg(totalObjects * 0.75);
-                MelonLogger.Msg(highestOwnedObjects);
                 if (highestOwnedObjects > (int)(totalObjects * 0.75) || VRCUtils.AreRiskyFunctionsAllowed)
                     highestOwnedObjectsLength = highestOwnedObjects.ToString().Length;
                 else

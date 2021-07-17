@@ -100,7 +100,8 @@ namespace PlayerList.Entries
         public virtual void Remove()
         {
             EntryManager.entries.Remove(this);
-            DestroyImmediate(gameObject);
+            if (!WasCollected)
+                DestroyImmediate(gameObject);
         }
 
         public static T CreateInstance<T>(GameObject gameObject, object[] parameters = null, bool includeConfig = false) where T : EntryBase
