@@ -129,7 +129,7 @@ namespace VRChatUtilityKit.Utilities
                 AreRiskyFunctionsAllowed = true;
                 yield break;
             }
-            else if (GameObject.Find("eVRCRiskFuncDisable ") != null)
+            else if (GameObject.Find("eVRCRiskFuncDisable") != null)
             {
                 AreRiskyFunctionsAllowed = false;
                 yield break;
