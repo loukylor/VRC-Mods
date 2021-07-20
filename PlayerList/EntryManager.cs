@@ -140,7 +140,7 @@ namespace PlayerList
         }
         public static void OnPlayerLeft(Player player)
         {
-            if (player.prop_APIUser_0.IsSelf)
+            if (player.prop_APIUser_0 == null || player.prop_APIUser_0.IsSelf)
                 return;
 
             if (!idToEntryTable.TryGetValue(player.prop_APIUser_0.id, out PlayerLeftPairEntry entry))
