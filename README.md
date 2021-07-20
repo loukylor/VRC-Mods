@@ -254,6 +254,14 @@ Additionally, in the popup you can see the user's:
  - date joined (date original unmerged account created)
  - friend number (the number friend they are. like 1st friend, 2nd friend, etc.)
 
+For avatars, you can see their:
+ - author's name
+ - name
+ - supported platforms
+ - release type
+ - time which they were last updated
+ - version
+
 ## Requirements
  - [UIExpansionKit](https://github.com/knah/VRCMods/)
  - [VRChatUtilityKit](https://github.com/loukylor/VRC-Mods/releases)
