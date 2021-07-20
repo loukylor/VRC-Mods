@@ -32,6 +32,7 @@ More detailed instructions and more mods can be found in the [VRChat Modding Gro
 - [RememberMe](#rememberme)
 - [SelectYourself](#selectyourself)
 - [TriggerESP](#triggeresp)
+- [UserHistory](#userhistory)
 - [UserInfoExtensions](#userinfoextensions)
 - [VRChatUtilityKit](#vrchatutilitykit)
 
@@ -74,7 +75,12 @@ And set the friend with the unoptimized avatar to the "Use Safety Settings" in t
 I spent lots of time to make sure the mod runs well, and also can be more snappy.
 There is no longer any delay to hide an avatar and also there should be less performance hit in general.
 
-The only difference is that the "Disable Spawn Sounds" setting will allow an avatar's spawn sounds to run once.
+The other differences are all audio related.
+The "Disable Spawn Sounds" setting will now allow an avatar's spawn sounds to run once. This will only run for those who aren't always shwon.
+There are new settings "Max Audio Distance" and "Limit Audio Distance" that allow you to limit the max distance of an avatar's audio.
+This runs for all players.
+
+**Warning:** Limiting audio distance may break VRChat's spatialized audio sources.
 
 The last addition is there is now an option to always include hidden avatars, even if they're a friend and you set AvatarHider to ignore friends.
 
@@ -96,7 +102,7 @@ Turns off cloning when you join an instance.
 You can configure whether you want cloning to be on or off based off instance type.
 So for example, you can have cloning on in Invite+ worlds and off in all the other instance types.
 
-You can also disable/enable cloning for a specific avatar.
+You can also disable/enable cloning for a specific avatar. The buttons to control these can be toggled on and off.
 Keep in mind however, that this requires the use of UIX and will overwrite the instance type cloning.
 
 ## Requirements
@@ -117,7 +123,8 @@ Adds a player list to the ShortcutMenu
 
 ## Features
 Each entry to the player list is a button that will open the user in the QuickMenu on click.
-The player's name will be colored to the rank they are (OGTrustRanks compatible!), each entry also has the player's ping, fps, platform, avatar performance and distance from you.
+The player's name will be colored to the rank they are (OGTrustRanks compatible!), each entry also has the player's ping, fps, platform, avatar performance, distance from you, and number of owned objects.
+Note that the number of owned objects will be inaccurate in instances where you're alone and also when you first join an instance.
 You may also toggle each of these on and off.
 So, if you don't like how the avatar performance takes up space, you can turn it off.
 
@@ -216,6 +223,17 @@ Note that it disables itself in worlds that don't allow risky functions.
 
 ## Credites
  - The shader used was a heavily modified version of the "Distance Fade Outline Shader" found in https://github.com/netri/Neitri-Unity-Shaders
+
+# UserHistory
+A mod that shows you when a user joined, and when clicking on them, opens when in the user page.
+It's basically a copy + paste of [InstanceHistory](#instancehistory)
+
+## Features
+It has an optinal dependency for UIX when opening the user history menu. This means you can run with or without it.
+It is highly recommnded to use UIX because it's just easier, although there are preferences to change the position of the regular button if you don't like UIX.
+
+## Requirements
+ - [VRChatUtilityKit](https://github.com/loukylor/VRC-Mods/releases)
 
 # UserInfoExtensions
 A mod that adds buttons to the to make VRChat more convenient
