@@ -42,6 +42,9 @@
 		<Reference Include="VRChatUtilityKit">
 		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\Mods\VRChatUtilityKit.dll</HintPath>
 		</Reference>
+		<Reference Include="VRCSDKBase">
+		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\VRCSDKBase.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

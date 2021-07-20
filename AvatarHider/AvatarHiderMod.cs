@@ -2,7 +2,7 @@
 using AvatarHider.DataTypes;
 using MelonLoader;
 
-[assembly: MelonInfo(typeof(AvatarHider.AvatarHiderMod), "AvatarHider", "1.2.6", "loukylor and ImTiara", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(AvatarHider.AvatarHiderMod), "AvatarHider", "1.3.0", "loukylor and ImTiara", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 [assembly: MelonOptionalDependencies("UIExpansionKit")]
 

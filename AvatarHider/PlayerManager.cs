@@ -45,11 +45,13 @@ namespace AvatarHider
 
         private static void OnPlayerJoin(Player player)
         {
-            if (player == null || player.prop_APIUser_0 == null || player.prop_APIUser_0.id == APIUser.CurrentUser.id) return; // The apiuser in player will only be null on the first join of the first instance of the client, and only occasionally. So it can be garunteed to be local player
+            if (player == null || player.prop_APIUser_0 == null) //player.prop_APIUser_0.id == APIUser.CurrentUser.id) // The apiuser in player will only be null on the first join of the first instance of the client, and only occasionally. So it can be garunteed to be local player
+                return;
 
             int photonId = player.prop_VRCPlayer_0.prop_PlayerNet_0.prop_PhotonView_0.field_Private_Int32_0;
             
-            if (players.ContainsKey(photonId)) return;
+            if (players.ContainsKey(photonId)) 
+                return;
 
             AvatarHiderPlayer playerProp = new AvatarHiderPlayer()
             {
@@ -69,6 +71,9 @@ namespace AvatarHider
         }
         private static void OnPlayerLeave(Player player)
         {
+            if (player.prop_APIUser_0 == null)
+                return;
+
             if (TryGetPlayerFromId(player.prop_APIUser_0.id, out AvatarHiderPlayer avatarHiderPlayer))
             {
                 players.Remove(avatarHiderPlayer.photonId);
@@ -179,8 +184,8 @@ namespace AvatarHider
 
         public static void HideOrShowAvatar(AvatarHiderPlayer avatarHiderPlayer)
         {
-            if (avatarHiderPlayer.userId == APIUser.CurrentUser.id)
-                return;
+            //if (avatarHiderPlayer.userId == APIUser.CurrentUser.id)
+            //    return;
             if (Config.IncludeHiddenAvatars.Value && avatarHiderPlayer.isHidden)
                 avatarHiderPlayer.SetInActive();
             else if ((Config.IgnoreFriends.Value && avatarHiderPlayer.isFriend) ||

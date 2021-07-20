@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using VRC;
+using VRC.SDKBase;
+using VRChatUtilityKit.Utilities;
 
 namespace AvatarHider.DataTypes
 {
@@ -35,6 +37,7 @@ namespace AvatarHider.DataTypes
         public GameObject avatar;
         public List<AudioSource> audioSources = new List<AudioSource>();
         public bool hasLetAudioPlay;
+        public bool hasLimitedAudio;
 
         public bool isFriend;
         public bool isShown;
@@ -74,12 +77,63 @@ namespace AvatarHider.DataTypes
             if (avatar != null)
             {
                 this.avatar = avatar;
+                avatar.SetActive(false);
+                foreach (AudioSource audioSource in avatar.GetComponentsInChildren<AudioSource>(true))
+                {
+                    audioSources.Add(audioSource);
+                    if (Config.LimitAudioDistance.Value)
+                        LimitAudioSource(audioSource);
+                }
                 avatar.SetActive(true);
                 active = false; // Do this so avatar sounds run on the first time
-                foreach (AudioSource audioSource in avatar.GetComponentsInChildren<AudioSource>(true))
-                    audioSources.Add(audioSource);
                 hasLetAudioPlay = false;
+                hasLimitedAudio = true;
             }
+        }
+
+        public void LimitAudioDistance()
+        {
+            foreach (AudioSource audioSource in audioSources)
+                LimitAudioSource(audioSource);
+        }
+
+        private void LimitAudioSource(AudioSource audioSource)
+        {
+            audioSource.spatialBlend = 1;
+
+            if (audioSource.minDistance > Config.MaxAudioDistance.Value)
+                audioSource.minDistance = Config.MaxAudioDistance.Value;
+
+            if (audioSource.maxDistance > Config.MaxAudioDistance.Value)
+                audioSource.maxDistance = Config.MaxAudioDistance.Value;
+
+            VRC_SpatialAudioSource spatialSource = audioSource.GetComponent<VRC_SpatialAudioSource>();
+            if (spatialSource == null)
+                return;
+
+            ONSPAudioSource onspSource = spatialSource.GetComponent<ONSPAudioSource>();
+            if (onspSource != null)
+            {
+                onspSource.enableSpatialization = true;
+                if (onspSource.far > Config.MaxAudioDistance.Value)
+                    onspSource.far = Config.MaxAudioDistance.Value;
+
+                if (onspSource.volumetricRadius > Config.MaxAudioDistance.Value)
+                    onspSource.volumetricRadius = Config.MaxAudioDistance.Value;
+
+                if (onspSource.near > Config.MaxAudioDistance.Value)
+                    onspSource.near = Config.MaxAudioDistance.Value;
+            }
+
+            spatialSource.EnableSpatialization = true;
+            if (spatialSource.Far > Config.MaxAudioDistance.Value)
+                spatialSource.Far = Config.MaxAudioDistance.Value;
+
+            if (spatialSource.VolumetricRadius > Config.MaxAudioDistance.Value)
+                spatialSource.VolumetricRadius = Config.MaxAudioDistance.Value;
+
+            if (spatialSource.Near > Config.MaxAudioDistance.Value)
+                spatialSource.Near = Config.MaxAudioDistance.Value;
         }
 
         public class RendererObject
@@ -111,16 +165,18 @@ namespace AvatarHider.DataTypes
         public static event Action<AvatarHiderPlayer> OnEnable;
         public static event Action<AvatarHiderPlayer> OnDisable;
 
+        private static bool wasLimitOnBefore = false;
+
         public static void Init()
         {
-            Config.DisableSpawnSound.OnValueChanged += OnRelevantConfigChanged;
-            OnRelevantConfigChanged(true, false);
+            Config.DisableSpawnSound.OnValueChangedUntyped += OnStaticConfigChange;
+            Config.LimitAudioDistance.OnValueChangedUntyped += OnStaticConfigChange;
+            Config.MaxAudioDistance.OnValueChangedUntyped += OnStaticConfigChange;
+            OnStaticConfigChange();
         }
 
-        public static void OnRelevantConfigChanged(bool oldValue, bool newValue)
+        public static void OnStaticConfigChange()
         {
-            if (oldValue == newValue) return;
-
             OnEnable = null;
             OnDisable = null;
 
@@ -130,31 +186,51 @@ namespace AvatarHider.DataTypes
                 playerProp.active = false; // Do this so avatar sounds run on the first time
             }
 
+            setActiveDelegate = setActiveCompletelyDelegate;
+            setInactiveDelegate = setInactiveCompletelyDelegate;
+
             if (Config.DisableSpawnSound.Value)
             {
-                foreach (AvatarHiderPlayer playerProp in PlayerManager.filteredPlayers.Values)
-                    playerProp.hasLetAudioPlay = false;
+                foreach (AvatarHiderPlayer ahPlayer in PlayerManager.filteredPlayers.Values)
+                    ahPlayer.hasLetAudioPlay = false;
 
-                setActiveDelegate = setActiveCompletelyDelegate;
-                setInactiveDelegate = setInactiveCompletelyDelegate;
-
-                OnEnable = new Action<AvatarHiderPlayer>((playerProp) =>
+                OnEnable += new Action<AvatarHiderPlayer>((ahPlayer) =>
                 {
-                    if (playerProp.hasLetAudioPlay)
-                        playerProp.StopAudio();
+                    if (ahPlayer.hasLetAudioPlay)
+                        ahPlayer.StopAudio();
                 });
-                OnDisable = new Action<AvatarHiderPlayer>((playerProp) =>
+                OnDisable += new Action<AvatarHiderPlayer>((ahPlayer) =>
                 {
-                    if (!playerProp.hasLetAudioPlay)
-                        playerProp.hasLetAudioPlay = true;
+                    if (!ahPlayer.hasLetAudioPlay)
+                        ahPlayer.hasLetAudioPlay = true;
                 });
             }
-            else
+            if (Config.LimitAudioDistance.Value)
             {
-                setActiveDelegate = setActiveCompletelyDelegate;
-                setInactiveDelegate = setInactiveCompletelyDelegate;
-            }
+                wasLimitOnBefore = true;
+                foreach (AvatarHiderPlayer ahPlayer in PlayerManager.players.Values)
+                {
+                    if (!ahPlayer.active)
+                        continue;
 
+                    ahPlayer.LimitAudioDistance();
+
+                    ahPlayer.hasLimitedAudio = true;
+                }
+                OnEnable += new Action<AvatarHiderPlayer>((ahPlayer) =>
+                {
+                    if (!ahPlayer.hasLimitedAudio)
+                    {
+                        ahPlayer.LimitAudioDistance();
+
+                        ahPlayer.hasLimitedAudio = true;
+                    }
+                });
+            }
+            else if (wasLimitOnBefore)
+            {
+                VRCUtils.ReloadAllAvatars();       
+            }
             RefreshManager.Refresh();
         }
     }
