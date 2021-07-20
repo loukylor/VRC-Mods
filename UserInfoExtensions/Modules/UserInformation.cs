@@ -2,11 +2,10 @@
 using MelonLoader;
 using UnityEngine;
 using UnityEngine.UI;
-using UserInfoExtensions;
 using VRC.Core;
 using VRChatUtilityKit.Utilities;
 
-namespace UserInfoExtentions.Modules
+namespace UserInfoExtensions.Modules
 {
     class UserInformation : ModuleBase
     {

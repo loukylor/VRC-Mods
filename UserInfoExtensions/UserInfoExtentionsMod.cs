@@ -4,12 +4,12 @@ using System.Reflection;
 using HarmonyLib;
 using MelonLoader;
 using UIExpansionKit.API;
-using UserInfoExtentions.Modules;
+using UserInfoExtensions.Modules;
 using VRC.UI;
 using VRChatUtilityKit.Ui;
 using VRChatUtilityKit.Utilities;
 
-[assembly: MelonInfo(typeof(UserInfoExtensions.UserInfoExtensionsMod), "UserInfoExtensions", "2.5.5", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(UserInfoExtensions.UserInfoExtensionsMod), "UserInfoExtensions", "2.6.0", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace UserInfoExtensions
@@ -55,6 +55,7 @@ namespace UserInfoExtensions
             AddModule(new GetAvatarAuthor());
             AddModule(new BioButtons());
             AddModule(new UserInformation());
+            AddModule(new AvatarInformation());
 
             VRCUtils.OnUiManagerInit += OnUiManagerInit;
 

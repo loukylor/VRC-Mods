@@ -4,11 +4,11 @@ using System.Net;
 using UnhollowerBaseLib.Attributes;
 using UnityEngine;
 using UnityEngine.UI;
-using UserInfoExtentions.Modules;
+using UserInfoExtensions.Modules;
 using VRChatUtilityKit.Ui;
 using VRChatUtilityKit.Utilities;
 
-namespace UserInfoExtentions.Components
+namespace UserInfoExtensions.Components
 {
     //Learned from Knah's UIExpansionKit (https://github.com/knah/VRCMods/blob/master/UIExpansionKit/Components/EnableDisableListener.cs)
     public class BioLinksPopup : VRCUiPopup

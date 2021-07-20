@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using MelonLoader;
-using UnhollowerRuntimeLib.XrefScans;
 using UnityEngine;
-using UserInfoExtensions;
 using VRC;
 using VRChatUtilityKit.Ui;
 using VRChatUtilityKit.Utilities;
 
-namespace UserInfoExtentions.Modules
+namespace UserInfoExtensions.Modules
 {
     public class QuickMenuFromSocial : ModuleBase
     {

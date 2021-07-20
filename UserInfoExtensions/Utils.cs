@@ -2,11 +2,10 @@
 using System.Collections;
 using MelonLoader;
 using UnityEngine;
-using UserInfoExtensions;
 using VRChatUtilityKit.Ui;
 using VRChatUtilityKit.Utilities;
 
-namespace UserInfoExtentions
+namespace UserInfoExtensions
 {
     class Utils
     {

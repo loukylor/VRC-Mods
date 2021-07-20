@@ -1,4 +1,4 @@
-﻿namespace UserInfoExtentions.Modules
+﻿namespace UserInfoExtensions.Modules
 {
     public class ModuleBase
     {

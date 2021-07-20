@@ -1,9 +1,9 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
-using UserInfoExtentions.Modules;
+using UserInfoExtensions.Modules;
 
-namespace UserInfoExtentions.Components
+namespace UserInfoExtensions.Components
 {
     public class BioLanguagesPopup : VRCUiPopup
     {

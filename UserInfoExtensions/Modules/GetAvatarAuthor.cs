@@ -5,13 +5,12 @@ using MelonLoader;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
-using UserInfoExtensions;
 using VRC.Core;
 using VRC.UI;
 using VRChatUtilityKit.Ui;
 using VRChatUtilityKit.Utilities;
 
-namespace UserInfoExtentions.Modules
+namespace UserInfoExtensions.Modules
 {
     public class GetAvatarAuthor : ModuleBase
     {

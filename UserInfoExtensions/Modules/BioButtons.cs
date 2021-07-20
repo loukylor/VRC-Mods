@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using MelonLoader;
 using UnhollowerRuntimeLib;
 using UnityEngine;
-using UserInfoExtensions;
-using UserInfoExtentions.Components;
+using UserInfoExtensions.Components;
 using VRC.UI;
 using VRChatUtilityKit.Ui;
 using VRChatUtilityKit.Utilities;
 
-namespace UserInfoExtentions.Modules
+namespace UserInfoExtensions.Modules
 {
     public class BioButtons : ModuleBase
     {
