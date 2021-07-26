@@ -94,9 +94,7 @@ namespace PlayerList.Entries
             gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new Action(() => UiManager.OpenUserInQuickMenu(player)));
 
             isFriend = APIUser.IsFriendsWith(apiUser.id);
-            GetPlayerColor();
-            if (player.prop_PlayerNet_0 != null)
-                UpdateEntry(player.prop_PlayerNet_0, this, true);
+            GetPlayerColor(false);
         }
         public static void OnStaticConfigChanged()
         {
@@ -187,7 +185,14 @@ namespace PlayerList.Entries
 
             StringBuilder tempString = new StringBuilder();
 
-            updateDelegate?.Invoke(playerNet, entry, ref tempString);
+            try
+            {
+                updateDelegate?.Invoke(playerNet, entry, ref tempString);
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"Errored while updating {entry.apiUser.displayName}'s entry:\n{ex}");
+            }
 
             entry.textComponent.text = entry.TrimExtra(tempString.ToString());
         }

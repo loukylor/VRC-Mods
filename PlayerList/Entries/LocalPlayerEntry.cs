@@ -38,7 +38,7 @@ namespace PlayerList.Entries
             isSelf = true;
             EntryManager.localPlayerEntry = this;
             player = Player.prop_Player_0;
-            apiUser = APIUser.CurrentUser;
+            apiUser = player.prop_APIUser_0;
             userId = apiUser.id;
 
             gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(new Action(() => UiManager.OpenUserInQuickMenu(player)));
@@ -185,7 +185,7 @@ namespace PlayerList.Entries
         }
         private static void AddDisplayName(Player player, LocalPlayerEntry entry, ref StringBuilder tempString)
         {
-            tempString.Append("<color=" + entry.playerColor + ">" + player.prop_APIUser_0.displayName + "</color>" + separator);
+            tempString.Append("<color=" + entry.playerColor + ">" + entry.apiUser.displayName + "</color>" + separator);
         }
 
         private static void OnShowSocialRankChange()
@@ -205,7 +205,7 @@ namespace PlayerList.Entries
                     playerColor = "#" + ColorUtility.ToHtmlStringRGB(VRCPlayer.Method_Public_Static_Color_APIUser_0(APIUser.CurrentUser));
                     break;
             }
-            if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.NameColor))
+            if (EntrySortManager.IsSortTypeInUse(EntrySortManager.SortType.NameColor) && playerLeftPairEntry != null)
                 EntrySortManager.SortPlayer(playerLeftPairEntry);
         }
     }
