@@ -20,6 +20,7 @@ namespace PlayerList.Entries
             get => _playerEntry;
             set
             {
+                EntryManager.idToEntryTable[value.userId] = this;
                 _playerEntry = value;
                 _playerEntry.transform.SetParent(transform);
                 value.transform.localPosition.SetZ(0);
