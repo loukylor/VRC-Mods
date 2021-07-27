@@ -175,7 +175,6 @@ namespace PlayerList
         public static void AddPlayerLeftPairEntry(PlayerLeftPairEntry entry)
         {
             playerLeftPairsEntries.Add(entry);
-            idToEntryTable.Add(entry.playerEntry.userId, entry);
             if (!entry.playerEntry.isSelf)
                 playerEntries.Add(entry.playerEntry);
             AddEntry(entry);
