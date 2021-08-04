@@ -19,14 +19,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Reference Include="Assembly-CSharp">
-			<HintPath>$(VRChatPath)MelonLoader\Managed\Assembly-CSharp.dll</HintPath>
-		</Reference>
 		<Reference Include="emmVRC">
 		  <HintPath>$(VRChatPath)Dependencies\emmVRC.dll</HintPath>
-		</Reference>
-		<Reference Include="Il2Cppmscorlib">
-			<HintPath>$(VRChatPath)MelonLoader\Managed\Il2Cppmscorlib.dll</HintPath>
 		</Reference>
 		<Reference Include="Il2CppSystem">
 		  <HintPath>$(VRChatPath)MelonLoader\Managed\Il2CppSystem.dll</HintPath>
@@ -34,23 +28,14 @@
 		<Reference Include="Il2CppSystem.Core">
 			<HintPath>$(VRChatPath)MelonLoader\Managed\Il2CppSystem.Core.dll</HintPath>
 		</Reference>
-		<Reference Include="MelonLoader">
-			<HintPath>$(VRChatPath)MelonLoader\MelonLoader.dll</HintPath>
-		</Reference>
 		<Reference Include="Photon-DotNet">
 		  <HintPath>$(VRChatPath)MelonLoader\Managed\Photon-DotNet.dll</HintPath>
 		</Reference>
 		<Reference Include="UIExpansionKit">
 		  <HintPath>$(VRChatPath)Mods\UIExpansionKit.dll</HintPath>
 		</Reference>
-		<Reference Include="UnhollowerBaseLib">
-			<HintPath>$(VRChatPath)MelonLoader\Managed\UnhollowerBaseLib.dll</HintPath>
-		</Reference>
 		<Reference Include="UnityEngine.AssetBundleModule">
 			<HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
-		</Reference>
-		<Reference Include="UnityEngine.CoreModule">
-			<HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.CoreModule.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.PhysicsModule">
 		  <HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.PhysicsModule.dll</HintPath>

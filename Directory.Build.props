@@ -3,7 +3,6 @@
        <VRChatPath>C:\Program Files (x86)\Steam\steamapps\common\VRChat\</VRChatPath>
     </PropertyGroup>
 
-    <!-- TODO; Should consolidate these references most likely..?
     <ItemGroup>
         <Reference Include="Assembly-CSharp">
             <HintPath>$(VRChatPath)MelonLoader\Managed\Assembly-CSharp.dll</HintPath>
@@ -20,5 +19,5 @@
         <Reference Include="UnityEngine.CoreModule">
             <HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
-    </ItemGroup>-->
+    </ItemGroup>
 </Project>
