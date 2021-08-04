@@ -1,6 +1,7 @@
 <Project>
     <PropertyGroup>
-       <VRChatPath>C:\Program Files (x86)\Steam\steamapps\common\VRChat\</VRChatPath>
+        <TargetFramework>net472</TargetFramework>
+        <VRChatPath>C:\Program Files (x86)\Steam\steamapps\common\VRChat\</VRChatPath>
     </PropertyGroup>
 
     <ItemGroup>

@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net472</TargetFramework>
 		<AssemblyName>TriggerESP</AssemblyName>
 		<RootNamespace>TriggerESP</RootNamespace>
 	</PropertyGroup>
