@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net472</TargetFramework>
 		<AssemblyName>TriggerESP</AssemblyName>
 		<RootNamespace>TriggerESP</RootNamespace>
 	</PropertyGroup>
@@ -19,55 +18,40 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Reference Include="Assembly-CSharp">
-			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\Assembly-CSharp.dll</HintPath>
-		</Reference>
-		<Reference Include="Il2Cppmscorlib">
-			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\Il2Cppmscorlib.dll</HintPath>
-		</Reference>
 		<Reference Include="Il2CppSystem.Core">
-		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\Il2CppSystem.Core.dll</HintPath>
-		</Reference>
-		<Reference Include="MelonLoader">
-			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\MelonLoader.dll</HintPath>
+		  <HintPath>$(VRChatPath)MelonLoader\Managed\Il2CppSystem.Core.dll</HintPath>
 		</Reference>
 		<Reference Include="UIExpansionKit">
-			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\Mods\UIExpansionKit.dll</HintPath>
-		</Reference>
-		<Reference Include="UnhollowerBaseLib">
-			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\UnhollowerBaseLib.dll</HintPath>
+			<HintPath>$(VRChatPath)Mods\UIExpansionKit.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.AssetBundleModule">
-		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
-		</Reference>
-		<Reference Include="UnityEngine.CoreModule">
-			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.CoreModule.dll</HintPath>
+		  <HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.PhysicsModule">
-		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+		  <HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.PhysicsModule.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.UI">
-		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.UI.dll</HintPath>
+		  <HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.UI.dll</HintPath>
 		</Reference>
 		<Reference Include="VRC.Udon">
-		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\VRC.Udon.dll</HintPath>
+		  <HintPath>$(VRChatPath)MelonLoader\Managed\VRC.Udon.dll</HintPath>
 		</Reference>
 		<Reference Include="VRCCore-Standalone">
-			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\VRCCore-Standalone.dll</HintPath>
+			<HintPath>$(VRChatPath)MelonLoader\Managed\VRCCore-Standalone.dll</HintPath>
 		</Reference>
 		<Reference Include="VRChatUtilityKit">
-		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\Mods\VRChatUtilityKit.dll</HintPath>
+		  <HintPath>$(VRChatPath)Mods\VRChatUtilityKit.dll</HintPath>
 		</Reference>
 		<Reference Include="VRCSDK3">
-		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\VRCSDK3.dll</HintPath>
+		  <HintPath>$(VRChatPath)MelonLoader\Managed\VRCSDK3.dll</HintPath>
 		</Reference>
 		<Reference Include="VRCSDKBase">
-		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\VRCSDKBase.dll</HintPath>
+		  <HintPath>$(VRChatPath)MelonLoader\Managed\VRCSDKBase.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="move &quot;bin\Release\net472\TriggerESP.dll&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\VRChat\Mods&quot;" />
+		<Exec Command="move &quot;bin\Release\net472\TriggerESP.dll&quot; &quot;$(VRChatPath)Mods&quot;" />
 	</Target>
 
 </Project>
