@@ -257,7 +257,9 @@ namespace PlayerList
         }
         public static void SortPlayer(PlayerLeftPairEntry sortEntry)
         {
-            if (IsSortTypeInAllUses(SortType.None) || (PlayerListConfig.showSelfAtTop.Value && sortEntry.playerEntry.isSelf))
+            if (IsSortTypeInAllUses(SortType.None) ||
+                (PlayerListConfig.showSelfAtTop.Value && sortEntry.playerEntry.isSelf) ||
+                (PlayerListConfig.freezeSortWhenVisible.Value && MenuManager.playerList.active))
                 return;
 
             // This method is good like 0.2ms
