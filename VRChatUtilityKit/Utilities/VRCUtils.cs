@@ -1,8 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Collections;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Reflection;
-using Il2CppSystem.Collections.Generic;
+using System.Threading.Tasks;
 using MelonLoader;
 using UnityEngine;
 using VRC;
@@ -75,7 +77,7 @@ namespace VRChatUtilityKit.Utilities
 
         internal static void Init()
         {
-            NetworkEvents.OnInstanceChanged += new Action<ApiWorld, ApiWorldInstance>((world, instance) => MelonCoroutines.Start(StartEmmCheck(world)));
+            NetworkEvents.OnInstanceChanged += new Action<ApiWorld, ApiWorldInstance>((world, instance) => StartEmmCheck(world));
             MelonCoroutines.Start(UiInitCoroutine());
 
             _reloadAvatarMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.Name.StartsWith("Method_Private_Void_Boolean_") && mi.Name.Length < 31 && mi.GetParameters().Any(pi => pi.IsOptional));
@@ -98,14 +100,22 @@ namespace VRChatUtilityKit.Utilities
         }
 
         // Completely stolen from Psychloor's PlayerRotator (https://github.com/Psychloor/PlayerRotater)
-        private static IEnumerator StartEmmCheck(ApiWorld world)
+        private static void StartEmmCheck(ApiWorld world)
         {
             // Check if black/whitelisted from emmVRC - thanks Emilia and the rest of emmVRC Staff
-            WWW www = new WWW($"https://dl.emmvrc.com/riskyfuncs.php?worldid={world.id}", null, new Dictionary<string, string>());
-            while (!www.isDone)
-                yield return null;
-            string result = www.text?.Trim().ToLower();
-            www.Dispose();
+            HttpWebRequest request = WebRequest.CreateHttp($"https://dl.emmvrc.com/riskyfuncs.php?worldid={world.id}");
+            request.BeginGetResponse(new AsyncCallback(EndEmmCheck), new Tuple<ApiWorld, HttpWebRequest>(world, request));
+        }
+
+        private static void EndEmmCheck(IAsyncResult asyncResult)
+        {
+            Tuple<ApiWorld, HttpWebRequest> state = (Tuple<ApiWorld, HttpWebRequest>)asyncResult.AsyncState;
+            string result;
+            using (WebResponse response = state.Item2.EndGetResponse(asyncResult))
+            using (Stream stream = response.GetResponseStream())
+            using (StreamReader reader = new StreamReader(stream))
+                result = reader.ReadToEnd();
+
             if (!string.IsNullOrWhiteSpace(result))
             {
                 switch (result)
@@ -113,26 +123,32 @@ namespace VRChatUtilityKit.Utilities
                     case "allowed":
                         MelonLogger.Msg("World allowed to use risky functions");
                         AreRiskyFunctionsAllowed = true;
-                        yield break;
+                        return;
 
                     case "denied":
                         MelonLogger.Msg("World NOT allowed to use risky functions");
                         AreRiskyFunctionsAllowed = false;
-                        yield break;
+                        return;
                 }
             }
 
+            // Fuck it i cant be fucked right now
+            AsyncUtils._toMainThreadQueue.Enqueue(new Action(() => CheckWorld(state.Item1)));
+        }
+
+        private static void CheckWorld(ApiWorld world)
+        {
             // no result from server or they're currently down
             // Check tags/GameObjects then.
             if (GameObject.Find("eVRCRiskFuncEnable") != null)
             {
                 AreRiskyFunctionsAllowed = true;
-                yield break;
+                return;
             }
             else if (GameObject.Find("eVRCRiskFuncDisable") != null)
             {
                 AreRiskyFunctionsAllowed = false;
-                yield break;
+                return;
             }
 
             foreach (string worldTag in world.tags)
@@ -141,7 +157,7 @@ namespace VRChatUtilityKit.Utilities
                 {
                     MelonLogger.Msg("World NOT allowed to use risky functions");
                     AreRiskyFunctionsAllowed = false;
-                    yield break;
+                    return;
                 }
             }
 
