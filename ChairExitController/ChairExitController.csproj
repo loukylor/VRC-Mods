@@ -6,7 +6,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<Reference Include="UnityEngine.InputLegacyModule">
-		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+		  <HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
 		</Reference>
 		<Reference Include="VRCCore-Standalone">
 		  <HintPath>$(VRChatPath)MelonLoader\Managed\VRCCore-Standalone.dll</HintPath>
