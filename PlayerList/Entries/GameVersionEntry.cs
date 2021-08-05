@@ -1,7 +1,10 @@
 ﻿using System;
+using Il2CppSystem.Reflection;
 using MelonLoader;
+using UnhollowerBaseLib;
 using UnhollowerBaseLib.Attributes;
 using UnityEngine;
+using VRC.Core;
 
 namespace PlayerList.Entries
 {
@@ -16,8 +19,21 @@ namespace PlayerList.Entries
         [HideFromIl2Cpp]
         public override void Init(object[] parameters = null)
         {
-            int buildNumber = GameObject.Find("_Application/ApplicationSetup").GetComponent<VRCApplicationSetup>().field_Public_Int32_0;
-            textComponent.text = OriginalText.Replace("{gameversion}", buildNumber.ToString());
+            Il2CppArrayBase<MonoBehaviour> components = GameObject.Find("_Application/ApplicationSetup").GetComponents<MonoBehaviour>();
+            foreach (MonoBehaviour component in components)
+            {
+                if (component.TryCast<Transform>() != null || component.TryCast<ApiCache>() != null)
+                    continue;
+
+                foreach (FieldInfo field in component.GetIl2CppType().GetFields())
+                {
+                    if (field.FieldType == UnhollowerRuntimeLib.Il2CppType.Of<int>())
+                    {
+                        textComponent.text = OriginalText.Replace("{gameversion}", field.GetValue(component).Unbox<int>().ToString());
+                        return;
+                    }
+                }
+            }
         }
     }
 }

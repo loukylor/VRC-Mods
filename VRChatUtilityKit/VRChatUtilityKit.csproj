@@ -24,9 +24,6 @@
 	  <Reference Include="UnityEngine.UI">
 	    <HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.UI.dll</HintPath>
 	  </Reference>
-	  <Reference Include="UnityEngine.UnityWebRequestWWWModule">
-	    <HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
-	  </Reference>
 	  <Reference Include="VRCCore-Standalone">
 	    <HintPath>$(VRChatPath)MelonLoader\Managed\VRCCore-Standalone.dll</HintPath>
 	  </Reference>

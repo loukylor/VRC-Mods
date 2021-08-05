@@ -36,6 +36,9 @@
 		<Reference Include="UnityEngine.AssetBundleModule">
 			<HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
 		</Reference>
+		<Reference Include="UnityEngine.InputLegacyModule">
+		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+		</Reference>
 		<Reference Include="UnityEngine.PhysicsModule">
 		  <HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.PhysicsModule.dll</HintPath>
 		</Reference>
