@@ -36,7 +36,7 @@ namespace VRChatUtilityKit.Utilities
         public static bool AreRiskyFunctionsAllowed 
         {
             get => _areRiskyFunctionsAllowed;
-            private set { _areRiskyFunctionsAllowed = value; OnEmmWorldCheckCompleted?.DelegateSafeInvoke(value); } 
+            private set { _areRiskyFunctionsAllowed = value; AsyncUtils._toMainThreadQueue.Enqueue(new Action(() => OnEmmWorldCheckCompleted?.DelegateSafeInvoke(value))); } 
         }
         private static bool _areRiskyFunctionsAllowed;
 
