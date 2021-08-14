@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>PrivateInstanceIcon</AssemblyName>
+		<RootNamespace>PrivateInstanceIcon</RootNamespace>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<OutputPath></OutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="icon.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="icon.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="UnityEngine.ImageConversionModule">
+		  <HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UI">
+		  <HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.UI.dll</HintPath>
+		</Reference>
+		<Reference Include="VRCCore-Standalone">
+			<HintPath>$(VRChatPath)MelonLoader\Managed\VRCCore-Standalone.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+	
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="move &quot;bin\Release\net472\PrivateInstanceIcon.dll&quot; &quot;$(VRChatPath)Mods&quot;" />
+	</Target>
+
+</Project>

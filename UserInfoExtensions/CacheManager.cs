@@ -36,7 +36,7 @@ namespace UserInfoExtensions
                 try
                 {
                     for (int i = 0; i < listContainer.ResponseList.Count; i++)
-                        cachedUsers[listContainer.ResponseModels[i].id] = new UserInfoExtensionsAPIUser(listContainer.ResponseList[i]);
+                        cachedUsers[listContainer.ResponseModels.get_Item(i).id] = new UserInfoExtensionsAPIUser(listContainer.ResponseList.get_Item(i));
                 }
                 catch (Exception ex)
                 {
@@ -77,10 +77,10 @@ namespace UserInfoExtensions
 
                 Il2CppSystem.Collections.Generic.Dictionary<string, Il2CppSystem.Object> jsonDictionary = jsonObject.Cast<Il2CppSystem.Collections.Generic.Dictionary<string, Il2CppSystem.Object>>();
                 if (jsonDictionary.ContainsKey("id"))
-                    Id = jsonDictionary["id"].ToString();
+                    Id = jsonDictionary.get_Item("id").ToString();
 
                 if (jsonDictionary.ContainsKey("date_joined"))
-                    DateJoined = jsonDictionary["date_joined"].ToString();
+                    DateJoined = jsonDictionary.get_Item("date_joined").ToString();
             }
         }
     }

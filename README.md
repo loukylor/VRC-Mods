@@ -28,6 +28,7 @@ More detailed instructions and more mods can be found in the [VRChat Modding Gro
 - [InstanceHistory](#instancehistory)
 - [PlayerList](#playerlist)
 - [PreviewScroller](#previewscroller)
+- [PrivateInstanceIcon](#privateinstanceicon)
 - [ReloadAvatars](#reloadavatars)
 - [RememberMe](#rememberme)
 - [SelectYourself](#selectyourself)
@@ -171,6 +172,16 @@ A mod that let's you sort of scroll the avatar preview so you can control where 
 
 ## Requirements
  - [VRChatUtilityKit](https://github.com/loukylor/VRC-Mods/releases)
+
+# PrivateInstanceIcon
+Adds an icon to the social menu that shows if you can join a person or not.
+
+## Features
+Let's you configure whether you want the icon on people that are on join me, but in privates.<br>
+You can also just straight up hide users from the list that you cant join. Note that when the list refreshes, the hidden users might pop up for a frame.
+
+## Picture of the Icon
+![Picture of me with the icon on it](https://i.imgur.com/bLgOC5R.png)
 
 # ReloadAvatars
 Adds buttons to reload a single user's avatar or all users' avatar.
