@@ -258,6 +258,7 @@ namespace PlayerList
             new ToggleButton(playerListMenus[2].gameObject, new Vector3(2, 1), "Reverse Upper", "Disabled", new Action<bool>((state) => PlayerListConfig.reverseUpperSort.Value = state), "Toggle reverse order of upper sort", "Toggle reverse order of upper sort", "UpperReverseToggle", PlayerListConfig.reverseUpperSort.Value, true);
             new ToggleButton(playerListMenus[2].gameObject, new Vector3(3, 1), "Reverse Highest", "Disabled", new Action<bool>((state) => PlayerListConfig.reverseHighestSort.Value = state), "Toggle reverse order of upper sort", "Toggle reverse order of upper sort", "HighestReverseToggle", PlayerListConfig.reverseHighestSort.Value, true);
             new ToggleButton(playerListMenus[2].gameObject, new Vector3(1, 2), "Show Self On Top", "Disabled", new Action<bool>((state) => PlayerListConfig.showSelfAtTop.Value = state), "Show the local player on top of the list always", "Show the local player on top of the list always", "ShowSelfOnTopToggle", PlayerListConfig.showSelfAtTop.Value, true);
+			new ToggleButton(playerListMenus[2].gameObject, new Vector3(2, 2), "Freeze sort when visible", "Disabled", new Action<bool>((state) => PlayerListConfig.freezeSortWhenVisible.Value = state), "Freeze sorting while the list is visible", "Freeze sorting while the list is visible", "FreezeSortWhenVisibleToggle", PlayerListConfig.freezeSortWhenVisible.Value, true);
 
             // Initialize PlayerList Customization menu
             playerListMenus.Add(new SubMenu("UserInterface/QuickMenu", "PlayerListMenuPage4"));

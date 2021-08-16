@@ -34,6 +34,7 @@ namespace PlayerList.Config
 
         public static EntryWrapper<PlayerEntry.DisplayNameColorMode> displayNameColorMode;
 
+        public static EntryWrapper<bool> freezeSortWhenVisible;
         public static EntryWrapper<bool> reverseBaseSort;
         public static EntryWrapper<EntrySortManager.SortType> currentBaseSort;
         public static EntryWrapper<bool> reverseUpperSort;
@@ -67,6 +68,7 @@ namespace PlayerList.Config
             displayNameToggle = CreateEntry(nameof(displayNameToggle), true, is_hidden: true);
             displayNameColorMode = CreateEntry(nameof(displayNameColorMode), PlayerEntry.DisplayNameColorMode.TrustAndFriends, is_hidden: true);
 
+			freezeSortWhenVisible = CreateEntry(nameof(freezeSortWhenVisible), false, is_hidden: true);
             reverseBaseSort = CreateEntry(nameof(reverseBaseSort), false, is_hidden: true);
             currentBaseSort = CreateEntry(nameof(currentBaseSort), EntrySortManager.SortType.None, is_hidden: true);
             reverseUpperSort = CreateEntry(nameof(reverseUpperSort), false, is_hidden: true);
