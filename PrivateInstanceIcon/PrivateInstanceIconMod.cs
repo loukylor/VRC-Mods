@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using VRC.Core;
 
-[assembly: MelonInfo(typeof(PrivateInstanceIcon.PrivateInstanceIconMod), "PrivateInstanceIcon", "1.0.0", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(PrivateInstanceIcon.PrivateInstanceIconMod), "PrivateInstanceIcon", "1.0.1", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace PrivateInstanceIcon
@@ -21,6 +21,7 @@ namespace PrivateInstanceIcon
 
         public static MelonPreferences_Entry<bool> excludeJoinMe;
         public static MelonPreferences_Entry<bool> hidePrivateInstances;
+        public static MelonPreferences_Entry<bool> includeFavoritesList;
         public override void OnApplicationStart()
         {
             listEnum = typeof(UiUserList).GetProperties().First(pi => pi.Name.StartsWith("field_Public_Enum"));
@@ -47,11 +48,15 @@ namespace PrivateInstanceIcon
             MelonPreferences_Category category = MelonPreferences.CreateCategory("PrivateInstanceIcon Config");
             excludeJoinMe = category.CreateEntry(nameof(excludeJoinMe), true, "Whether to hide the icon when people are on join me, and in private instances.");
             hidePrivateInstances = category.CreateEntry(nameof(hidePrivateInstances), false, "Whether to just not show people who are in private instances.");
+            includeFavoritesList = category.CreateEntry(nameof(includeFavoritesList), true, "Whether to include the icon and hiding in the friends favorites list.");
         }
 
         private static void OnUiUserListAwake(UiUserList __instance)
         {
-            if ((int)listEnum.GetValue(__instance) != 3)
+            int enumValue = (int)listEnum.GetValue(__instance);
+            if (includeFavoritesList.Value && enumValue != 3 && enumValue != 7)
+                return;
+            else if (!includeFavoritesList.Value && enumValue != 3)
                 return;
 
             GameObject pickerPrefab = (GameObject)pickerPrefabProp.GetValue(__instance);
@@ -73,7 +78,10 @@ namespace PrivateInstanceIcon
 
         private static void OnSetPickerContentFromApiModel(UiUserList __instance, VRCUiContentButton __0, Il2CppSystem.Object __1)
         {
-            if ((int)listEnum.GetValue(__instance) != 3)
+            int enumValue = (int)listEnum.GetValue(__instance);
+            if (includeFavoritesList.Value && enumValue != 3 && enumValue != 7)
+                return;
+            else if (!includeFavoritesList.Value && enumValue != 3)
                 return;
 
             APIUser user = __1.TryCast<APIUser>();
