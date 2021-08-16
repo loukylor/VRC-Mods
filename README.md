@@ -178,7 +178,8 @@ Adds an icon to the social menu that shows if you can join a person or not.
 
 ## Features
 Let's you configure whether you want the icon on people that are on join me, but in privates.<br>
-You can also just straight up hide users from the list that you cant join. Note that when the list refreshes, the hidden users might pop up for a frame.
+You can also just straight up hide users from the list that you cant join. Note that when the list refreshes, the hidden users might pop up for a frame.<br>
+There is also a setting to include/exclude users from your favorites lists.
 
 ## Picture of the Icon
 ![Picture of me with the icon on it](https://i.imgur.com/bLgOC5R.png)
