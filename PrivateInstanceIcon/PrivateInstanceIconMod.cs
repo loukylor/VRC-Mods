@@ -62,6 +62,9 @@ namespace PrivateInstanceIcon
             GameObject pickerPrefab = (GameObject)pickerPrefabProp.GetValue(__instance);
             VRCUiContentButton picker = pickerPrefab.GetComponent<VRCUiContentButton>();
 
+            if (picker.field_Public_VRCUiDynamicOverlayIcons_0.field_Public_ArrayOf_GameObject_0.Any(iconCheck => iconCheck.name == "PrivateInstanceIcon"))
+                return;
+
             GameObject[] newArr = new GameObject[picker.field_Public_VRCUiDynamicOverlayIcons_0.field_Public_ArrayOf_GameObject_0.Length + 1];
             picker.field_Public_VRCUiDynamicOverlayIcons_0.field_Public_ArrayOf_GameObject_0.CopyTo(newArr, 0);
 
