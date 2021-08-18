@@ -182,7 +182,7 @@ You can also just straight up hide users from the list that you cant join. Note 
 There is also a setting to include/exclude users from your favorites lists.
 
 ## Picture of the Icon
-![Picture of me with the icon on it](https://i.imgur.com/bLgOC5R.png)
+![Picture of me with the icon on it](https://i.imgur.com/T0Z0uba.png)
 
 # ReloadAvatars
 Adds buttons to reload a single user's avatar or all users' avatar.
