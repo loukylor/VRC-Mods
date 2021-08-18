@@ -42,8 +42,8 @@ namespace PrivateInstanceIcon
             iconSprite.hideFlags = HideFlags.DontUnloadUnusedAsset;
 
             foreach (MethodInfo method in typeof(UiUserList).GetMethods().Where(mi => mi.Name.StartsWith("Method_Protected_Virtual_Void_VRCUiContentButton_Object_")))
-                HarmonyInstance.Patch(method, null, typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModel), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
-            HarmonyInstance.Patch(typeof(UiUserList).GetMethod("Awake"), postfix: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnUiUserListAwake), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod(), finalizer: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModelErrored), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
+                HarmonyInstance.Patch(method, postfix: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModel), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod(), finalizer: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModelErrored), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
+            HarmonyInstance.Patch(typeof(UiUserList).GetMethod("Awake"), postfix: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnUiUserListAwake), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
 
             MelonPreferences_Category category = MelonPreferences.CreateCategory("PrivateInstanceIcon Config");
             excludeJoinMe = category.CreateEntry(nameof(excludeJoinMe), true, "Whether to hide the icon when people are on join me, and in private instances.");
@@ -91,10 +91,22 @@ namespace PrivateInstanceIcon
             GameObject icon = __0.field_Public_VRCUiDynamicOverlayIcons_0.field_Public_ArrayOf_GameObject_0.First(gameObject => gameObject.name == "PrivateInstanceIcon");
             if (user.location == "private" && !(excludeJoinMe.Value && __0.field_Public_UiStatusIcon_0.field_Public_UserStatus_0 == APIUser.UserStatus.JoinMe))
             {
+                string text = __instance.field_Public_Text_0.text;
+                text = text.Split(new string[] { " [" }, StringSplitOptions.None)[0];
                 if (hidePrivateInstances.Value)
+                {
                     MelonCoroutines.Start(SetInactiveCoroutine(__0.gameObject));
+                    int hiddenCount = 0;
+                    foreach (VRCUiContentButton picker in __instance.pickers)
+                        if (!picker.gameObject.active)
+                            hiddenCount++;
+                    __instance.field_Public_Text_0.text = text + $" [{hiddenCount} hidden]";
+                }
                 else
+                {
                     icon.SetActive(true);
+                    __instance.field_Public_Text_0.text = text;
+                }
             }
             else
             { 
