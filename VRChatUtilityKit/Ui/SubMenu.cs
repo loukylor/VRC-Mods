@@ -38,5 +38,6 @@ namespace VRChatUtilityKit.Ui
         public SubMenu(string parent, string pageName) : this(GameObject.Find(parent), pageName) { }
 
         public void OpenSubMenu(bool setCurrentMenu = true, bool setCurrentTab = true) => UiManager.OpenSubMenu(this, setCurrentMenu, setCurrentTab);
+        public void OpenSubMenu() => OpenSubMenu(true, true);
     }
 }
