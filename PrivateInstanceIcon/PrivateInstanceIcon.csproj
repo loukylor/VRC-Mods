@@ -10,11 +10,19 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="icon.png" />
+	  <None Remove="lock.png" />
+		<None Remove="lock-open.png" />
+		<None Remove="friend.png" />
+		<None Remove="friends.png" />
+		<None Remove="globe.png" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="icon.png" />
+	  <EmbeddedResource Include="lock.png" />
+		<EmbeddedResource Include="lock-open.png" />
+		<EmbeddedResource Include="friend.png" />
+		<EmbeddedResource Include="friends.png" />
+		<EmbeddedResource Include="globe.png" />
 	</ItemGroup>
 
 	<ItemGroup>

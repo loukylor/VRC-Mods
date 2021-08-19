@@ -17,7 +17,8 @@ namespace PrivateInstanceIcon
     {
         private static PropertyInfo listEnum;
         private static PropertyInfo pickerPrefabProp;
-		private static Sprite lockIconSprite;
+		private static Sprite lockIconSprite, openLockSprite,
+						friendSprite, friendsSprite, globeSprite;
 
         public static MelonPreferences_Entry<bool> excludeJoinMe;
         public static MelonPreferences_Entry<bool> hidePrivateInstances;
@@ -27,7 +28,11 @@ namespace PrivateInstanceIcon
             listEnum = typeof(UiUserList).GetProperties().First(pi => pi.Name.StartsWith("field_Public_Enum"));
             pickerPrefabProp = typeof(UiUserList).GetProperties().First(pi => pi.PropertyType == typeof(GameObject));
 
-			lockIconSprite = LoadSprite("PrivateInstanceIcon.icon.png");
+			lockIconSprite = LoadSprite("PrivateInstanceIcon.lock.png");
+			openLockSprite = LoadSprite("PrivateInstanceIcon.lock-open.png");
+			friendSprite = LoadSprite("PrivateInstanceIcon.friend.png");
+			friendsSprite = LoadSprite("PrivateInstanceIcon.friends.png");
+			globeSprite = LoadSprite("PrivateInstanceIcon.globe.png");
 
             foreach (MethodInfo method in typeof(UiUserList).GetMethods().Where(mi => mi.Name.StartsWith("Method_Protected_Virtual_Void_VRCUiContentButton_Object_")))
                 HarmonyInstance.Patch(method, postfix: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModel), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod(), finalizer: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModelErrored), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
