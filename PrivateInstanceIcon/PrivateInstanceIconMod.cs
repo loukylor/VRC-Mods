@@ -105,8 +105,7 @@ namespace PrivateInstanceIcon
             if (user == null)
                 return;
 
-            GameObject icon = __0.field_Public_VRCUiDynamicOverlayIcons_0.field_Public_ArrayOf_GameObject_0.First(gameObject => gameObject.name == "PrivateInstanceIcon");
-			MelonLogger.Msg($"Location: {user.location}");
+			GameObject icon = __0.field_Public_VRCUiDynamicOverlayIcons_0.field_Public_ArrayOf_GameObject_0.First(gameObject => gameObject.name == "PrivateInstanceIcon");
 			if (user.location == "private")
             {
                 string text = __instance.field_Public_Text_0.text;
