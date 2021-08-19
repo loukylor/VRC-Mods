@@ -17,10 +17,9 @@ namespace PrivateInstanceIcon
     {
         private static PropertyInfo listEnum;
         private static PropertyInfo pickerPrefabProp;
-		private static Sprite lockIconSprite, openLockSprite,
-						friendSprite, friendsSprite, globeSprite;
+		private static Sprite lockIconSprite, openLockSprite, friendsSprite, friendsPlusSprite, globeSprite;
 
-        public static MelonPreferences_Entry<bool> excludeJoinMe;
+		public static MelonPreferences_Entry<bool> showPrivateIcon, showJoinablePrivateIcon, showFriendsIcon, showFriendsPlusIcon, showPublicIcon;
         public static MelonPreferences_Entry<bool> hidePrivateInstances;
         public static MelonPreferences_Entry<bool> includeFavoritesList;
         public override void OnApplicationStart()
@@ -30,18 +29,23 @@ namespace PrivateInstanceIcon
 
 			lockIconSprite = LoadSprite("PrivateInstanceIcon.lock.png");
 			openLockSprite = LoadSprite("PrivateInstanceIcon.lock-open.png");
-			friendSprite = LoadSprite("PrivateInstanceIcon.friend.png");
-			friendsSprite = LoadSprite("PrivateInstanceIcon.friends.png");
+			friendsSprite = LoadSprite("PrivateInstanceIcon.friend.png");
+			friendsPlusSprite = LoadSprite("PrivateInstanceIcon.friends.png");
 			globeSprite = LoadSprite("PrivateInstanceIcon.globe.png");
 
             foreach (MethodInfo method in typeof(UiUserList).GetMethods().Where(mi => mi.Name.StartsWith("Method_Protected_Virtual_Void_VRCUiContentButton_Object_")))
                 HarmonyInstance.Patch(method, postfix: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModel), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod(), finalizer: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModelErrored), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
             HarmonyInstance.Patch(typeof(UiUserList).GetMethod("Awake"), postfix: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnUiUserListAwake), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
 
-            MelonPreferences_Category category = MelonPreferences.CreateCategory("PrivateInstanceIcon Config");
-            excludeJoinMe = category.CreateEntry(nameof(excludeJoinMe), true, "Whether to hide the icon when people are on join me, and in private instances.");
-            hidePrivateInstances = category.CreateEntry(nameof(hidePrivateInstances), false, "Whether to just not show people who are in private instances.");
-            includeFavoritesList = category.CreateEntry(nameof(includeFavoritesList), true, "Whether to include the icon and hiding in the friends favorites list.");
+			MelonPreferences_Category category = MelonPreferences.CreateCategory("PrivateInstanceIcon Config");
+			hidePrivateInstances = category.CreateEntry(nameof(hidePrivateInstances), false, "Whether or not to hide people who are in private instances.");
+			includeFavoritesList = category.CreateEntry(nameof(includeFavoritesList), true, "Whether to include the icons and hiding in the friends favorites list.");
+
+			showPrivateIcon = category.CreateEntry(nameof(showPrivateIcon), true, "Whether to show the private instance icon.");
+			showJoinablePrivateIcon = category.CreateEntry(nameof(showJoinablePrivateIcon), true, "Whether to show the joinable private instance icon.");
+			showFriendsIcon = category.CreateEntry(nameof(showFriendsIcon), false, "Whether to show the friends instance icon.");
+			showFriendsPlusIcon = category.CreateEntry(nameof(showFriendsPlusIcon), false, "Whether to show the friends+ instance icon.");
+			showPublicIcon = category.CreateEntry(nameof(showPublicIcon), false, "Whether to show the public instance icon.");
         }
 
 		private Sprite LoadSprite(string manifestString)
@@ -81,8 +85,7 @@ namespace PrivateInstanceIcon
 
             GameObject icon = GameObject.Instantiate(picker.transform.Find("Icons/OverlayIcons/iconUserOnPC").gameObject);
             icon.name = "PrivateInstanceIcon";
-            icon.transform.SetParent(picker.transform.Find("Icons/OverlayIcons"));
-			icon.GetComponent<Image>().sprite = lockIconSprite;
+			icon.transform.SetParent(picker.transform.Find("Icons/OverlayIcons"));
             icon.SetActive(false);
 
             newArr[newArr.Length - 1] = icon;
@@ -103,7 +106,8 @@ namespace PrivateInstanceIcon
                 return;
 
             GameObject icon = __0.field_Public_VRCUiDynamicOverlayIcons_0.field_Public_ArrayOf_GameObject_0.First(gameObject => gameObject.name == "PrivateInstanceIcon");
-            if (user.location == "private" && !(excludeJoinMe.Value && __0.field_Public_UiStatusIcon_0.field_Public_UserStatus_0 == APIUser.UserStatus.JoinMe))
+			MelonLogger.Msg($"Location: {user.location}");
+			if (user.location == "private")
             {
                 string text = __instance.field_Public_Text_0.text;
                 text = text.Split(new string[] { " [" }, StringSplitOptions.None)[0];
@@ -118,13 +122,57 @@ namespace PrivateInstanceIcon
                 }
                 else
                 {
-                    icon.SetActive(true);
+					if (__0.field_Public_UiStatusIcon_0.field_Public_UserStatus_0 == APIUser.UserStatus.JoinMe)
+					{
+						if (showJoinablePrivateIcon.Value)
+						{
+							icon.GetComponent<Image>().sprite = openLockSprite;
+							icon.SetActive(true);
+						}
+						else icon.SetActive(false);
+					}
+					else
+					{
+						if (showPrivateIcon.Value)
+						{
+							icon.GetComponent<Image>().sprite = lockIconSprite;
+							icon.SetActive(true);
+						}
+						else icon.SetActive(false);
+					}
                     __instance.field_Public_Text_0.text = text;
                 }
-            }
-            else
-            { 
-                icon.SetActive(false);
+			}
+			else if (user.location.Contains("~friends("))
+			{
+				if (showFriendsPlusIcon.Value)
+				{
+					icon.GetComponent<Image>().sprite = friendsSprite;
+					icon.SetActive(true);
+				}
+				else icon.SetActive(false);
+			}
+			else if (user.location.Contains("~hidden("))
+			{
+				if (showFriendsPlusIcon.Value)
+				{
+					icon.GetComponent<Image>().sprite = friendsPlusSprite;
+					icon.SetActive(true);
+				}
+				else icon.SetActive(false);
+			}
+			else if (user.location.StartsWith("wrld_"))
+			{
+				if (showPublicIcon.Value)
+				{
+					icon.GetComponent<Image>().sprite = globeSprite;
+					icon.SetActive(true);
+				}
+				else icon.SetActive(false);
+			}
+			else
+			{
+				icon.SetActive(false);
             }
         }
 
