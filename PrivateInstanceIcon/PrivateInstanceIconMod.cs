@@ -17,7 +17,7 @@ namespace PrivateInstanceIcon
     {
         private static PropertyInfo listEnum;
         private static PropertyInfo pickerPrefabProp;
-        private static Sprite iconSprite;
+		private static Sprite lockIconSprite;
 
         public static MelonPreferences_Entry<bool> excludeJoinMe;
         public static MelonPreferences_Entry<bool> hidePrivateInstances;
@@ -27,19 +27,19 @@ namespace PrivateInstanceIcon
             listEnum = typeof(UiUserList).GetProperties().First(pi => pi.Name.StartsWith("field_Public_Enum"));
             pickerPrefabProp = typeof(UiUserList).GetProperties().First(pi => pi.PropertyType == typeof(GameObject));
 
-            Texture2D iconTex = new Texture2D(2, 2);
+			Texture2D lockIconTex = new Texture2D(2, 2);
             using (Stream iconStream = Assembly.GetManifestResourceStream("PrivateInstanceIcon.icon.png"))
             {
                 var buffer = new byte[iconStream.Length];
                 iconStream.Read(buffer, 0, buffer.Length);
-                ImageConversion.LoadImage(iconTex, buffer);
+				ImageConversion.LoadImage(lockIconTex, buffer);
             }
 
-            Rect rect = new Rect(0, 0, iconTex.width, iconTex.height);
+			Rect rect = new Rect(0, 0, lockIconTex.width, lockIconTex.height);
             Vector2 pivot = new Vector2(0.5f, 0.5f);
             Vector4 border = Vector4.zero;
-            iconSprite = Sprite.CreateSprite_Injected(iconTex, ref rect, ref pivot, 50, 0, SpriteMeshType.Tight, ref border, false);
-            iconSprite.hideFlags = HideFlags.DontUnloadUnusedAsset;
+			lockIconSprite = Sprite.CreateSprite_Injected(lockIconTex, ref rect, ref pivot, 50, 0, SpriteMeshType.Tight, ref border, false);
+			lockIconSprite.hideFlags = HideFlags.DontUnloadUnusedAsset;
 
             foreach (MethodInfo method in typeof(UiUserList).GetMethods().Where(mi => mi.Name.StartsWith("Method_Protected_Virtual_Void_VRCUiContentButton_Object_")))
                 HarmonyInstance.Patch(method, postfix: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModel), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod(), finalizer: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModelErrored), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
@@ -71,7 +71,7 @@ namespace PrivateInstanceIcon
             GameObject icon = GameObject.Instantiate(picker.transform.Find("Icons/OverlayIcons/iconUserOnPC").gameObject);
             icon.name = "PrivateInstanceIcon";
             icon.transform.SetParent(picker.transform.Find("Icons/OverlayIcons"));
-            icon.GetComponent<Image>().sprite = iconSprite;
+			icon.GetComponent<Image>().sprite = lockIconSprite;
             icon.SetActive(false);
 
             newArr[newArr.Length - 1] = icon;
