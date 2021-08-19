@@ -27,19 +27,7 @@ namespace PrivateInstanceIcon
             listEnum = typeof(UiUserList).GetProperties().First(pi => pi.Name.StartsWith("field_Public_Enum"));
             pickerPrefabProp = typeof(UiUserList).GetProperties().First(pi => pi.PropertyType == typeof(GameObject));
 
-			Texture2D lockIconTex = new Texture2D(2, 2);
-            using (Stream iconStream = Assembly.GetManifestResourceStream("PrivateInstanceIcon.icon.png"))
-            {
-                var buffer = new byte[iconStream.Length];
-                iconStream.Read(buffer, 0, buffer.Length);
-				ImageConversion.LoadImage(lockIconTex, buffer);
-            }
-
-			Rect rect = new Rect(0, 0, lockIconTex.width, lockIconTex.height);
-            Vector2 pivot = new Vector2(0.5f, 0.5f);
-            Vector4 border = Vector4.zero;
-			lockIconSprite = Sprite.CreateSprite_Injected(lockIconTex, ref rect, ref pivot, 50, 0, SpriteMeshType.Tight, ref border, false);
-			lockIconSprite.hideFlags = HideFlags.DontUnloadUnusedAsset;
+			lockIconSprite = LoadSprite("PrivateInstanceIcon.icon.png");
 
             foreach (MethodInfo method in typeof(UiUserList).GetMethods().Where(mi => mi.Name.StartsWith("Method_Protected_Virtual_Void_VRCUiContentButton_Object_")))
                 HarmonyInstance.Patch(method, postfix: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModel), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod(), finalizer: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModelErrored), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
@@ -51,7 +39,25 @@ namespace PrivateInstanceIcon
             includeFavoritesList = category.CreateEntry(nameof(includeFavoritesList), true, "Whether to include the icon and hiding in the friends favorites list.");
         }
 
-        private static void OnUiUserListAwake(UiUserList __instance)
+		private Sprite LoadSprite(string manifestString)
+		{
+			Texture2D texture = new Texture2D(2, 2);
+			using (Stream iconStream = Assembly.GetManifestResourceStream(manifestString))
+			{
+				var buffer = new byte[iconStream.Length];
+				iconStream.Read(buffer, 0, buffer.Length);
+				ImageConversion.LoadImage(texture, buffer);
+			}
+
+			Rect rect = new Rect(0, 0, texture.width, texture.height);
+			Vector2 pivot = new Vector2(0.5f, 0.5f);
+			Vector4 border = Vector4.zero;
+			Sprite sprite = Sprite.CreateSprite_Injected(texture, ref rect, ref pivot, 50, 0, SpriteMeshType.Tight, ref border, false);
+			sprite.hideFlags = HideFlags.DontUnloadUnusedAsset;
+			return sprite;
+		}
+
+		private static void OnUiUserListAwake(UiUserList __instance)
         {
             int enumValue = (int)listEnum.GetValue(__instance);
             if (includeFavoritesList.Value && enumValue != 3 && enumValue != 7)
