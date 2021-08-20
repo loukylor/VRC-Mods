@@ -149,7 +149,7 @@ namespace PrivateInstanceIcon
             else if (user.location.Contains("~hidden("))
                 ProcessInstanceBehavior(__instance, __0.gameObject, icon, friendsPlusInstanceBehavior.Value, friendsPlusSprite);
             else if (user.location.StartsWith("wrld_"))
-                ProcessInstanceBehavior(__instance, __0.gameObject, icon, publicInstanceBehavior.Value, friendsPlusSprite);
+                ProcessInstanceBehavior(__instance, __0.gameObject, icon, publicInstanceBehavior.Value, globeSprite);
             else
                 icon.SetActive(false);
         }
