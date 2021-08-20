@@ -13,14 +13,19 @@ using VRC.Core;
 
 namespace PrivateInstanceIcon
 {
+	public enum InstanceBehavior
+	{
+		ShowIcon,
+		Default,
+		HideUsers
+	}
     public class PrivateInstanceIconMod : MelonMod
     {
         private static PropertyInfo listEnum;
         private static PropertyInfo pickerPrefabProp;
 		private static Sprite lockIconSprite, openLockSprite, friendsSprite, friendsPlusSprite, globeSprite;
 
-		public static MelonPreferences_Entry<bool> showPrivateIcon, showJoinablePrivateIcon, showFriendsIcon, showFriendsPlusIcon, showPublicIcon;
-        public static MelonPreferences_Entry<bool> hidePrivateInstances;
+		public static MelonPreferences_Entry<InstanceBehavior> privateInstanceBehavior, joinablePrivateInstanceBehavior, friendsInstanceBehavior, friendsPlusInstanceBehavior, publicInstanceBehavior;
         public static MelonPreferences_Entry<bool> includeFavoritesList;
         public override void OnApplicationStart()
         {
@@ -38,14 +43,18 @@ namespace PrivateInstanceIcon
             HarmonyInstance.Patch(typeof(UiUserList).GetMethod("Awake"), postfix: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnUiUserListAwake), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
 
 			MelonPreferences_Category category = MelonPreferences.CreateCategory("PrivateInstanceIcon Config");
-			hidePrivateInstances = category.CreateEntry(nameof(hidePrivateInstances), false, "Whether or not to hide people who are in private instances.");
 			includeFavoritesList = category.CreateEntry(nameof(includeFavoritesList), true, "Whether to include the icons and hiding in the friends favorites list.");
 
-			showPrivateIcon = category.CreateEntry(nameof(showPrivateIcon), true, "Whether to show the private instance icon.");
-			showJoinablePrivateIcon = category.CreateEntry(nameof(showJoinablePrivateIcon), true, "Whether to show the joinable private instance icon.");
-			showFriendsIcon = category.CreateEntry(nameof(showFriendsIcon), false, "Whether to show the friends instance icon.");
-			showFriendsPlusIcon = category.CreateEntry(nameof(showFriendsPlusIcon), false, "Whether to show the friends+ instance icon.");
-			showPublicIcon = category.CreateEntry(nameof(showPublicIcon), false, "Whether to show the public instance icon.");
+			privateInstanceBehavior = category.CreateEntry("Private Instances", InstanceBehavior.ShowIcon,
+						"How the list should behave for private instances");
+			joinablePrivateInstanceBehavior = category.CreateEntry("Joinable Private Instances", InstanceBehavior.ShowIcon,
+						"How the list should behave for joinable private instances");
+			friendsInstanceBehavior = category.CreateEntry("Friends Instances", InstanceBehavior.Default,
+						"How the list should behave for friends instances");
+			friendsPlusInstanceBehavior = category.CreateEntry("Friends+ Instances", InstanceBehavior.Default,
+						"How the list should behave for friends+ instances");
+			publicInstanceBehavior = category.CreateEntry("Public Instances", InstanceBehavior.Default,
+						"How the list should behave for public instances");
         }
 
 		private Sprite LoadSprite(string manifestString)
@@ -93,7 +102,30 @@ namespace PrivateInstanceIcon
             picker.field_Public_VRCUiDynamicOverlayIcons_0.field_Public_ArrayOf_GameObject_0 = newArr;
         }
 
-        private static void OnSetPickerContentFromApiModel(UiUserList __instance, VRCUiContentButton __0, Il2CppSystem.Object __1)
+		private static void ProcessInstanceBehavior(UiUserList userList, GameObject userButton, GameObject icon, InstanceBehavior state, Sprite sprite)
+		{
+			string text = userList.field_Public_Text_0.text;
+			text = text.Split(new string[] { " [" }, StringSplitOptions.None)[0];
+			if (state == InstanceBehavior.HideUsers)
+			{
+				MelonCoroutines.Start(SetInactiveCoroutine(userButton));
+				int hiddenCount = 0;
+				foreach (VRCUiContentButton picker in userList.pickers)
+					if (!picker.gameObject.active)
+						hiddenCount++;
+				userList.field_Public_Text_0.text = text + $" [{hiddenCount} hidden]";
+			}
+			else if (state == InstanceBehavior.ShowIcon)
+			{
+				icon.GetComponent<Image>().sprite = sprite;
+				icon.SetActive(true);
+			}
+			else icon.SetActive(false);
+
+			userList.field_Public_Text_0.text = text;
+		}
+
+		private static void OnSetPickerContentFromApiModel(UiUserList __instance, VRCUiContentButton __0, Il2CppSystem.Object __1)
         {
             int enumValue = (int)listEnum.GetValue(__instance);
             if (includeFavoritesList.Value && enumValue != 3 && enumValue != 7)
@@ -107,72 +139,19 @@ namespace PrivateInstanceIcon
 
 			GameObject icon = __0.field_Public_VRCUiDynamicOverlayIcons_0.field_Public_ArrayOf_GameObject_0.First(gameObject => gameObject.name == "PrivateInstanceIcon");
 			if (user.location == "private")
-            {
-                string text = __instance.field_Public_Text_0.text;
-                text = text.Split(new string[] { " [" }, StringSplitOptions.None)[0];
-                if (hidePrivateInstances.Value)
-                {
-                    MelonCoroutines.Start(SetInactiveCoroutine(__0.gameObject));
-                    int hiddenCount = 0;
-                    foreach (VRCUiContentButton picker in __instance.pickers)
-                        if (!picker.gameObject.active)
-                            hiddenCount++;
-                    __instance.field_Public_Text_0.text = text + $" [{hiddenCount} hidden]";
-                }
-                else
-                {
-					if (__0.field_Public_UiStatusIcon_0.field_Public_UserStatus_0 == APIUser.UserStatus.JoinMe)
-					{
-						if (showJoinablePrivateIcon.Value)
-						{
-							icon.GetComponent<Image>().sprite = openLockSprite;
-							icon.SetActive(true);
-						}
-						else icon.SetActive(false);
-					}
-					else
-					{
-						if (showPrivateIcon.Value)
-						{
-							icon.GetComponent<Image>().sprite = lockIconSprite;
-							icon.SetActive(true);
-						}
-						else icon.SetActive(false);
-					}
-                    __instance.field_Public_Text_0.text = text;
-                }
+			{
+				if (__0.field_Public_UiStatusIcon_0.field_Public_UserStatus_0 == APIUser.UserStatus.JoinMe)
+					ProcessInstanceBehavior(__instance, __0.gameObject, icon, joinablePrivateInstanceBehavior.Value, openLockSprite);
+				else ProcessInstanceBehavior(__instance, __0.gameObject, icon, privateInstanceBehavior.Value, lockIconSprite);
 			}
 			else if (user.location.Contains("~friends("))
-			{
-				if (showFriendsPlusIcon.Value)
-				{
-					icon.GetComponent<Image>().sprite = friendsSprite;
-					icon.SetActive(true);
-				}
-				else icon.SetActive(false);
-			}
+				ProcessInstanceBehavior(__instance, __0.gameObject, icon, friendsInstanceBehavior.Value, friendsSprite);
 			else if (user.location.Contains("~hidden("))
-			{
-				if (showFriendsPlusIcon.Value)
-				{
-					icon.GetComponent<Image>().sprite = friendsPlusSprite;
-					icon.SetActive(true);
-				}
-				else icon.SetActive(false);
-			}
+				ProcessInstanceBehavior(__instance, __0.gameObject, icon, friendsPlusInstanceBehavior.Value, friendsPlusSprite);
 			else if (user.location.StartsWith("wrld_"))
-			{
-				if (showPublicIcon.Value)
-				{
-					icon.GetComponent<Image>().sprite = globeSprite;
-					icon.SetActive(true);
-				}
-				else icon.SetActive(false);
-			}
+				ProcessInstanceBehavior(__instance, __0.gameObject, icon, publicInstanceBehavior.Value, friendsPlusSprite);
 			else
-			{
 				icon.SetActive(false);
-            }
         }
 
         private static IEnumerator SetInactiveCoroutine(GameObject go)
