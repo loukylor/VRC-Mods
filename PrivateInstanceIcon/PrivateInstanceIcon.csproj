@@ -26,6 +26,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Reference Include="UIExpansionKit">
+          <HintPath>$(VRChatPath)Mods\UIExpansionKit.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine.ImageConversionModule">
           <HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
         </Reference>
@@ -35,6 +38,9 @@
         <Reference Include="VRCCore-Standalone">
             <HintPath>$(VRChatPath)MelonLoader\Managed\VRCCore-Standalone.dll</HintPath>
         </Reference>
+          <Reference Include="VRChatUtilityKit">
+        <HintPath>$(VRChatPath)Mods\VRChatUtilityKit.dll</HintPath>
+    </Reference>
     </ItemGroup>
     
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">

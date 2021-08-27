@@ -10,23 +10,16 @@ using VRC.Core;
 
 [assembly: MelonInfo(typeof(PrivateInstanceIcon.PrivateInstanceIconMod), "PrivateInstanceIcon", "1.1.0", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
+[assembly: MelonOptionalDependencies("UIExpansionKit")]
 
 namespace PrivateInstanceIcon
 {
-    public enum InstanceBehavior
-    {
-        ShowIcon,
-        Default,
-        HideUsers
-    }
     public class PrivateInstanceIconMod : MelonMod
     {
         private static PropertyInfo listEnum;
         private static PropertyInfo pickerPrefabProp;
         private static Sprite lockIconSprite, openLockSprite, friendsSprite, friendsPlusSprite, globeSprite;
 
-        public static MelonPreferences_Entry<InstanceBehavior> privateInstanceBehavior, joinablePrivateInstanceBehavior, friendsInstanceBehavior, friendsPlusInstanceBehavior, publicInstanceBehavior;
-        public static MelonPreferences_Entry<bool> includeFavoritesList;
         public override void OnApplicationStart()
         {
             listEnum = typeof(UiUserList).GetProperties().First(pi => pi.Name.StartsWith("field_Public_Enum"));
@@ -42,19 +35,7 @@ namespace PrivateInstanceIcon
                 HarmonyInstance.Patch(method, postfix: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModel), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod(), finalizer: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModelErrored), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
             HarmonyInstance.Patch(typeof(UiUserList).GetMethod("Awake"), postfix: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnUiUserListAwake), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
 
-            MelonPreferences_Category category = MelonPreferences.CreateCategory("PrivateInstanceIcon Config");
-            includeFavoritesList = category.CreateEntry(nameof(includeFavoritesList), true, "Whether to include the icons and hiding in the friends favorites list.");
-
-            privateInstanceBehavior = category.CreateEntry("Private Instances", InstanceBehavior.ShowIcon,
-                                                            "How the list should behave for private instances");
-            joinablePrivateInstanceBehavior = category.CreateEntry("Joinable Private Instances", InstanceBehavior.ShowIcon,
-                                                            "How the list should behave for joinable private instances");
-            friendsInstanceBehavior = category.CreateEntry("Friends Instances", InstanceBehavior.Default,
-                                                            "How the list should behave for friends instances");
-            friendsPlusInstanceBehavior = category.CreateEntry("Friends+ Instances", InstanceBehavior.Default,
-                                                            "How the list should behave for friends+ instances");
-            publicInstanceBehavior = category.CreateEntry("Public Instances", InstanceBehavior.Default,
-                                                            "How the list should behave for public instances");
+            Config.Init();
         }
 
         private Sprite LoadSprite(string manifestString)
@@ -78,9 +59,9 @@ namespace PrivateInstanceIcon
         private static void OnUiUserListAwake(UiUserList __instance)
         {
             int enumValue = (int)listEnum.GetValue(__instance);
-            if (includeFavoritesList.Value && enumValue != 3 && enumValue != 7)
+            if (Config.IncludeFavoritesList && enumValue != 3 && enumValue != 7)
                 return;
-            else if (!includeFavoritesList.Value && enumValue != 3)
+            else if (!Config.IncludeFavoritesList && enumValue != 3)
                 return;
 
             GameObject pickerPrefab = (GameObject)pickerPrefabProp.GetValue(__instance);
@@ -128,9 +109,9 @@ namespace PrivateInstanceIcon
         private static void OnSetPickerContentFromApiModel(UiUserList __instance, VRCUiContentButton __0, Il2CppSystem.Object __1)
         {
             int enumValue = (int)listEnum.GetValue(__instance);
-            if (includeFavoritesList.Value && enumValue != 3 && enumValue != 7)
+            if (Config.IncludeFavoritesList && enumValue != 3 && enumValue != 7)
                 return;
-            else if (!includeFavoritesList.Value && enumValue != 3)
+            else if (!Config.IncludeFavoritesList && enumValue != 3)
                 return;
 
             APIUser user = __1.TryCast<APIUser>();
@@ -141,15 +122,15 @@ namespace PrivateInstanceIcon
             if (user.location == "private")
             {
                 if (__0.field_Public_UiStatusIcon_0.field_Public_UserStatus_0 == APIUser.UserStatus.JoinMe)
-                    ProcessInstanceBehavior(__instance, __0.gameObject, icon, joinablePrivateInstanceBehavior.Value, openLockSprite);
-                else ProcessInstanceBehavior(__instance, __0.gameObject, icon, privateInstanceBehavior.Value, lockIconSprite);
+                    ProcessInstanceBehavior(__instance, __0.gameObject, icon, Config.JoinablePrivateInstanceBehavior, openLockSprite);
+                else ProcessInstanceBehavior(__instance, __0.gameObject, icon, Config.PrivateInstanceBehavior, lockIconSprite);
             }
             else if (user.location.Contains("~friends("))
-                ProcessInstanceBehavior(__instance, __0.gameObject, icon, friendsInstanceBehavior.Value, friendsSprite);
+                ProcessInstanceBehavior(__instance, __0.gameObject, icon, Config.FriendsInstanceBehavior, friendsSprite);
             else if (user.location.Contains("~hidden("))
-                ProcessInstanceBehavior(__instance, __0.gameObject, icon, friendsPlusInstanceBehavior.Value, friendsPlusSprite);
+                ProcessInstanceBehavior(__instance, __0.gameObject, icon, Config.FriendsPlusInstanceBehavior, friendsPlusSprite);
             else if (user.location.StartsWith("wrld_"))
-                ProcessInstanceBehavior(__instance, __0.gameObject, icon, publicInstanceBehavior.Value, globeSprite);
+                ProcessInstanceBehavior(__instance, __0.gameObject, icon, Config.PublicInstanceBehavior, globeSprite);
             else
                 icon.SetActive(false);
         }
