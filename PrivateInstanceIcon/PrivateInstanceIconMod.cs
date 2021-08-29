@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -18,6 +18,8 @@ namespace PrivateInstanceIcon
         private static PropertyInfo listEnum;
         private static PropertyInfo pickerPrefabProp;
         private static Sprite iconSprite;
+
+        private static readonly Dictionary<int, string> listTitleTable = new Dictionary<int, string>();
 
         public static MelonPreferences_Entry<bool> excludeJoinMe;
         public static MelonPreferences_Entry<bool> hidePrivateInstances;
@@ -42,21 +44,57 @@ namespace PrivateInstanceIcon
             iconSprite.hideFlags = HideFlags.DontUnloadUnusedAsset;
 
             foreach (MethodInfo method in typeof(UiUserList).GetMethods().Where(mi => mi.Name.StartsWith("Method_Protected_Virtual_Void_VRCUiContentButton_Object_")))
-                HarmonyInstance.Patch(method, postfix: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModel), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod(), finalizer: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModelErrored), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
+                HarmonyInstance.Patch(method, postfix: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModel), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());//, finalizer: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModelErrored), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
             HarmonyInstance.Patch(typeof(UiUserList).GetMethod("Awake"), postfix: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnUiUserListAwake), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
+
+            HarmonyInstance.Patch(typeof(UiUserList).GetMethods().First(mb => mb.Name.StartsWith("Method_Private_IEnumerator_List_1_APIUser_Int32_Boolean_")), typeof(PrivateInstanceIconMod).GetMethod(nameof(OnRenderList), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
 
             MelonPreferences_Category category = MelonPreferences.CreateCategory("PrivateInstanceIcon Config");
             excludeJoinMe = category.CreateEntry(nameof(excludeJoinMe), true, "Whether to hide the icon when people are on join me, and in private instances.");
             hidePrivateInstances = category.CreateEntry(nameof(hidePrivateInstances), false, "Whether to just not show people who are in private instances.");
             includeFavoritesList = category.CreateEntry(nameof(includeFavoritesList), true, "Whether to include the icon and hiding in the friends favorites list.");
+            includeFavoritesList = category.CreateEntry(nameof(includeFavoritesList), true, "Whether to include the icon and hiding in the friends favorites list.");
+        }
+
+        private static void OnRenderList(UiUserList __instance, Il2CppSystem.Collections.Generic.List<APIUser> __0)
+        {
+            if (!ShouldAdjustList(__instance))
+                return;
+
+            if (!hidePrivateInstances.Value)
+                return;
+
+            int hiddenCount = 0;
+            for (int i = __0.Count - 1; i >= 0; i--)
+            {
+                if (ShouldAdjustUser(__0[i]))
+                {
+                    hiddenCount++;
+                    __0.RemoveAt(i);
+                }
+            }
+
+            string text = __instance.field_Public_Text_0.text;
+            string hiddenText = $" [{hiddenCount} hidden]";
+
+            if (!listTitleTable.TryGetValue(__instance.GetInstanceID(), out string pastText))
+            {
+                listTitleTable.Add(__instance.GetInstanceID(), hiddenText);
+            }
+            else
+            {
+                int indexOfLastText = text.LastIndexOf(pastText);
+                if (indexOfLastText != -1)
+                    text = text.Remove(indexOfLastText, pastText.Length);
+            }
+
+            __instance.field_Public_Text_0.text = text + hiddenText;
+            listTitleTable[__instance.GetInstanceID()] = hiddenText;
         }
 
         private static void OnUiUserListAwake(UiUserList __instance)
         {
-            int enumValue = (int)listEnum.GetValue(__instance);
-            if (includeFavoritesList.Value && enumValue != 3 && enumValue != 7)
-                return;
-            else if (!includeFavoritesList.Value && enumValue != 3)
+            if (!ShouldAdjustList(__instance))
                 return;
 
             GameObject pickerPrefab = (GameObject)pickerPrefabProp.GetValue(__instance);
@@ -81,10 +119,7 @@ namespace PrivateInstanceIcon
 
         private static void OnSetPickerContentFromApiModel(UiUserList __instance, VRCUiContentButton __0, Il2CppSystem.Object __1)
         {
-            int enumValue = (int)listEnum.GetValue(__instance);
-            if (includeFavoritesList.Value && enumValue != 3 && enumValue != 7)
-                return;
-            else if (!includeFavoritesList.Value && enumValue != 3)
+            if (!ShouldAdjustList(__instance))
                 return;
 
             APIUser user = __1.TryCast<APIUser>();
@@ -92,46 +127,21 @@ namespace PrivateInstanceIcon
                 return;
 
             GameObject icon = __0.field_Public_VRCUiDynamicOverlayIcons_0.field_Public_ArrayOf_GameObject_0.First(gameObject => gameObject.name == "PrivateInstanceIcon");
-            if (user.location == "private" && !(excludeJoinMe.Value && __0.field_Public_UiStatusIcon_0.field_Public_UserStatus_0 == APIUser.UserStatus.JoinMe))
-            {
-                string text = __instance.field_Public_Text_0.text;
-                text = text.Split(new string[] { " [" }, StringSplitOptions.None)[0];
-                if (hidePrivateInstances.Value)
-                {
-                    MelonCoroutines.Start(SetInactiveCoroutine(__0.gameObject));
-                    int hiddenCount = 0;
-                    foreach (VRCUiContentButton picker in __instance.pickers)
-                        if (!picker.gameObject.active)
-                            hiddenCount++;
-                    __instance.field_Public_Text_0.text = text + $" [{hiddenCount} hidden]";
-                }
-                else
-                {
-                    icon.SetActive(true);
-                    __instance.field_Public_Text_0.text = text;
-                }
-            }
+            if (ShouldAdjustUser(user))
+                icon.SetActive(true);
             else
-            { 
                 icon.SetActive(false);
-            }
         }
 
-        private static IEnumerator SetInactiveCoroutine(GameObject go)
+        private static bool ShouldAdjustUser(APIUser user) => user.location == "private" && !(excludeJoinMe.Value && user.statusValue == APIUser.UserStatus.JoinMe);
+        private static bool ShouldAdjustList(UiUserList list)
         {
-            // This was necessary. fuck you unity
-            go.SetActive(false);
-            yield return null;
-            go.SetActive(false);
-        }
-
-        private static Exception OnSetPickerContentFromApiModelErrored(Exception __exception)
-        {
-            // There's actually no better way to do this https://github.com/knah/Il2CppAssemblyUnhollower/blob/master/UnhollowerBaseLib/Il2CppException.cs
-            if (__exception is NullReferenceException || __exception.Message.Contains("System.NullReferenceException"))
-                return null;
-            else
-                return __exception;
+            int enumValue = (int)listEnum.GetValue(list);
+            if (includeFavoritesList.Value && enumValue != 3 && enumValue != 7)
+                return false;
+            else if (!includeFavoritesList.Value && enumValue != 3)
+                return false;
+            return true;
         }
     }
 }
