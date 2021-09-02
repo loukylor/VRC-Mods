@@ -10,8 +10,8 @@
 	</PropertyGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="move &quot;bin\Release\net472\VRChatUtilityKit.dll&quot; &quot;$(VRChatPath)Mods&quot;" />
-		<Exec Command="move &quot;bin\Release\net472\VRChatUtilityKit.xml&quot; &quot;$(VRChatPath)Mods&quot;" />
+		<Copy SourceFiles="$(OutDir)VRChatUtilityKit.dll" DestinationFolder="$(VRChatPath)Mods" />
+		<Copy SourceFiles="$(ProjectDir)VRChatUtilityKit.xml" DestinationFolder="$(VRChatPath)Mods" />
 	</Target>
 
 	<ItemGroup>

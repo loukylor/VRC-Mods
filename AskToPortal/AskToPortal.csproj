@@ -3,9 +3,6 @@
   <PropertyGroup>
     <AssemblyName>AskToPortal</AssemblyName>
     <RootNamespace>AskToPortal</RootNamespace>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
@@ -38,7 +35,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="move &quot;bin\Release\net472\AskToPortal.dll&quot; &quot;$(VRChatPath)Mods&quot;" />
+    <Copy SourceFiles="$(OutDir)AskToPortal.dll" DestinationFolder="$(VRChatPath)Mods" />
   </Target>
   
 </Project>
