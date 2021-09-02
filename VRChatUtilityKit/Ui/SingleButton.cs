@@ -15,6 +15,16 @@ namespace VRChatUtilityKit.Ui
         {
             ButtonComponent = gameObject.GetComponent<Button>();
             ButtonComponent.onClick.AddListener(onClick);
+            ButtonComponent.colors = new ColorBlock()
+            {
+                colorMultiplier = ButtonComponent.colors.colorMultiplier,
+                fadeDuration = ButtonComponent.colors.fadeDuration,
+                disabledColor = ButtonComponent.colors.disabledColor,
+                highlightedColor = ButtonComponent.colors.highlightedColor,
+                normalColor = ButtonComponent.colors.normalColor,
+                pressedColor = ButtonComponent.colors.pressedColor,
+                selectedColor = ButtonComponent.colors.normalColor
+            };
             TooltipComponent = gameObject.GetComponent<UiTooltip>();
             TooltipComponent.field_Public_String_0 = tooltip;
             TooltipComponent.field_Public_String_1 = tooltip;

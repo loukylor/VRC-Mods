@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -8,7 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using VRC.Core;
 
-[assembly: MelonInfo(typeof(PrivateInstanceIcon.PrivateInstanceIconMod), "PrivateInstanceIcon", "1.1.0", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(PrivateInstanceIcon.PrivateInstanceIconMod), "PrivateInstanceIcon", "1.1.1", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 [assembly: MelonOptionalDependencies("UIExpansionKit")]
 
@@ -19,6 +18,7 @@ namespace PrivateInstanceIcon
         private static PropertyInfo listEnum;
         private static PropertyInfo pickerPrefabProp;
         private static Sprite lockIconSprite, openLockSprite, friendsSprite, friendsPlusSprite, globeSprite;
+        private static readonly Dictionary<int, string> listTitleTable = new Dictionary<int, string>();
 
         public override void OnApplicationStart()
         {
@@ -32,8 +32,10 @@ namespace PrivateInstanceIcon
             globeSprite = LoadSprite("PrivateInstanceIcon.globe.png");
 
             foreach (MethodInfo method in typeof(UiUserList).GetMethods().Where(mi => mi.Name.StartsWith("Method_Protected_Virtual_Void_VRCUiContentButton_Object_")))
-                HarmonyInstance.Patch(method, postfix: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModel), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod(), finalizer: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModelErrored), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
+                HarmonyInstance.Patch(method, postfix: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModel), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());//, finalizer: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModelErrored), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
             HarmonyInstance.Patch(typeof(UiUserList).GetMethod("Awake"), postfix: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnUiUserListAwake), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
+
+            HarmonyInstance.Patch(typeof(UiUserList).GetMethods().First(mb => mb.Name.StartsWith("Method_Private_IEnumerator_List_1_APIUser_Int32_Boolean_")), typeof(PrivateInstanceIconMod).GetMethod(nameof(OnRenderList), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
 
             Config.Init();
         }
@@ -56,12 +58,42 @@ namespace PrivateInstanceIcon
             return sprite;
         }
 
+        private static void OnRenderList(UiUserList __instance, Il2CppSystem.Collections.Generic.List<APIUser> __0)
+        {
+            if (!ShouldAdjustList(__instance))
+                return;
+
+            int hiddenCount = 0;
+            for (int i = __0.Count - 1; i >= 0; i--)
+            {
+                if (ShouldHideUser(__0[i]))
+                {
+                    hiddenCount++;
+                    __0.RemoveAt(i);
+                }
+            }
+
+            string text = __instance.field_Public_Text_0.text;
+            string hiddenText = $" [{hiddenCount} hidden]";
+
+            if (!listTitleTable.TryGetValue(__instance.GetInstanceID(), out string pastText))
+            {
+                listTitleTable.Add(__instance.GetInstanceID(), hiddenText);
+            }
+            else
+            {
+                int indexOfLastText = text.LastIndexOf(pastText);
+                if (indexOfLastText != -1)
+                    text = text.Remove(indexOfLastText, pastText.Length);
+            }
+
+            __instance.field_Public_Text_0.text = text + hiddenText;
+            listTitleTable[__instance.GetInstanceID()] = hiddenText;
+        }
+
         private static void OnUiUserListAwake(UiUserList __instance)
         {
-            int enumValue = (int)listEnum.GetValue(__instance);
-            if (Config.IncludeFavoritesList && enumValue != 3 && enumValue != 7)
-                return;
-            else if (!Config.IncludeFavoritesList && enumValue != 3)
+            if (!ShouldAdjustList(__instance))
                 return;
 
             GameObject pickerPrefab = (GameObject)pickerPrefabProp.GetValue(__instance);
@@ -83,35 +115,9 @@ namespace PrivateInstanceIcon
             picker.field_Public_VRCUiDynamicOverlayIcons_0.field_Public_ArrayOf_GameObject_0 = newArr;
         }
 
-        private static void ProcessInstanceBehavior(UiUserList userList, GameObject userButton, GameObject icon, InstanceBehavior state, Sprite sprite)
-        {
-            string text = userList.field_Public_Text_0.text;
-            text = text.Split(new string[] { " [" }, StringSplitOptions.None)[0];
-            if (state == InstanceBehavior.HideUsers)
-            {
-                MelonCoroutines.Start(SetInactiveCoroutine(userButton));
-                int hiddenCount = 0;
-                foreach (VRCUiContentButton picker in userList.pickers)
-                    if (!picker.gameObject.active)
-                        hiddenCount++;
-                userList.field_Public_Text_0.text = text + $" [{hiddenCount} hidden]";
-            }
-            else if (state == InstanceBehavior.ShowIcon)
-            {
-                icon.GetComponent<Image>().sprite = sprite;
-                icon.SetActive(true);
-            }
-            else icon.SetActive(false);
-
-            userList.field_Public_Text_0.text = text;
-        }
-
         private static void OnSetPickerContentFromApiModel(UiUserList __instance, VRCUiContentButton __0, Il2CppSystem.Object __1)
         {
-            int enumValue = (int)listEnum.GetValue(__instance);
-            if (Config.IncludeFavoritesList && enumValue != 3 && enumValue != 7)
-                return;
-            else if (!Config.IncludeFavoritesList && enumValue != 3)
+            if (!ShouldAdjustList(__instance))
                 return;
 
             APIUser user = __1.TryCast<APIUser>();
@@ -119,37 +125,55 @@ namespace PrivateInstanceIcon
                 return;
 
             GameObject icon = __0.field_Public_VRCUiDynamicOverlayIcons_0.field_Public_ArrayOf_GameObject_0.First(gameObject => gameObject.name == "PrivateInstanceIcon");
-            if (user.location == "private")
+
+            if (UserInstanceSprite(user) is Sprite sprite)
             {
-                if (__0.field_Public_UiStatusIcon_0.field_Public_UserStatus_0 == APIUser.UserStatus.JoinMe)
-                    ProcessInstanceBehavior(__instance, __0.gameObject, icon, Config.JoinablePrivateInstanceBehavior, openLockSprite);
-                else ProcessInstanceBehavior(__instance, __0.gameObject, icon, Config.PrivateInstanceBehavior, lockIconSprite);
+                icon.GetComponent<Image>().sprite = sprite;
+                icon.SetActive(true);
             }
-            else if (user.location.Contains("~friends("))
-                ProcessInstanceBehavior(__instance, __0.gameObject, icon, Config.FriendsInstanceBehavior, friendsSprite);
-            else if (user.location.Contains("~hidden("))
-                ProcessInstanceBehavior(__instance, __0.gameObject, icon, Config.FriendsPlusInstanceBehavior, friendsPlusSprite);
-            else if (user.location.StartsWith("wrld_"))
-                ProcessInstanceBehavior(__instance, __0.gameObject, icon, Config.PublicInstanceBehavior, globeSprite);
             else
                 icon.SetActive(false);
         }
 
-        private static IEnumerator SetInactiveCoroutine(GameObject go)
+        private static bool ShouldHideUser(APIUser user)
         {
-            // This was necessary. fuck you unity
-            go.SetActive(false);
-            yield return null;
-            go.SetActive(false);
+            // user.location == "private" && !(excludeJoinMe.Value && user.statusValue == APIUser.UserStatus.JoinMe);
+            if (user.location == "private")
+            {
+                if (user.statusValue == APIUser.UserStatus.JoinMe) return Config.JoinablePrivateInstanceBehavior == InstanceBehavior.HideUsers;
+                else return Config.PrivateInstanceBehavior == InstanceBehavior.HideUsers;
+            }
+            else if (user.location.Contains("~friends(")) return Config.FriendsInstanceBehavior == InstanceBehavior.HideUsers;
+            else if (user.location.Contains("~hidden(")) return Config.FriendsPlusInstanceBehavior == InstanceBehavior.HideUsers;
+            else if (user.location.StartsWith("wrld_")) return Config.PublicInstanceBehavior == InstanceBehavior.HideUsers;
+
+            // For offline users for example, or any other unknown states.
+            return false;
         }
 
-        private static Exception OnSetPickerContentFromApiModelErrored(Exception __exception)
+        /// <summary>
+        /// Returns a sprite if it should be shown for the user.
+        /// </summary>
+        /// <returns>The sprite to show, or null if shouldn't be shown.</returns>
+        private static Sprite UserInstanceSprite(APIUser user)
         {
-            // There's actually no better way to do this https://github.com/knah/Il2CppAssemblyUnhollower/blob/master/UnhollowerBaseLib/Il2CppException.cs
-            if (__exception is NullReferenceException || __exception.Message.Contains("System.NullReferenceException"))
-                return null;
-            else
-                return __exception;
+            if (user.location == "private" && user.statusValue == APIUser.UserStatus.JoinMe && Config.JoinablePrivateInstanceBehavior == InstanceBehavior.ShowIcon) return openLockSprite;
+            if (user.location == "private" && user.statusValue != APIUser.UserStatus.JoinMe && Config.PrivateInstanceBehavior == InstanceBehavior.ShowIcon) return lockIconSprite;
+            else if (Config.FriendsInstanceBehavior == InstanceBehavior.ShowIcon && user.location.Contains("~friends(")) return friendsSprite;
+            else if (Config.FriendsPlusInstanceBehavior == InstanceBehavior.ShowIcon && user.location.Contains("~hidden(")) return friendsPlusSprite;
+            else if (Config.PublicInstanceBehavior == InstanceBehavior.ShowIcon && user.location.StartsWith("wrld_")) return globeSprite;
+
+            return null;
+        }
+
+        private static bool ShouldAdjustList(UiUserList list)
+        {
+            int enumValue = (int)listEnum.GetValue(list);
+            if (Config.IncludeFavoritesList && enumValue != 3 && enumValue != 7)
+                return false;
+            else if (!Config.IncludeFavoritesList && enumValue != 3)
+                return false;
+            return true;
         }
     }
 }
