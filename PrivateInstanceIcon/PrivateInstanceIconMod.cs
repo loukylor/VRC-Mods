@@ -157,11 +157,23 @@ namespace PrivateInstanceIcon
         /// <returns>The sprite to show, or null if shouldn't be shown.</returns>
         private static Sprite UserInstanceSprite(APIUser user)
         {
-            if (user.location == "private" && user.statusValue == APIUser.UserStatus.JoinMe && Config.JoinablePrivateInstanceBehavior == InstanceBehavior.ShowIcon) return openLockSprite;
-            if (user.location == "private" && user.statusValue != APIUser.UserStatus.JoinMe && Config.PrivateInstanceBehavior == InstanceBehavior.ShowIcon) return lockIconSprite;
-            else if (Config.FriendsInstanceBehavior == InstanceBehavior.ShowIcon && user.location.Contains("~friends(")) return friendsSprite;
-            else if (Config.FriendsPlusInstanceBehavior == InstanceBehavior.ShowIcon && user.location.Contains("~hidden(")) return friendsPlusSprite;
-            else if (Config.PublicInstanceBehavior == InstanceBehavior.ShowIcon && user.location.StartsWith("wrld_")) return globeSprite;
+            if (user.location == "private")
+            {
+                if (user.statusValue == APIUser.UserStatus.JoinMe && Config.JoinablePrivateInstanceBehavior == InstanceBehavior.ShowIcon) return openLockSprite;
+                else if (user.statusValue != APIUser.UserStatus.JoinMe && Config.PrivateInstanceBehavior == InstanceBehavior.ShowIcon) return lockIconSprite;
+            }
+            else if (user.location.Contains("~friends("))
+            {
+                if (Config.FriendsInstanceBehavior == InstanceBehavior.ShowIcon) return friendsSprite;
+            }
+            else if (user.location.Contains("~hidden("))
+            {
+                if (Config.FriendsPlusInstanceBehavior == InstanceBehavior.ShowIcon) return friendsPlusSprite;
+            }
+            else if (user.location.StartsWith("wrld_"))
+            {
+                if (Config.PublicInstanceBehavior == InstanceBehavior.ShowIcon) return globeSprite;
+            }
 
             return null;
         }
