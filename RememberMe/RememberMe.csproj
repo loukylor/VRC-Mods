@@ -22,7 +22,7 @@
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="move &quot;bin\Release\net472\RememberMe.dll&quot; &quot;$(VRChatPath)Mods&quot;" />
+		<Copy SourceFiles="$(OutDir)RememberMe.dll" DestinationFolder="$(VRChatPath)Mods" />
 	</Target>
 
 </Project>

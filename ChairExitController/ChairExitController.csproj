@@ -14,7 +14,7 @@
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="move &quot;bin\Release\net472\ChairExitController.dll&quot; &quot;$(VRChatPath)Mods&quot;" />
+		<Copy SourceFiles="$(OutDir)ChairExitController.dll" DestinationFolder="$(VRChatPath)Mods" />
 	</Target>
 
 </Project>
