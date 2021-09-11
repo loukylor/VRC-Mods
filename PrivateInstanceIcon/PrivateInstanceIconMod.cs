@@ -59,22 +59,12 @@ namespace PrivateInstanceIcon
             return sprite;
         }
 
-        private static void Print(MethodInfo __originalMethod)
-        {
-            System.Console.WriteLine(__originalMethod.DeclaringType.FullName);
-            System.Console.WriteLine(__originalMethod.Name);
-            System.Console.WriteLine("");
-        }
-
         private static void OnRenderList(UiUserList __instance, Il2CppSystem.Collections.Generic.List<APIUser> __0)
         {
             if (__0.Count == 0)
                 return;
 
-            if (!ShouldAdjustList(__instance))
-                return;
-
-            if (!hidePrivateInstances.Value)
+            if (!Config.isAnyTypeHidden || !ShouldAdjustList(__instance))
             {
                 if (listTitleTable.TryGetValue(__instance.GetInstanceID(), out string pastText))
                 {
@@ -90,17 +80,22 @@ namespace PrivateInstanceIcon
             else
             {
                 int hiddenCount = 0;
+                int shownCount = 0;
                 for (int i = __0.Count - 1; i >= 0; i--)
                 {
-                    if (ShouldAdjustUser(__0[i]))
+                    if (ShouldHideUser(__0[i]))
                     {
                         hiddenCount++;
                         __0.RemoveAt(i);
                     }
+                    else
+                    {
+                        shownCount++;
+                    }
                 }
 
                 string text = __instance.field_Public_Text_0.text;
-                string hiddenText = $" [{hiddenCount} hidden]";
+                string hiddenText = $" [{hiddenCount} hidden, {shownCount} shown]";
 
                 if (!listTitleTable.TryGetValue(__instance.GetInstanceID(), out string pastText))
                 {
@@ -152,7 +147,6 @@ namespace PrivateInstanceIcon
                     GameObject icon = GameObject.Instantiate(__0.transform.Find("Icons/OverlayIcons/iconUserOnPC").gameObject);
                     icon.name = "PrivateInstanceIcon";
                     icon.transform.SetParent(__0.transform.Find("Icons/OverlayIcons"));
-                    icon.GetComponent<Image>().sprite = iconSprite;
                     icon.SetActive(false);
                     icon.hideFlags |= HideFlags.DontUnloadUnusedAsset;
                     __0.field_Public_VRCUiDynamicOverlayIcons_0.field_Public_ArrayOf_GameObject_0[i] = icon;

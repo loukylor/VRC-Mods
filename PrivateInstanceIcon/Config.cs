@@ -51,16 +51,32 @@ namespace PrivateInstanceIcon
         protected static MelonPreferences_Entry<string> privateInstanceBehavior, joinablePrivateInstanceBehavior, friendsInstanceBehavior, friendsPlusInstanceBehavior, publicInstanceBehavior;
         protected static MelonPreferences_Entry<bool> includeFavoritesList;
 
+        public static bool isAnyTypeHidden;
+
         public static void Init()
         {
             category = MelonPreferences.CreateCategory(categoryName);
             includeFavoritesList = category.CreateEntry(nameof(includeFavoritesList), true, "Whether to include the icons and hiding in the friends favorites list.");
 
             privateInstanceBehavior = CreateInstanceBehaviourMapping("Private", InstanceBehavior.ShowIcon);
-            joinablePrivateInstanceBehavior = CreateInstanceBehaviourMapping("Joinable Private", InstanceBehavior.ShowIcon);
+            joinablePrivateInstanceBehavior = CreateInstanceBehaviourMapping("Joinable Private", InstanceBehavior.Default);
             friendsInstanceBehavior = CreateInstanceBehaviourMapping("Friends", InstanceBehavior.Default);
             friendsPlusInstanceBehavior = CreateInstanceBehaviourMapping("Friends+", InstanceBehavior.Default);
             publicInstanceBehavior = CreateInstanceBehaviourMapping("Public", InstanceBehavior.Default);
+
+            OnBehaviorChange();
+            foreach (MelonPreferences_Entry entry in category.Entries)
+                if (entry is MelonPreferences_Entry<string> behavior)
+                    behavior.OnValueChangedUntyped += OnBehaviorChange;
+        }
+
+        private static void OnBehaviorChange()
+        {
+            isAnyTypeHidden = PrivateInstanceBehavior == InstanceBehavior.HideUsers
+                || JoinablePrivateInstanceBehavior == InstanceBehavior.HideUsers
+                || FriendsInstanceBehavior == InstanceBehavior.HideUsers
+                || FriendsPlusInstanceBehavior == InstanceBehavior.HideUsers
+                || PublicInstanceBehavior == InstanceBehavior.HideUsers;
         }
 
         internal static MelonPreferences_Entry<string> CreateInstanceBehaviourMapping(string instanceTypeName, InstanceBehavior defaultVal)
