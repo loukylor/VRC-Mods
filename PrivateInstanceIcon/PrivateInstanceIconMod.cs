@@ -9,6 +9,7 @@ using VRC.Core;
 
 [assembly: MelonInfo(typeof(PrivateInstanceIcon.PrivateInstanceIconMod), "PrivateInstanceIcon", "1.1.1", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
+[assembly: MelonOptionalDependencies("UIExpansionKit")]
 
 namespace PrivateInstanceIcon
 {
@@ -16,31 +17,19 @@ namespace PrivateInstanceIcon
     {
         private static PropertyInfo listEnum;
         private static PropertyInfo pickerPrefabProp;
-        private static Sprite iconSprite;
-
+        private static Sprite lockIconSprite, openLockSprite, friendsSprite, friendsPlusSprite, globeSprite;
         private static readonly Dictionary<int, string> listTitleTable = new Dictionary<int, string>();
 
-        public static MelonPreferences_Entry<bool> excludeJoinMe;
-        public static MelonPreferences_Entry<bool> hidePrivateInstances;
-        public static MelonPreferences_Entry<bool> includeFavoritesList;
         public override void OnApplicationStart()
         {
             listEnum = typeof(UiUserList).GetProperties().First(pi => pi.Name.StartsWith("field_Public_Enum"));
             pickerPrefabProp = typeof(UiUserList).GetProperties().First(pi => pi.PropertyType == typeof(GameObject));
 
-            Texture2D iconTex = new Texture2D(2, 2);
-            using (Stream iconStream = Assembly.GetManifestResourceStream("PrivateInstanceIcon.icon.png"))
-            {
-                var buffer = new byte[iconStream.Length];
-                iconStream.Read(buffer, 0, buffer.Length);
-                ImageConversion.LoadImage(iconTex, buffer);
-            }
-
-            Rect rect = new Rect(0, 0, iconTex.width, iconTex.height);
-            Vector2 pivot = new Vector2(0.5f, 0.5f);
-            Vector4 border = Vector4.zero;
-            iconSprite = Sprite.CreateSprite_Injected(iconTex, ref rect, ref pivot, 50, 0, SpriteMeshType.Tight, ref border, false);
-            iconSprite.hideFlags = HideFlags.DontUnloadUnusedAsset;
+            lockIconSprite = LoadSprite("PrivateInstanceIcon.lock.png");
+            openLockSprite = LoadSprite("PrivateInstanceIcon.lock-open.png");
+            friendsSprite = LoadSprite("PrivateInstanceIcon.friend.png");
+            friendsPlusSprite = LoadSprite("PrivateInstanceIcon.friends.png");
+            globeSprite = LoadSprite("PrivateInstanceIcon.globe.png");
 
             foreach (MethodInfo method in typeof(UiUserList).GetMethods().Where(mi => mi.Name.StartsWith("Method_Protected_Virtual_Void_VRCUiContentButton_Object_")))
                 HarmonyInstance.Patch(method, typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModelPrefix), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod(), typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModel), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());//, finalizer: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModelErrored), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
@@ -49,10 +38,25 @@ namespace PrivateInstanceIcon
             foreach (MethodInfo method in typeof(UiUserList).GetMethods().Where(mb => mb.Name.StartsWith("Method_Private_IEnumerator_List_1_APIUser_Int32_Boolean_")))
                 HarmonyInstance.Patch(method, typeof(PrivateInstanceIconMod).GetMethod(nameof(OnRenderList), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
 
-            MelonPreferences_Category category = MelonPreferences.CreateCategory("PrivateInstanceIcon Config");
-            excludeJoinMe = category.CreateEntry(nameof(excludeJoinMe), true, "Whether to hide the icon when people are on join me, and in private instances.");
-            hidePrivateInstances = category.CreateEntry(nameof(hidePrivateInstances), false, "Whether to just not show people who are in private instances.");
-            includeFavoritesList = category.CreateEntry(nameof(includeFavoritesList), true, "Whether to include the icon and hiding in the friends favorites list.");
+            Config.Init();
+        }
+
+        private Sprite LoadSprite(string manifestString)
+        {
+            Texture2D texture = new Texture2D(2, 2);
+            using (Stream iconStream = Assembly.GetManifestResourceStream(manifestString))
+            {
+                var buffer = new byte[iconStream.Length];
+                iconStream.Read(buffer, 0, buffer.Length);
+                ImageConversion.LoadImage(texture, buffer);
+            }
+
+            Rect rect = new Rect(0, 0, texture.width, texture.height);
+            Vector2 pivot = new Vector2(0.5f, 0.5f);
+            Vector4 border = Vector4.zero;
+            Sprite sprite = Sprite.CreateSprite_Injected(texture, ref rect, ref pivot, 50, 0, SpriteMeshType.Tight, ref border, false);
+            sprite.hideFlags = HideFlags.DontUnloadUnusedAsset;
+            return sprite;
         }
 
         private static void Print(MethodInfo __originalMethod)
@@ -131,7 +135,6 @@ namespace PrivateInstanceIcon
             GameObject icon = GameObject.Instantiate(picker.transform.Find("Icons/OverlayIcons/iconUserOnPC").gameObject);
             icon.name = "PrivateInstanceIcon";
             icon.transform.SetParent(picker.transform.Find("Icons/OverlayIcons"));
-            icon.GetComponent<Image>().sprite = iconSprite;
             icon.SetActive(false);
 
             newArr[newArr.Length - 1] = icon;
@@ -168,19 +171,65 @@ namespace PrivateInstanceIcon
                 return;
 
             GameObject icon = __0.field_Public_VRCUiDynamicOverlayIcons_0.field_Public_ArrayOf_GameObject_0.First(gameObject => gameObject.name == "PrivateInstanceIcon");
-            if (ShouldAdjustUser(user))
+
+            if (UserInstanceSprite(user) is Sprite sprite)
+            {
+                icon.GetComponent<Image>().sprite = sprite;
                 icon.SetActive(true);
+            }
             else
                 icon.SetActive(false);
         }
 
-        private static bool ShouldAdjustUser(APIUser user) => user.location == "private" && !(excludeJoinMe.Value && user.statusValue == APIUser.UserStatus.JoinMe);
+        private static bool ShouldHideUser(APIUser user)
+        {
+            // user.location == "private" && !(excludeJoinMe.Value && user.statusValue == APIUser.UserStatus.JoinMe);
+            if (user.location == "private")
+            {
+                if (user.statusValue == APIUser.UserStatus.JoinMe) return Config.JoinablePrivateInstanceBehavior == InstanceBehavior.HideUsers;
+                else return Config.PrivateInstanceBehavior == InstanceBehavior.HideUsers;
+            }
+            else if (user.location.Contains("~friends(")) return Config.FriendsInstanceBehavior == InstanceBehavior.HideUsers;
+            else if (user.location.Contains("~hidden(")) return Config.FriendsPlusInstanceBehavior == InstanceBehavior.HideUsers;
+            else if (user.location.StartsWith("wrld_")) return Config.PublicInstanceBehavior == InstanceBehavior.HideUsers;
+
+            // For offline users for example, or any other unknown states.
+            return false;
+        }
+
+        /// <summary>
+        /// Returns a sprite if it should be shown for the user.
+        /// </summary>
+        /// <returns>The sprite to show, or null if shouldn't be shown.</returns>
+        private static Sprite UserInstanceSprite(APIUser user)
+        {
+            if (user.location == "private")
+            {
+                if (user.statusValue == APIUser.UserStatus.JoinMe && Config.JoinablePrivateInstanceBehavior == InstanceBehavior.ShowIcon) return openLockSprite;
+                else if (user.statusValue != APIUser.UserStatus.JoinMe && Config.PrivateInstanceBehavior == InstanceBehavior.ShowIcon) return lockIconSprite;
+            }
+            else if (user.location.Contains("~friends("))
+            {
+                if (Config.FriendsInstanceBehavior == InstanceBehavior.ShowIcon) return friendsSprite;
+            }
+            else if (user.location.Contains("~hidden("))
+            {
+                if (Config.FriendsPlusInstanceBehavior == InstanceBehavior.ShowIcon) return friendsPlusSprite;
+            }
+            else if (user.location.StartsWith("wrld_"))
+            {
+                if (Config.PublicInstanceBehavior == InstanceBehavior.ShowIcon) return globeSprite;
+            }
+
+            return null;
+        }
+
         private static bool ShouldAdjustList(UiUserList list)
         {
             int enumValue = (int)listEnum.GetValue(list);
-            if (includeFavoritesList.Value && enumValue != 3 && enumValue != 7)
+            if (Config.IncludeFavoritesList && enumValue != 3 && enumValue != 7)
                 return false;
-            else if (!includeFavoritesList.Value && enumValue != 3)
+            else if (!Config.IncludeFavoritesList && enumValue != 3)
                 return false;
             return true;
         }

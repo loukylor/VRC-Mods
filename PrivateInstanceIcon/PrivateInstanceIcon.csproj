@@ -1,38 +1,48 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<AssemblyName>PrivateInstanceIcon</AssemblyName>
-		<RootNamespace>PrivateInstanceIcon</RootNamespace>
-	</PropertyGroup>
+    <PropertyGroup>
+        <AssemblyName>PrivateInstanceIcon</AssemblyName>
+        <RootNamespace>PrivateInstanceIcon</RootNamespace>
+    </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<OutputPath></OutputPath>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	</PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <OutputPath></OutputPath>
+    </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	</PropertyGroup>
 
-	<ItemGroup>
-	  <None Remove="icon.png" />
-	</ItemGroup>
+    <ItemGroup>
+      <None Remove="lock.png" />
+        <None Remove="lock-open.png" />
+        <None Remove="friend.png" />
+        <None Remove="friends.png" />
+        <None Remove="globe.png" />
+    </ItemGroup>
 
-	<ItemGroup>
-	  <EmbeddedResource Include="icon.png" />
-	</ItemGroup>
+    <ItemGroup>
+      <EmbeddedResource Include="lock.png" />
+        <EmbeddedResource Include="lock-open.png" />
+        <EmbeddedResource Include="friend.png" />
+        <EmbeddedResource Include="friends.png" />
+        <EmbeddedResource Include="globe.png" />
+    </ItemGroup>
 
-	<ItemGroup>
-		<Reference Include="UnityEngine.ImageConversionModule">
-		  <HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
-		</Reference>
-		<Reference Include="UnityEngine.UI">
-		  <HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.UI.dll</HintPath>
-		</Reference>
-		<Reference Include="VRCCore-Standalone">
-			<HintPath>$(VRChatPath)MelonLoader\Managed\VRCCore-Standalone.dll</HintPath>
-		</Reference>
-	</ItemGroup>
+    <ItemGroup>
+        <Reference Include="UIExpansionKit">
+          <HintPath>$(VRChatPath)Mods\UIExpansionKit.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.ImageConversionModule">
+          <HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.UI">
+          <HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.UI.dll</HintPath>
+        </Reference>
+        <Reference Include="VRCCore-Standalone">
+            <HintPath>$(VRChatPath)MelonLoader\Managed\VRCCore-Standalone.dll</HintPath>
+        </Reference>
+          <Reference Include="VRChatUtilityKit">
+        <HintPath>$(VRChatPath)Mods\VRChatUtilityKit.dll</HintPath>
+    </Reference>
+    </ItemGroup>
 	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Copy SourceFiles="$(OutDir)PrivateInstanceIcon.dll" DestinationFolder="$(VRChatPath)Mods" />
