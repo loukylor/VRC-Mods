@@ -3,9 +3,6 @@
   <PropertyGroup>
     <AssemblyName>UserInfoExtensions</AssemblyName>
     <RootNamespace>UserInfoExtensions</RootNamespace>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
@@ -37,7 +34,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-	  <Exec Command="move &quot;bin\Release\net472\UserInfoExtensions.dll&quot; &quot;$(VRChatPath)Mods&quot;" />
+	  <Copy SourceFiles="$(OutDir)UserInfoExtensions.dll" DestinationFolder="$(VRChatPath)Mods" />
   </Target>
 
 </Project>
