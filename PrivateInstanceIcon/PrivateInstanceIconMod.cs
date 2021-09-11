@@ -43,10 +43,11 @@ namespace PrivateInstanceIcon
             iconSprite.hideFlags = HideFlags.DontUnloadUnusedAsset;
 
             foreach (MethodInfo method in typeof(UiUserList).GetMethods().Where(mi => mi.Name.StartsWith("Method_Protected_Virtual_Void_VRCUiContentButton_Object_")))
-                HarmonyInstance.Patch(method, postfix: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModel), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());//, finalizer: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModelErrored), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
+                HarmonyInstance.Patch(method, typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModelPrefix), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod(), typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModel), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());//, finalizer: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnSetPickerContentFromApiModelErrored), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
             HarmonyInstance.Patch(typeof(UiUserList).GetMethod("Awake"), postfix: typeof(PrivateInstanceIconMod).GetMethod(nameof(OnUiUserListAwake), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
 
-            HarmonyInstance.Patch(typeof(UiUserList).GetMethods().First(mb => mb.Name.StartsWith("Method_Private_IEnumerator_List_1_APIUser_Int32_Boolean_")), typeof(PrivateInstanceIconMod).GetMethod(nameof(OnRenderList), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
+            foreach (MethodInfo method in typeof(UiUserList).GetMethods().Where(mb => mb.Name.StartsWith("Method_Private_IEnumerator_List_1_APIUser_Int32_Boolean_")))
+                HarmonyInstance.Patch(method, typeof(PrivateInstanceIconMod).GetMethod(nameof(OnRenderList), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
 
             MelonPreferences_Category category = MelonPreferences.CreateCategory("PrivateInstanceIcon Config");
             excludeJoinMe = category.CreateEntry(nameof(excludeJoinMe), true, "Whether to hide the icon when people are on join me, and in private instances.");
@@ -54,40 +55,63 @@ namespace PrivateInstanceIcon
             includeFavoritesList = category.CreateEntry(nameof(includeFavoritesList), true, "Whether to include the icon and hiding in the friends favorites list.");
         }
 
+        private static void Print(MethodInfo __originalMethod)
+        {
+            System.Console.WriteLine(__originalMethod.DeclaringType.FullName);
+            System.Console.WriteLine(__originalMethod.Name);
+            System.Console.WriteLine("");
+        }
+
         private static void OnRenderList(UiUserList __instance, Il2CppSystem.Collections.Generic.List<APIUser> __0)
         {
+            if (__0.Count == 0)
+                return;
+
             if (!ShouldAdjustList(__instance))
                 return;
 
             if (!hidePrivateInstances.Value)
-                return;
-
-            int hiddenCount = 0;
-            for (int i = __0.Count - 1; i >= 0; i--)
             {
-                if (ShouldAdjustUser(__0[i]))
+                if (listTitleTable.TryGetValue(__instance.GetInstanceID(), out string pastText))
                 {
-                    hiddenCount++;
-                    __0.RemoveAt(i);
+                    string text = __instance.field_Public_Text_0.text;
+
+                    int indexOfLastText = text.LastIndexOf(pastText);
+                    if (indexOfLastText != -1)
+                        text = text.Remove(indexOfLastText, pastText.Length);
+
+                    __instance.field_Public_Text_0.text = text;
                 }
-            }
-
-            string text = __instance.field_Public_Text_0.text;
-            string hiddenText = $" [{hiddenCount} hidden]";
-
-            if (!listTitleTable.TryGetValue(__instance.GetInstanceID(), out string pastText))
-            {
-                listTitleTable.Add(__instance.GetInstanceID(), hiddenText);
             }
             else
             {
-                int indexOfLastText = text.LastIndexOf(pastText);
-                if (indexOfLastText != -1)
-                    text = text.Remove(indexOfLastText, pastText.Length);
-            }
+                int hiddenCount = 0;
+                for (int i = __0.Count - 1; i >= 0; i--)
+                {
+                    if (ShouldAdjustUser(__0[i]))
+                    {
+                        hiddenCount++;
+                        __0.RemoveAt(i);
+                    }
+                }
 
-            __instance.field_Public_Text_0.text = text + hiddenText;
-            listTitleTable[__instance.GetInstanceID()] = hiddenText;
+                string text = __instance.field_Public_Text_0.text;
+                string hiddenText = $" [{hiddenCount} hidden]";
+
+                if (!listTitleTable.TryGetValue(__instance.GetInstanceID(), out string pastText))
+                {
+                    listTitleTable.Add(__instance.GetInstanceID(), hiddenText);
+                }
+                else
+                {
+                    int indexOfLastText = text.LastIndexOf(pastText);
+                    if (indexOfLastText != -1)
+                        text = text.Remove(indexOfLastText, pastText.Length);
+                }
+
+                __instance.field_Public_Text_0.text = text + hiddenText;
+                listTitleTable[__instance.GetInstanceID()] = hiddenText;
+            }
         }
 
         private static void OnUiUserListAwake(UiUserList __instance)
@@ -113,6 +137,25 @@ namespace PrivateInstanceIcon
             newArr[newArr.Length - 1] = icon;
 
             picker.field_Public_VRCUiDynamicOverlayIcons_0.field_Public_ArrayOf_GameObject_0 = newArr;
+        }
+
+        private static void OnSetPickerContentFromApiModelPrefix(VRCUiContentButton __0)
+        {
+            // For some reason, our icon just dies for whatever reason sometimes
+            for (int i = 0; i < __0.field_Public_VRCUiDynamicOverlayIcons_0.field_Public_ArrayOf_GameObject_0.Count; i++)
+            {
+                if (__0.field_Public_VRCUiDynamicOverlayIcons_0.field_Public_ArrayOf_GameObject_0[i] == null)
+                {
+                    GameObject icon = GameObject.Instantiate(__0.transform.Find("Icons/OverlayIcons/iconUserOnPC").gameObject);
+                    icon.name = "PrivateInstanceIcon";
+                    icon.transform.SetParent(__0.transform.Find("Icons/OverlayIcons"));
+                    icon.GetComponent<Image>().sprite = iconSprite;
+                    icon.SetActive(false);
+                    icon.hideFlags |= HideFlags.DontUnloadUnusedAsset;
+                    __0.field_Public_VRCUiDynamicOverlayIcons_0.field_Public_ArrayOf_GameObject_0[i] = icon;
+                    return;
+                }
+            }
         }
 
         private static void OnSetPickerContentFromApiModel(UiUserList __instance, VRCUiContentButton __0, Il2CppSystem.Object __1)
