@@ -177,9 +177,20 @@ A mod that let's you sort of scroll the avatar preview so you can control where 
 Adds an icon to the social menu that shows if you can join a person or not.
 
 ## Features
-Let's you configure whether you want the icon on people that are on join me, but in privates.<br>
-You can also just straight up hide users from the list that you cant join. Note that when the list refreshes, the hidden users might pop up for a frame.<br>
-There is also a setting to include/exclude users from your favorites lists.
+Let's you configure what the mod does when a user is in a certain world type.<br>
+There are 3 things the mods does,
+ - Hides the user from the list
+ - Shows an icon indicating what world type they're in
+ - Acts like default VRChat
+
+Each of these behaviors can be applied to users in
+ - Private worlds
+ - Private worlds that you can join. (Join me but in private)
+ - Friends only worlds
+ - Friends plus worlds
+ - Public worlds
+
+You can also configure the mod to not affect the favorite users lists.
 
 ## Picture of the Icon
 ![Picture of me with the icon on it](https://i.imgur.com/T0Z0uba.png)
