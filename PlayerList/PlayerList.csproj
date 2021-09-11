@@ -66,7 +66,7 @@
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="move &quot;bin\Release\net472\PlayerList.dll&quot; &quot;$(VRChatPath)Mods&quot;" />
+		<Copy SourceFiles="$(OutDir)PlayerList.dll" DestinationFolder="$(VRChatPath)Mods" />
 	</Target>
 
 </Project>

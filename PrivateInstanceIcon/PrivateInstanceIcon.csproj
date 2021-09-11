@@ -9,6 +9,7 @@
         <OutputPath></OutputPath>
     </PropertyGroup>
 
+
     <ItemGroup>
       <None Remove="lock.png" />
         <None Remove="lock-open.png" />
@@ -42,9 +43,9 @@
         <HintPath>$(VRChatPath)Mods\VRChatUtilityKit.dll</HintPath>
     </Reference>
     </ItemGroup>
-    
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <Exec Command="move &quot;bin\Release\net472\PrivateInstanceIcon.dll&quot; &quot;$(VRChatPath)Mods&quot;" />
-    </Target>
+	
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Copy SourceFiles="$(OutDir)PrivateInstanceIcon.dll" DestinationFolder="$(VRChatPath)Mods" />
+	</Target>
 
 </Project>
