@@ -177,7 +177,7 @@ namespace VRChatUtilityKit.Ui
 
             BigMenuIndexEnum = quickMenuNestedEnums.First(type => type.IsEnum && type != QuickMenuIndexEnum);
             _closeBigMenu = typeof(VRCUiManager).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_Boolean_") && !mb.Name.Contains("_PDM_") && XrefUtils.CheckUsedBy(mb, "ExitStation"));
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_Boolean_") && !mb.Name.Contains("_PDM_") && XrefUtils.CheckUsedBy(mb, "Method_Public_Void_Player_"));
             _mainMenu = typeof(QuickMenu).GetMethods()
                 .First(mb => mb.Name.StartsWith("Method_Public_Void_Enum") && mb.GetParameters().Length == 2 && mb.GetParameters()[0].ParameterType == BigMenuIndexEnum && mb.GetParameters()[1].ParameterType == typeof(bool));
             foreach (XrefInstance instance in XrefScanner.XrefScan(_mainMenu))
@@ -423,10 +423,7 @@ namespace VRChatUtilityKit.Ui
         /// <param name="user">The user to open</param>
         public static void OpenUserInUserInfoPage(APIUser user)
         {
-            if (user == null)
-                throw new ArgumentNullException("Given APIUser was null.");
-
-            QuickMenu.prop_QuickMenu_0.prop_APIUser_0 = user;
+            QuickMenu.prop_QuickMenu_0.prop_APIUser_0 = user ?? throw new ArgumentNullException("Given APIUser was null.");
             MainMenu(4, false, false, false);
         }
         /// <summary>
@@ -437,10 +434,7 @@ namespace VRChatUtilityKit.Ui
         /// <param name="addToScreenStack"></param>
         public static void OpenUserInUserInfoPage(APIUser user, bool addToScreenStack)
         {
-            if (user == null)
-                throw new ArgumentNullException("Given APIUser was null.");
-
-            QuickMenu.prop_QuickMenu_0.prop_APIUser_0 = user;
+            QuickMenu.prop_QuickMenu_0.prop_APIUser_0 = user ?? throw new ArgumentNullException("Given APIUser was null.");
             MainMenu(4, false, addToScreenStack, false);
         }
         /// <summary>
