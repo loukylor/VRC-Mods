@@ -143,7 +143,7 @@ namespace VRChatUtilityKit.Utilities
         private static MethodInfo convertActionToOnAvatarInstantiateEvent;
         private static void OnPlayerAwake(VRCPlayer __instance)
         {
-            addOnAvatarInstantiateEvent.Invoke(__instance, new object[] { convertActionToOnAvatarInstantiateEvent.Invoke(null, new object[] { new Action(() => OnAvatarInstantiate(__instance.prop_VRCAvatarManager_0, __instance.prop_VRCAvatarManager_0?.field_Private_ApiAvatar_1, __instance.field_Internal_GameObject_0))}) });
+            addOnAvatarInstantiateEvent.Invoke(__instance, new object[] { convertActionToOnAvatarInstantiateEvent.Invoke(null, new object[] { new Action(() => OnAvatarInstantiate(__instance.prop_VRCAvatarManager_0, __instance.prop_VRCAvatarManager_0?.prop_ApiAvatar_0, __instance.field_Internal_GameObject_0))}) });
         }
         private static void OnAvatarInstantiate(VRCAvatarManager manager, ApiAvatar apiAvatar, GameObject avatar)
         {
