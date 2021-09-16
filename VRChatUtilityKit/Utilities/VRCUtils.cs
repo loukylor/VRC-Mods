@@ -22,7 +22,7 @@ namespace VRChatUtilityKit.Utilities
         /// <summary>
         /// Calls when the VRChat UiManager is initialized
         /// </summary>
-        public static Action OnUiManagerInit;
+        public static event Action OnUiManagerInit;
 
         /// <summary>
         /// Calls when the emm world check finishes.
@@ -89,7 +89,7 @@ namespace VRChatUtilityKit.Utilities
             while (VRCUiManager.prop_VRCUiManager_0 == null)
                 yield return null;
 
-            OnUiManagerInit.Invoke();
+            OnUiManagerInit?.Invoke();
         }
 
         internal static void UiInit()
