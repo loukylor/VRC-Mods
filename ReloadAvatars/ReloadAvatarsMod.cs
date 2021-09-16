@@ -4,7 +4,7 @@ using UIExpansionKit.API;
 using UnityEngine;
 using VRChatUtilityKit.Utilities;
 
-[assembly: MelonInfo(typeof(ReloadAvatars.ReloadAvatarsMod), "ReloadAvatars", "1.0.5", "loukylor", "https://github.com/loukylor/VRC-Mods")]
+[assembly: MelonInfo(typeof(ReloadAvatars.ReloadAvatarsMod), "ReloadAvatars", "1.0.6", "loukylor", "https://github.com/loukylor/VRC-Mods")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
 namespace ReloadAvatars
@@ -43,7 +43,6 @@ namespace ReloadAvatars
                 try
                 {
                     VRCUtils.ReloadAllAvatars();
-                    VRCUtils.ReloadAvatar(VRCPlayer.field_Internal_Static_VRCPlayer_0);
                 }
                 catch (Exception ex)
                 {
