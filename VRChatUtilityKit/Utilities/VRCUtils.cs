@@ -22,7 +22,7 @@ namespace VRChatUtilityKit.Utilities
         /// <summary>
         /// Calls when the VRChat UiManager is initialized
         /// </summary>
-        public static event Action OnUiManagerInit;
+        public static Action OnUiManagerInit;
 
         /// <summary>
         /// Calls when the emm world check finishes.
@@ -72,7 +72,7 @@ namespace VRChatUtilityKit.Utilities
         /// </summary>
         public static Player ActivePlayerInQuickMenu => QuickMenu.prop_QuickMenu_0.field_Private_Player_0; 
 
-        private static MethodInfo _reloadAvatarMethod;
+        private static MethodInfo _loadAvatarMethod;
         private static MethodInfo _reloadAllAvatarsMethod;
 
         internal static void Init()
@@ -80,8 +80,8 @@ namespace VRChatUtilityKit.Utilities
             NetworkEvents.OnInstanceChanged += new Action<ApiWorld, ApiWorldInstance>((world, instance) => StartEmmCheck(world));
             MelonCoroutines.Start(UiInitCoroutine());
 
-            _reloadAvatarMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.Name.StartsWith("Method_Private_Void_Boolean_") && mi.Name.Length < 31 && mi.GetParameters().Any(pi => pi.IsOptional));
-            _reloadAllAvatarsMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.Name.StartsWith("Method_Public_Void_Boolean_") && mi.Name.Length < 30 && mi.GetParameters().Any(pi => pi.IsOptional));// Both methods seem to do the same thing;
+            _loadAvatarMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.Name.StartsWith("Method_Private_Void_Boolean_") && mi.Name.Length < 31 && mi.GetParameters().Any(pi => pi.IsOptional) && XrefUtils.CheckUsedBy(mi, "ReloadAvatarNetworkedRPC"));
+            _reloadAllAvatarsMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.Name.StartsWith("Method_Public_Void_Boolean_") && mi.Name.Length < 30 && mi.GetParameters().All(pi => pi.IsOptional) && XrefUtils.CheckUsedBy(mi, "Method_Public_Void_", typeof(FeaturePermissionManager)));// Both methods seem to do the same thing;
         }
 
         private static IEnumerator UiInitCoroutine()
@@ -200,8 +200,16 @@ namespace VRChatUtilityKit.Utilities
         /// </summary>
         public static void ReloadAllAvatars()
         {
-            _reloadAllAvatarsMethod.Invoke(VRCPlayer.field_Internal_Static_VRCPlayer_0, new object[] { true });
-            _reloadAvatarMethod.Invoke(VRCPlayer.field_Internal_Static_VRCPlayer_0, new object[] { true }); // Ensure self is also reloaded (reload is not networked)
+            _reloadAllAvatarsMethod.Invoke(VRCPlayer.field_Internal_Static_VRCPlayer_0, new object[] { false });
+        }
+
+        /// <summary>
+        /// Reloads all avatars.
+        /// </summary>
+        /// <param name="excludeSelf">Whether or not to exclude the local player from the reload.</param>
+        public static void ReloadAllAvatars(bool excludeSelf = false)
+        {
+            _reloadAllAvatarsMethod.Invoke(VRCPlayer.field_Internal_Static_VRCPlayer_0, new object[] { excludeSelf });
         }
 
         /// <summary>
@@ -210,7 +218,7 @@ namespace VRChatUtilityKit.Utilities
         /// <param name="player">The given player</param>
         public static void ReloadAvatar(VRCPlayer player)
         {
-            _reloadAvatarMethod.Invoke(player, new object[] { true }); // Ensure self is also reloaded (reload is not networked)
+            _loadAvatarMethod.Invoke(player, new object[] { true }); 
         }
     }
 }

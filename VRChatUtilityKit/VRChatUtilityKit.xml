@@ -604,6 +604,12 @@
             Reloads all avatars.
             </summary>
         </member>
+        <member name="M:VRChatUtilityKit.Utilities.VRCUtils.ReloadAllAvatars(System.Boolean)">
+            <summary>
+            Reloads all avatars.
+            </summary>
+            <param name="excludeSelf">Whether or not to exclude the local player from the reload.</param>
+        </member>
         <member name="M:VRChatUtilityKit.Utilities.VRCUtils.ReloadAvatar(VRCPlayer)">
             <summary>
             Reloads the given player's avatar.
