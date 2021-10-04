@@ -23,7 +23,6 @@ namespace PlayerList
         public override void OnApplicationStart()
         {
             Instance = this;
-            ClassInjector.RegisterTypeInIl2Cpp<EnableDisableListener>();
             PlayerListConfig.RegisterSettings();
             EntryManager.Init();
             ListPositionManager.Init();

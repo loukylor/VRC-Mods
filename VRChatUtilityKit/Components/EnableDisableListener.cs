@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MelonLoader;
+using System;
 using UnhollowerBaseLib.Attributes;
 using UnityEngine;
 using VRChatUtilityKit.Utilities;
@@ -10,6 +11,7 @@ namespace VRChatUtilityKit.Components
     /// <summary>
     /// A simple enable/disable listener component
     /// </summary>
+    [RegisterTypeInIl2Cpp]
     public class EnableDisableListener : MonoBehaviour
     {
         /// <summary>
