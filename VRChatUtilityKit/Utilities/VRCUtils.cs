@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Threading.Tasks;
 using MelonLoader;
 using UnityEngine;
 using VRC;
@@ -22,7 +21,7 @@ namespace VRChatUtilityKit.Utilities
         /// <summary>
         /// Calls when the VRChat UiManager is initialized
         /// </summary>
-        public static Action OnUiManagerInit;
+        public static event Action OnUiManagerInit;
 
         /// <summary>
         /// Calls when the emm world check finishes.
@@ -87,6 +86,8 @@ namespace VRChatUtilityKit.Utilities
         private static IEnumerator UiInitCoroutine()
         {
             while (VRCUiManager.prop_VRCUiManager_0 == null)
+                yield return null;
+            while (GameObject.Find("UserInterface").transform.Find("Canvas_QuickMenu(Clone)") == null)
                 yield return null;
 
             OnUiManagerInit?.Invoke();
