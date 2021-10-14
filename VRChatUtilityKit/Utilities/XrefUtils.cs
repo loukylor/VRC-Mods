@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MelonLoader;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnhollowerRuntimeLib.XrefScans;
@@ -77,6 +79,50 @@ namespace VRChatUtilityKit.Utilities
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Dumps the Xref information on a method.
+        /// This is for DEBUG PURPOSES ONLY.
+        /// </summary>
+        /// <param name="method">The method to dump information on</param>
+        public static void DumpXrefInfo(MethodBase method)
+        {
+            MelonLogger.Msg(ConsoleColor.Yellow, $"Scanning {method.Name}");
+            
+            MelonLogger.Msg(ConsoleColor.Yellow, $"Checking UsedBy");
+            DumpScan(XrefScanner.UsedBy(method));
+            
+            MelonLogger.Msg(ConsoleColor.Green, "Checking Using");
+            DumpScan(XrefScanner.XrefScan(method));
+        }
+
+        private static void DumpScan(IEnumerable<XrefInstance> scan)
+        {
+            foreach (XrefInstance instance in scan)
+            {
+                if (instance.Type == XrefType.Global)
+                    MelonLogger.Msg(instance.ReadAsObject().ToString());
+
+                MelonLogger.Msg(instance.Type);
+
+                MethodBase resolvedMethod = instance.TryResolve();
+                if (instance.Type == XrefType.Method)
+                {
+                    if (resolvedMethod == null)
+                    {
+                        MelonLogger.Msg("null");
+                        MelonLogger.Msg("null");
+                    }
+                    else
+                    {
+                        MelonLogger.Msg(resolvedMethod.Name);
+                        MelonLogger.Msg(resolvedMethod.DeclaringType.Name);
+                    }
+
+                    MelonLogger.Msg("");
+                }
+            }
         }
     }
 }
