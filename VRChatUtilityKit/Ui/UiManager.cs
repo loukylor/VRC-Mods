@@ -1,18 +1,18 @@
-﻿using System;
+﻿using HarmonyLib;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using HarmonyLib;
-using MelonLoader;
 using UnhollowerBaseLib;
+using UnhollowerRuntimeLib.XrefScans;
 using UnityEngine;
-using UnityEngine.UI;
 using VRC;
 using VRC.Core;
+using VRC.DataModel;
 using VRC.UI;
+using VRC.UI.Core;
+using VRC.UI.Elements;
 using VRChatUtilityKit.Utilities;
-
-using UnhollowerRuntimeLib.XrefScans;
 
 namespace VRChatUtilityKit.Ui
 {
@@ -83,14 +83,11 @@ namespace VRChatUtilityKit.Ui
         public static event Action OnQuickMenuClosed;
 
         /// <summary>
-        /// Called when the QuickMenu index is set.
+        /// Called when a UIPage is shown in the QuickMenu.
+        /// The bool in the event is whether the page was shown or hidden.
         /// </summary>
-        public static event Action<int> OnQuickMenuIndexSet;
+        public static event Action<UIPage, bool> OnUIPageToggled;
 
-        private static MethodInfo _setQuickMenuIndex;
-        private static MethodInfo _openQuickMenu;
-        private static MethodInfo _openQuickMenuNoBool;
-        private static MethodInfo _closeQuickMenu;
         private static PropertyInfo _quickMenuEnumProperty;
         /// <summary>
         /// The type of the enum that is used for the QuickMenu index.
@@ -122,58 +119,21 @@ namespace VRChatUtilityKit.Ui
         public static Sprite RegularButtonSprite { get; private set; }
 
         /// <summary>
-        /// The current menu stored by VRChat.
+        /// The current MenuStateController used by VRChat
         /// </summary>
-        public static GameObject CurrentMenu
-        {
-            get
-            {
-                if (_currentMenuField == null)
-                    return null;
-                else
-                    return (GameObject)_currentMenuField.GetValue(QuickMenu.prop_QuickMenu_0);
-            }
-            set { _currentMenuField?.SetValue(QuickMenu.prop_QuickMenu_0, value); }
-        }
-        private static PropertyInfo _currentMenuField;
-
-        /// <summary>
-        /// The current tab menu stored by VRChat.
-        /// </summary>
-        public static GameObject CurrentTabMenu
-        {
-            get
-            {
-                if (currentTabMenuField == null)
-                    return null;
-                else
-                    return (GameObject)currentTabMenuField.GetValue(QuickMenu.prop_QuickMenu_0);
-            }
-            set { currentTabMenuField?.SetValue(QuickMenu.prop_QuickMenu_0, value); }
-        }
-        private static PropertyInfo currentTabMenuField;
+        public static MenuStateController CurrentMenuStateController { get; private set; }
 
         private static Type _quickMenuContextualDisplayEnum;
         private static MethodBase _setContextMethod;
 
         internal static void Init()
         {
+            InitializeUIManagerUtils();
+
             List<Type> quickMenuNestedEnums = typeof(QuickMenu).GetNestedTypes().Where(type => type.IsEnum).ToList();
             _quickMenuEnumProperty = typeof(QuickMenu).GetProperties()
                 .First(pi => pi.PropertyType.IsEnum && quickMenuNestedEnums.Contains(pi.PropertyType));
             QuickMenuIndexEnum = _quickMenuEnumProperty.PropertyType;
-            _setQuickMenuIndex = typeof(QuickMenu).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_Enum") && !mb.Name.Contains("_PDM_") && mb.GetParameters().Length == 1 && mb.GetParameters()[0].ParameterType == QuickMenuIndexEnum);
-            _openQuickMenu = typeof(QuickMenu).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && XrefUtils.CheckUsing(mb, _setQuickMenuIndex.Name, typeof(QuickMenu)));
-            _openQuickMenuNoBool = (MethodInfo)XrefScanner.UsedBy(_openQuickMenu)
-                .First(instance => instance.Type == XrefType.Method && instance.TryResolve() != null && XrefUtils.CheckUsedBy((MethodInfo)instance.TryResolve(), "OpenQuickMenuAddMessagePhotoCamera")).TryResolve();
-            _closeQuickMenu = typeof(QuickMenu).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_") && mb.Name.Length <= 29 && XrefUtils.CheckUsedBy(mb, _setQuickMenuIndex.Name));
-
-            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_openQuickMenu, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnQuickMenuOpen), BindingFlags.NonPublic | BindingFlags.Static)));
-            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_closeQuickMenu, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnQuickMenuClose), BindingFlags.NonPublic | BindingFlags.Static)));
-            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_setQuickMenuIndex, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnQuickMenuIndexAssigned), BindingFlags.NonPublic | BindingFlags.Static)), null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnQuickMenuIndexAssignedErrorSuppressor), BindingFlags.NonPublic | BindingFlags.Static)), null);
 
             BigMenuIndexEnum = quickMenuNestedEnums.First(type => type.IsEnum && type != QuickMenuIndexEnum);
             _closeBigMenu = typeof(VRCUiManager).GetMethods()
@@ -193,6 +153,8 @@ namespace VRChatUtilityKit.Ui
             }
 
             MethodInfo _placeUiAfterPause = typeof(QuickMenu).GetNestedTypes().First(type => type.Name.Contains("IEnumerator")).GetMethod("MoveNext");
+
+            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(UIPage).GetMethod("Show"), new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnUIPageToggle), BindingFlags.NonPublic | BindingFlags.Static)));
 
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_openBigMenu, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnBigMenuOpen), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_closeBigMenu, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnBigMenuClose), BindingFlags.NonPublic | BindingFlags.Static)));
@@ -222,9 +184,9 @@ namespace VRChatUtilityKit.Ui
                     _tabContainerComponent = component;
                     _setTabIndexInQuickMenu = component.GetIl2CppType().GetFields(Il2CppSystem.Reflection.BindingFlags.NonPublic | Il2CppSystem.Reflection.BindingFlags.Instance).First(f => f.FieldType.IsEnum);
                     foreach (Il2CppSystem.Reflection.FieldInfo field in component.GetIl2CppType().GetFields())
-                    { 
+                    {
                         if (field.FieldType.IsArray)
-                        { 
+                        {
                             _existingTabsField = field;
                             break;
                         }
@@ -239,130 +201,11 @@ namespace VRChatUtilityKit.Ui
             _showTabContentMethod = _tabDescriptorType.GetMethod("ShowTabContent");
             _setIndexOfTab = _tabDescriptorType.GetFields().First(f => f.FieldType.IsEnum);
 
+            CurrentMenuStateController = GameObject.Find("UserInterface/Canvas_QuickMenu(Clone)").GetComponent<MenuStateController>();
+
             ButtonReaction buttonReaction = GameObject.Find("UserInterface/QuickMenu/UIElementsMenu/NameplatesOnButton").GetComponent<ButtonReaction>();
             FullOnButtonSprite = buttonReaction.field_Public_Sprite_0.name.Contains("Full_ON") ? buttonReaction.field_Public_Sprite_0 : buttonReaction.field_Public_Sprite_1;
             RegularButtonSprite = buttonReaction.field_Public_Sprite_0.name.Contains("White") ? buttonReaction.field_Public_Sprite_0 : buttonReaction.field_Public_Sprite_1;
-
-            if (_currentMenuField != null) return;
-
-            // Check which fields return null
-            List<PropertyInfo> possibleProps = new List<PropertyInfo>();
-            foreach (PropertyInfo prop in typeof(QuickMenu).GetProperties().Where(pi => pi.Name.StartsWith("field_Private_GameObject_")))
-            {
-                GameObject value = (GameObject)prop.GetValue(QuickMenu.prop_QuickMenu_0);
-                if (value == null)
-                    possibleProps.Add(prop);
-            }
-
-            // Open QuickMenu to set current menu
-            try
-            {
-                _setQuickMenuIndex.Invoke(QuickMenu.prop_QuickMenu_0, new object[] { 8 });
-            }
-            catch { } // Ignore error cuz it still sets the menu
-
-            // Find out which menu actually got set
-            foreach (PropertyInfo prop in possibleProps)
-                if (prop.GetValue(QuickMenu.prop_QuickMenu_0) != null)
-                    _currentMenuField = prop;
-
-            if (_currentMenuField == null) MelonLogger.Error("Something went wrong. In technical speak: after attempting to determine the current menu field info, it was null. The mod will likely not function properly");
-
-            CurrentMenu.SetActive(false);
-
-            MonoBehaviour tabManager = GameObject.Find("UserInterface/QuickMenu/QuickModeTabs").GetComponents<MonoBehaviour>().First(monoBehaviour => monoBehaviour.GetIl2CppType().GetMethods().Any(mb => mb.Name.StartsWith("ShowTabContent")));
-            Il2CppSystem.Reflection.PropertyInfo tabManagerSingleton = tabManager.GetIl2CppType().GetProperties().First(pi => pi.PropertyType == tabManager.GetIl2CppType());
-            tabManagerSingleton.SetValue(null, tabManager, null); // Singleton is null until QM is opened. Set it to a value so that the next line won't error
-
-            try
-            {
-                GameObject.Find("UserInterface/QuickMenu/QuickModeTabs/NotificationsTab").GetComponent<Button>().onClick.Invoke(); // Force a button click to set notifs menu as current tab menu
-            }
-            catch
-            {
-                MelonLogger.Error("Could not find NotificiationsTab button. The mod will likely not function properly");
-            }
-
-            tabManagerSingleton.SetValue(null, null, null); // Set singleton back to null as to not change values willy nilly xD
-
-            foreach (PropertyInfo prop in possibleProps)
-                if (prop.Name != _currentMenuField.Name && prop.GetValue(QuickMenu.prop_QuickMenu_0) != null)
-                    currentTabMenuField = prop;
-
-            if (_currentMenuField == null) MelonLogger.Error("Something went wrong. In technical speak: after attempting to determine the current tab field info, it was null. The mod will likely not function properly");
-
-            CurrentTabMenu.SetActive(false);
-
-            // Set to null as to not change values unexpectedly 
-            foreach (PropertyInfo prop in possibleProps)
-                prop.SetValue(QuickMenu.prop_QuickMenu_0, null);
-        }
-
-        private static void OpenMenuInternal(GameObject page, bool setCurrentMenu = true, bool setCurrentTab = true)
-        {
-            if (page == null)
-                throw new ArgumentNullException($"Page given is null");
-
-            CurrentMenu?.SetActive(false);
-
-            if (page.name == "ShortcutMenu")
-            {
-                ShowTabContent(ExistingTabs[0]);
-                SetQuickMenuIndex(0);
-                SetTabIndexInQuickMenu(0);
-            }
-            else
-            {
-                _quickMenuEnumProperty.SetValue(QuickMenu.prop_QuickMenu_0, -1);
-            }
-
-            if (setCurrentMenu)
-                CurrentMenu = page;
-
-            CurrentTabMenu?.SetActive(false);
-            if (setCurrentTab)
-                CurrentTabMenu = page;
-
-            QuickMenuContextualDisplay quickMenuContextualDisplay = QuickMenu.prop_QuickMenu_0.field_Private_QuickMenuContextualDisplay_0;
-            _setContextMethod.Invoke(quickMenuContextualDisplay, new object[3] { 0, null, null });
-
-            page.SetActive(true);
-        }
-
-        /// <summary>
-        /// Opens the given page in the QuickMenu.
-        /// </summary>
-        /// <param name="page">The page to open</param>
-        /// <param name="setCurrentMenu">Whether to set the current menu stored by VRChat to the page given</param>
-        /// <param name="setCurrentTab">Whether to set the current tab menu stored by VRChat to the page given</param>
-        public static void OpenSubMenu(SubMenu page, bool setCurrentMenu = true, bool setCurrentTab = true) => OpenSubMenu(page.gameObject, setCurrentMenu, setCurrentTab);
-        /// <summary>
-        /// Opens the given page in the QuickMenu.
-        /// </summary>
-        /// <param name="page">The page to open</param>
-        /// <param name="setCurrentMenu">Whether to set the current menu stored by VRChat to the page given</param>
-        /// <param name="setCurrentTab">Whether to set the current tab menu stored by VRChat to the page given</param>
-        public static void OpenSubMenu(string page, bool setCurrentMenu = true, bool setCurrentTab = true) => OpenSubMenu(GameObject.Find(page), setCurrentMenu, setCurrentTab);
-        /// <summary>
-        /// Opens the given page in the QuickMenu.
-        /// </summary>
-        /// <param name="page">The page to open</param>
-        /// <param name="setCurrentMenu">Whether to set the current menu stored by VRChat to the page given</param>
-        /// <param name="setCurrentTab">Whether to set the current tab menu stored by VRChat to the page given</param>
-        public static void OpenSubMenu(GameObject page, bool setCurrentMenu = true, bool setCurrentTab = true) => OpenMenuInternal(page, setCurrentMenu, setCurrentTab);
-
-        /// <summary>
-        /// Opens the given tab as a tab menu and highlights the given tab button.
-        /// </summary>
-        /// <param name="tabButton">The tab button to highlight</param>
-        /// <param name="page">The page to open</param>
-        /// <param name="setCurrentMenu">Whether to set the current menu stored by VRChat to the page given</param>
-        /// <param name="setCurrentTab">Whether to set the current tab menu stored by VRChat to the page given</param>
-        public static void OpenTabMenu(TabButton tabButton, GameObject page, bool setCurrentMenu = true, bool setCurrentTab = true)
-        {
-            ShowTabContent(tabButton.gameObject);
-            OpenMenuInternal(page, setCurrentMenu, setCurrentTab);
-            SetTabIndexInQuickMenu(tabButton.index);
         }
 
         private static void OnBigMenuOpen() => OnBigMenuOpened?.DelegateSafeInvoke();
@@ -456,8 +299,10 @@ namespace VRChatUtilityKit.Ui
 
         private static void OnQuickMenuOpen() => OnQuickMenuOpened?.DelegateSafeInvoke();
         private static void OnQuickMenuClose() => OnQuickMenuClosed?.DelegateSafeInvoke();
-        private static void OnQuickMenuIndexAssigned(int __0) => OnQuickMenuIndexSet?.DelegateSafeInvoke(__0);
-        private static Exception OnQuickMenuIndexAssignedErrorSuppressor(Exception __exception) 
+
+        private static void OnUIPageToggle(UIPage __instance, bool __0) => OnUIPageToggled.DelegateSafeInvoke(__instance, __0);
+
+        private static Exception OnQuickMenuIndexAssignedErrorSuppressor(Exception __exception)
         {
             // There's actually no better way to do this https://github.com/knah/Il2CppAssemblyUnhollower/blob/master/UnhollowerBaseLib/Il2CppException.cs
             if (__exception is NullReferenceException || __exception.Message.Contains("System.NullReferenceException"))
@@ -465,45 +310,204 @@ namespace VRChatUtilityKit.Ui
             else
                 return __exception;
         }
-        /// <summary>
-        /// Sets the index of the QuickMenu.
-        /// </summary>
-        /// <param name="index">The index to set it to</param>
-        public static void SetQuickMenuIndex(int index) => _setQuickMenuIndex.Invoke(QuickMenu.prop_QuickMenu_0, new object[1] { index });
+
         /// <summary>
         /// Opens given user in the QuickMenu.
         /// </summary>
         /// <param name="playerToSelect">The player to select</param>
-        public static void OpenUserInQuickMenu(Player playerToSelect)
-        {
-            if (playerToSelect == null)
-                throw new ArgumentNullException("Given Player was null.");
-            if (playerToSelect.prop_APIUser_0 == null)
-                throw new ArgumentNullException("Given Player's APIUser was null.");
-            if (playerToSelect.prop_VRCPlayer_0 == null)
-                throw new ArgumentNullException("Given Player's VRCPlayer was null.");
+        public static void OpenUserInQuickMenu(IUser playerToSelect) => VRCData.UserSelection.SelectUser(playerToSelect);
 
-            QuickMenu.prop_QuickMenu_0.prop_APIUser_0 = playerToSelect.prop_APIUser_0;
-            QuickMenu.prop_QuickMenu_0.field_Private_Player_0 = playerToSelect;
-            CursorUtils.CurrentCursor.Method_Public_Void_VRCPlayer_PDM_0(playerToSelect.prop_VRCPlayer_0);
-            QuickMenuContextualDisplay quickMenuContextualDisplay = QuickMenu.prop_QuickMenu_0.field_Private_QuickMenuContextualDisplay_0;
-            QuickMenuContextualDisplay.Method_Public_Static_Void_VRCPlayer_0(playerToSelect.prop_VRCPlayer_0);
-            _setContextMethod.Invoke(quickMenuContextualDisplay, new object[3] { 3, playerToSelect.prop_APIUser_0, null });
-            SetQuickMenuIndex(3);
+        #region All the unobfuscated shit in the UIManager
+        private static Type uIManagerType;
+
+        // I'm lazy ok
+        private static readonly Dictionary<string, MethodInfo> nameToMethodTable = new Dictionary<string, MethodInfo>();
+
+        private static void AddToNameToMethodTable(string name)
+        {
+            MethodInfo method = uIManagerType.GetMethod(name);
+            if (method == null)
+            {
+                MelonLoader.MelonLogger.Error($"Could not find unobfuscated method with name {name} in UIManager");
+                return;
+            }
+
+            nameToMethodTable.Add(name, method);
         }
+
+        private static void InitializeUIManagerUtils()
+        {
+            uIManagerType = typeof(Player).Assembly.GetTypes().First(type => type.IsSubclassOf(typeof(UIManager)));
+
+            AddToNameToMethodTable("AskConfirmOpenURL");
+            AddToNameToMethodTable("CloseMenu");
+            AddToNameToMethodTable("GoToHomeWorld");
+            AddToNameToMethodTable("OpenActionMenu");
+            AddToNameToMethodTable("OpenAvatarsMenu");
+            AddToNameToMethodTable("OpenCannedWorldSearch");
+            AddToNameToMethodTable("OpenChangeStatusMenu");
+            AddToNameToMethodTable("OpenCreateNewWorldInstanceMenu");
+            AddToNameToMethodTable("OpenCurrentWorldMenu");
+            AddToNameToMethodTable("OpenEmotesActionMenu");
+            AddToNameToMethodTable("OpenGalleryCameraMenu");
+            AddToNameToMethodTable("OpenGalleryMenu");
+            AddToNameToMethodTable("OpenMainMenuTab");
+            AddToNameToMethodTable("OpenProfileMenu");
+            AddToNameToMethodTable("OpenQuickMenuTab");
+            AddToNameToMethodTable("OpenSafetyMenu");
+            AddToNameToMethodTable("OpenSettingsMenu");
+            AddToNameToMethodTable("OpenSocialMenu");
+            AddToNameToMethodTable("OpenUserIconCameraMenu");
+            AddToNameToMethodTable("OpenViewWorldAuthorMenu");
+            AddToNameToMethodTable("OpenVRCPlusMenu");
+            AddToNameToMethodTable("OpenWorldsMenu");
+            AddToNameToMethodTable("ShowAlert");
+        }
+
         /// <summary>
-        /// Opens the QuickMenu.
+        /// Opens the popup to confirm opening a link with the given link.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
         /// </summary>
-        public static void OpenQuickMenu() => _openQuickMenuNoBool.Invoke(QuickMenu.prop_QuickMenu_0, null);
+        /// <param name="link">The link to open</param>
+        public static void AskConfirmOpenURL(string link) => nameToMethodTable[nameof(AskConfirmOpenURL)].Invoke(UIManager.Instance, new object[1] { link });
+
         /// <summary>
-        /// Opens the QuickMenu.
+        /// Closes the QuickMenu or big menu.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
         /// </summary>
-        /// <param name="useRight">Whether open the QuickMenu on the right hand</param>
-        public static void OpenQuickMenu(bool useRight) => _openQuickMenu.Invoke(QuickMenu.prop_QuickMenu_0, new object[1] { useRight });
+        public static void CloseMenu() => nameToMethodTable[nameof(CloseMenu)].Invoke(UIManager.Instance, null);
+
         /// <summary>
-        /// Closes the QuickMenu.
+        /// Goes to the home world WITHOUT opening the confirmation popup.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
         /// </summary>
-        public static void CloseQuickMenu() => _closeQuickMenu.Invoke(QuickMenu.prop_QuickMenu_0, new object[1] { true });
+        public static void GoToHomeWorld() => nameToMethodTable[nameof(GoToHomeWorld)].Invoke(UIManager.Instance, null);
+
+        /// <summary>
+        /// Opens the ActionMenu.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+        /// </summary>
+        public static void OpenActionMenu() => nameToMethodTable[nameof(OpenActionMenu)].Invoke(UIManager.Instance, null);
+
+        /// <summary>
+        /// Opens the Avatar big menu.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+        /// </summary>
+        public static void OpenAvatarsMenu() => nameToMethodTable[nameof(OpenAvatarsMenu)].Invoke(UIManager.Instance, null);
+
+        /// <summary>
+        /// Opens the World Search big menu and searches the given searchTerm.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+        /// </summary>
+        /// <param name="searchTerm">The term to search</param>
+        public static void OpenCannedWorldSearch(string searchTerm) => nameToMethodTable[nameof(OpenCannedWorldSearch)].Invoke(UIManager.Instance, new object[1] { searchTerm });
+
+        /// <summary>
+        /// Opens the Social big menu along with the Update Status popup.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+        /// </summary>
+        public static void OpenChangeStatusMenu() => nameToMethodTable[nameof(OpenChangeStatusMenu)].Invoke(UIManager.Instance, null);
+
+        /// <summary>
+        /// Opens the WorldInfo big menu along with the NewInstance popup.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+        /// </summary>
+        public static void OpenCreateNewWorldInstanceMenu() => nameToMethodTable[nameof(OpenCreateNewWorldInstanceMenu)].Invoke(UIManager.Instance, null);
+
+        /// <summary>
+        /// Opens the current world in the WorldInfo big menu.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+        /// </summary>
+        public static void OpenCurrentWorldMenu() => nameToMethodTable[nameof(OpenCurrentWorldMenu)].Invoke(UIManager.Instance, null);
+
+        /// <summary>
+        /// Opens the avatar emotes ActionMenu.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+        /// </summary>
+        public static void OpenEmotesActionMenu() => nameToMethodTable[nameof(OpenEmotesActionMenu)].Invoke(UIManager.Instance, null);
+
+        /// <summary>
+        /// Opens the Add Photo to Gallery menu in the QuickMenu.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+        /// </summary>
+        public static void OpenGalleryCameraMenu() => nameToMethodTable[nameof(OpenGalleryCameraMenu)].Invoke(UIManager.Instance, null);
+
+        /// <summary>
+        /// Opens the Gallery big menu.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+        /// </summary>
+        public static void OpenGalleryMenu() => nameToMethodTable[nameof(OpenGalleryMenu)].Invoke(UIManager.Instance, null);
+
+        // TODO: asdlkfja;sdlkfj;alskdjf;
+        /// <summary>
+        /// Opens the UserInfo big menu on the current user.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+        /// </summary>
+        public static void OpenMainMenuTab() => nameToMethodTable[nameof(OpenMainMenuTab)].Invoke(UIManager.Instance, null);
+
+        /// <summary>
+        /// Opens the current user in the WorldInfo big menu.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+        /// </summary>
+        public static void OpenProfileMenu() => nameToMethodTable[nameof(OpenProfileMenu)].Invoke(UIManager.Instance, null);
+
+        /// <summary>
+        /// Opens given page in the QuickMenu.
+        /// A list of valid pages can be found in the CurrentMenuStateController's _wings dictionary.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+        /// </summary>
+        /// <param name="pageName">The page to open</param>
+        public static void OpenQuickMenuTab(string pageName) => nameToMethodTable[nameof(OpenQuickMenuTab)].Invoke(UIManager.Instance, new object[1] { pageName });
+
+        /// <summary>
+        /// Opens the Safety big menu.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+        /// </summary>
+        public static void OpenSafetyMenu() => nameToMethodTable[nameof(OpenSafetyMenu)].Invoke(UIManager.Instance, null);
+
+        /// <summary>
+        /// Opens the Settings big menu.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+        /// </summary>
+        public static void OpenSettingsMenu() => nameToMethodTable[nameof(OpenSettingsMenu)].Invoke(UIManager.Instance, null);
+
+        /// <summary>
+        /// Opens the Social big menu.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+        /// </summary>
+        public static void OpenSocialMenu() => nameToMethodTable[nameof(OpenSocialMenu)].Invoke(UIManager.Instance, null);
+
+        /// <summary>
+        /// Opens the UserIcon menu in the QuickMenu.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+        /// </summary>
+        public static void OpenUserIconCameraMenu() => nameToMethodTable[nameof(OpenUserIconCameraMenu)].Invoke(UIManager.Instance, null);
+
+        /// <summary>
+        /// Opens the current world author in the big menu. (I think) Equal to the on click of the world author button in the worlds menu.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+        /// </summary>
+        public static void OpenViewWorldAuthorMenu() => nameToMethodTable[nameof(OpenViewWorldAuthorMenu)].Invoke(UIManager.Instance, null);
+
+        /// <summary>
+        /// Opens the VRC+ big menu.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+        /// </summary>
+        public static void OpenVRCPlusMenu() => nameToMethodTable[nameof(OpenVRCPlusMenu)].Invoke(UIManager.Instance, null);
+
+        /// <summary>
+        /// Opens the worlds big menu.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+        /// </summary>
+        public static void OpenWorldsMenu() => nameToMethodTable[nameof(OpenWorldsMenu)].Invoke(UIManager.Instance, null);
+
+        /// <summary>
+        /// Shows an alert at the bottom of the QuickMenu.
+        /// (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons)
+        /// </summary>
+        /// <param name="alertText">The text to show</param>
+        public static void ShowAlert(string alertText) => nameToMethodTable[nameof(ShowAlert)].Invoke(UIManager.Instance, new object[1] { alertText });
+        #endregion
 
         /// <summary>
         /// Closes the current open popup
