@@ -1,5 +1,9 @@
-﻿using VRChatUtilityKit.Utilities;
+﻿using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+using VRC.UI.Elements;
+using VRC.UI.Elements.Controls;
+using VRChatUtilityKit.Utilities;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 #pragma warning disable IDE1006 // Naming Styles
@@ -9,35 +13,47 @@ namespace VRChatUtilityKit.Ui
     public class SubMenu
     {
         public GameObject gameObject { get; private set; }
-        public RectTransform RectTransform { get; private set; }
+        public RectTransform rectTransform { get; private set; }
         public string Path { get; private set; }
 
-        public SubMenu(GameObject subMenuBase)
+        public UIPage uiPage { get; private set; }
+
+        public VerticalLayoutGroup pageLayoutGroup { get; private set; }
+
+        public MenuBackButton backButton { get; private set; }
+
+        public TextMeshProUGUI titleText { get; private set; }
+        public string text
         {
-            gameObject = subMenuBase;
-
-            RectTransform = gameObject.GetComponent<RectTransform>();
-
-            Path = gameObject.GetPath();
+            get => titleText.text;
+            set => titleText.text = value;
         }
-        public SubMenu(GameObject subMenuBase, GameObject parent, string pageName)
+
+        public SubMenu(GameObject subMenuBase, GameObject parent, string name, string pageName)
         {
-            gameObject = Object.Instantiate(subMenuBase, parent.transform);
-            Object.Destroy(gameObject.GetComponent<ShortcutMenu>());
-            for (int i = gameObject.transform.childCount - 1; i >= 0; i--)
-            {
-                Object.DestroyImmediate(gameObject.transform.GetChild(i).gameObject);
-            }
+            gameObject = GameObject.Instantiate(subMenuBase, parent.transform);
             gameObject.name = pageName;
+            rectTransform = gameObject.GetComponent<RectTransform>();
 
-            RectTransform = gameObject.GetComponent<RectTransform>();
+            GameObject.DestroyImmediate(gameObject.GetComponent<UIPage>());
+            GameObject.Destroy(rectTransform.Find("Header_H1/RightItemContainer/Button_QM_Expand").gameObject); // Dunno how the binding class works so
+
+            pageLayoutGroup = rectTransform.Find("ScrollRect/Viewport/VerticalLayoutGroup").GetComponent<VerticalLayoutGroup>();
+            for (int i = pageLayoutGroup.rectTransform.childCount - 1; i >= 0; i--)
+                GameObject.DestroyImmediate(pageLayoutGroup.transform.GetChild(i).gameObject);
+
+            backButton = rectTransform.Find("Header_H1/LeftItemContainer/Button_Back").GetComponent<MenuBackButton>();
+            titleText = rectTransform.Find("Header_H1/LeftItemContainer/Text_Title").GetComponent<TextMeshProUGUI>();
+            uiPage = gameObject.AddComponent<UIPage>();
+            uiPage._menuStateController = UiManager.QMStateController;
+            uiPage.Name = name;
+
+            UiManager.QMStateController._uiPages.Add(name, uiPage);
 
             Path = gameObject.GetPath();
         }
-        public SubMenu(GameObject parent, string pageName) : this(GameObject.Find("UserInterface/QuickMenu/ShortcutMenu"), parent, pageName) { }
-        public SubMenu(string parent, string pageName) : this(GameObject.Find(parent), pageName) { }
-
-        public void OpenSubMenu(bool setCurrentMenu = true, bool setCurrentTab = true) => UiManager.OpenSubMenu(this, setCurrentMenu, setCurrentTab);
-        public void OpenSubMenu() => OpenSubMenu(true, true);
+        public SubMenu(GameObject parent, string name, string pageName) : this(UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard").gameObject, parent, name, pageName) { }
+        public SubMenu(string parent, string name, string pageName) : this(GameObject.Find(parent), name, pageName) { }
+        public SubMenu(string name, string pageName) : this(UiManager.QMStateController.transform.Find("Container/Window/QMParent").gameObject, name, pageName) { }
     }
 }
