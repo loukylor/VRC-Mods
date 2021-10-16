@@ -9,7 +9,7 @@ namespace VRChatUtilityKit.Ui
 {
     public class TabMenu : SubMenu
     {
-        internal TabMenu(GameObject subMenuBase, GameObject parent, string name, string pageName) : base(subMenuBase, parent, name, pageName)
+        internal TabMenu(string name, string pageName) : base(name, pageName)
         {
             Il2CppReferenceArray<UIPage> rootPages = UiManager.QMStateController.menuRootPages;
             Il2CppReferenceArray<UIPage> newRootPages = new Il2CppReferenceArray<UIPage>(rootPages.Count + 1);
