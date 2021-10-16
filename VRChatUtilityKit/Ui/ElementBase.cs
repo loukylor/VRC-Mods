@@ -13,26 +13,13 @@ namespace VRChatUtilityKit.Ui
         /// </summary>
         public string Path { get; private set; }
         public GameObject gameObject { get; private set; }
-        public RectTransform Rect { get; private set; }
+        public RectTransform rectTransform { get; private set; }
 
-        private Vector3 _position;
-        public Vector3 Position
-        {
-            get => Converters.ConvertToEmmUnits(_position); 
-            set
-            {
-                gameObject.transform.localPosition = Converters.ConvertToUnityUnits(value);
-                _position = value;
-            }
-        }
-
-        public ElementBase(GameObject parent, GameObject template, Vector3 position, string name)
+        public ElementBase(GameObject parent, GameObject template, string name)
         {
             gameObject = Object.Instantiate(template, parent.transform);
-            Rect = gameObject.GetComponent<RectTransform>();
+            rectTransform = gameObject.GetComponent<RectTransform>();
             Path = gameObject.GetPath();
-
-            Position = position;
 
             gameObject.name = name;
         }

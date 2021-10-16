@@ -10,12 +10,8 @@ using VRChatUtilityKit.Utilities;
 
 namespace VRChatUtilityKit.Ui
 {
-    public class SubMenu
+    public class SubMenu : ElementBase
     {
-        public GameObject gameObject { get; private set; }
-        public RectTransform rectTransform { get; private set; }
-        public string Path { get; private set; }
-
         public UIPage uiPage { get; private set; }
 
         public VerticalLayoutGroup pageLayoutGroup { get; private set; }
@@ -29,12 +25,8 @@ namespace VRChatUtilityKit.Ui
             set => titleText.text = value;
         }
 
-        public SubMenu(GameObject subMenuBase, GameObject parent, string name, string pageName)
+        public SubMenu(GameObject parent, GameObject subMenuBase, string name, string pageName) : base(parent, subMenuBase, pageName)
         {
-            gameObject = GameObject.Instantiate(subMenuBase, parent.transform);
-            gameObject.name = pageName;
-            rectTransform = gameObject.GetComponent<RectTransform>();
-
             GameObject.DestroyImmediate(gameObject.GetComponent<UIPage>());
             GameObject.Destroy(rectTransform.Find("Header_H1/RightItemContainer/Button_QM_Expand").gameObject); // Dunno how the binding class works so
 
@@ -49,10 +41,8 @@ namespace VRChatUtilityKit.Ui
             uiPage.Name = name;
 
             UiManager.QMStateController._uiPages.Add(name, uiPage);
-
-            Path = gameObject.GetPath();
         }
-        public SubMenu(GameObject parent, string name, string pageName) : this(UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard").gameObject, parent, name, pageName) { }
+        public SubMenu(GameObject parent, string name, string pageName) : this(parent, UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard").gameObject, name, pageName) { }
         public SubMenu(string parent, string name, string pageName) : this(GameObject.Find(parent), name, pageName) { }
         public SubMenu(string name, string pageName) : this(UiManager.QMStateController.transform.Find("Container/Window/QMParent").gameObject, name, pageName) { }
     }
