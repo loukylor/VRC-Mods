@@ -15,13 +15,13 @@ namespace VRChatUtilityKit.Ui
         public GameObject gameObject { get; private set; }
         public RectTransform rectTransform { get; private set; }
 
-        public ElementBase(GameObject parent, GameObject template, string name)
+        public ElementBase(GameObject parent, GameObject template, string gameObjectName)
         {
             gameObject = Object.Instantiate(template, parent.transform);
             rectTransform = gameObject.GetComponent<RectTransform>();
             Path = gameObject.GetPath();
 
-            gameObject.name = name;
+            gameObject.name = gameObjectName;
         }
 
         public void Destroy()

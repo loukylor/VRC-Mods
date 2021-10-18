@@ -15,14 +15,26 @@
 	</Target>
 
 	<ItemGroup>
+	  <Reference Include="DataModel">
+	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\DataModel.dll</HintPath>
+	  </Reference>
 	  <Reference Include="Il2CppSystem.Core">
 	    <HintPath>$(VRChatPath)MelonLoader\Managed\Il2CppSystem.Core.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Unity.TextMeshPro">
+	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\Unity.TextMeshPro.dll</HintPath>
 	  </Reference>
 	  <Reference Include="UnityEngine.TextRenderingModule">
 	    <HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
 	  </Reference>
 	  <Reference Include="UnityEngine.UI">
 	    <HintPath>$(VRChatPath)MelonLoader\Managed\UnityEngine.UI.dll</HintPath>
+	  </Reference>
+	  <Reference Include="VRC.UI.Core">
+	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\VRChat\MelonLoader\Managed\VRC.UI.Core.dll</HintPath>
+	  </Reference>
+	  <Reference Include="VRC.UI.Elements">
+	    <HintPath>$(VRChatPath)MelonLoader\Managed\VRC.UI.Elements.dll</HintPath>
 	  </Reference>
 	  <Reference Include="VRCCore-Standalone">
 	    <HintPath>$(VRChatPath)MelonLoader\Managed\VRCCore-Standalone.dll</HintPath>
