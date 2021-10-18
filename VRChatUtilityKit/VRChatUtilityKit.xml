@@ -120,9 +120,9 @@
             The regular button sprite.
             </summary>
         </member>
-        <member name="P:VRChatUtilityKit.Ui.UiManager.CurrentMenuStateController">
+        <member name="P:VRChatUtilityKit.Ui.UiManager.QMStateController">
             <summary>
-            The current MenuStateController used by VRChat
+            The QuickMenu MenuStateController used by VRChat
             </summary>
         </member>
         <member name="M:VRChatUtilityKit.Ui.UiManager.MainMenu(System.Int32)">
@@ -504,6 +504,22 @@
             <param name="delegate">The given delegate</param>
             <param name="args">The params of the delegate</param>
         </member>
+        <member name="M:VRChatUtilityKit.Utilities.Extensions.ToIUser(VRC.Core.APIUser)">
+            <summary>
+            Converts the given APIUser to an IUser.
+            Try not to use this too often; make sure to cache your IUser object. The operation is fairly slow. 
+            </summary>
+            <param name="value">The APIUser to convert to IUser</param>
+            <returns></returns>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.Extensions.ToAPIUser(VRC.DataModel.IUser)">
+            <summary>
+            Converts the given IUser to an APIUser.
+            Thanks knah for providing this.
+            </summary>
+            <param name="value">The IUser to convert to APIUser</param>
+            <returns></returns>
+        </member>
         <member name="T:VRChatUtilityKit.Utilities.NetworkEvents">
             <summary>
             A set of events pertaining to VRChat's network.
@@ -618,7 +634,7 @@
             A set of utilities pertaining to VRChat itself.
             </summary>
         </member>
-        <member name="F:VRChatUtilityKit.Utilities.VRCUtils.OnUiManagerInit">
+        <member name="E:VRChatUtilityKit.Utilities.VRCUtils.OnUiManagerInit">
             <summary>
             Calls when the VRChat UiManager is initialized
             </summary>
