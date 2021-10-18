@@ -119,9 +119,9 @@ namespace VRChatUtilityKit.Ui
         public static Sprite RegularButtonSprite { get; private set; }
 
         /// <summary>
-        /// The current MenuStateController used by VRChat
+        /// The QuickMenu MenuStateController used by VRChat
         /// </summary>
-        public static MenuStateController CurrentMenuStateController { get; private set; }
+        public static MenuStateController QMStateController { get; private set; }
 
         private static Type _quickMenuContextualDisplayEnum;
         private static MethodBase _setContextMethod;
@@ -174,34 +174,35 @@ namespace VRChatUtilityKit.Ui
             _popupV2 = typeof(VRCUiPopupManager).GetMethods()
                 .First(mb => mb.Name.StartsWith("Method_Public_Void_String_String_String_Action_String_Action_Action_1_VRCUiPopup_") && !mb.Name.Contains("PDM") && XrefUtils.CheckMethod(mb, "UserInterface/MenuContent/Popups/StandardPopupV2"));
         }
+
         internal static void UiInit()
         {
-            GameObject tabContainer = GameObject.Find("UserInterface/QuickMenu/QuickModeTabs");
-            foreach (Component component in tabContainer.GetComponents<Component>())
-            {
-                if (!component.GetIl2CppType().FullName.Contains("UnityEngine") && component.GetIl2CppType().GetMethods().Any(mi => mi.Name == "ShowTabContent"))
-                {
-                    _tabContainerComponent = component;
-                    _setTabIndexInQuickMenu = component.GetIl2CppType().GetFields(Il2CppSystem.Reflection.BindingFlags.NonPublic | Il2CppSystem.Reflection.BindingFlags.Instance).First(f => f.FieldType.IsEnum);
-                    foreach (Il2CppSystem.Reflection.FieldInfo field in component.GetIl2CppType().GetFields())
-                    {
-                        if (field.FieldType.IsArray)
-                        {
-                            _existingTabsField = field;
-                            break;
-                        }
-                    }
-                    break;
-                }
-            }
+            //GameObject tabContainer = GameObject.Find("UserInterface/QuickMenu/QuickModeTabs");
+            //foreach (Component component in tabContainer.GetComponents<Component>())
+            //{
+            //    if (!component.GetIl2CppType().FullName.Contains("UnityEngine") && component.GetIl2CppType().GetMethods().Any(mi => mi.Name == "ShowTabContent"))
+            //    {
+            //        _tabContainerComponent = component;
+            //        _setTabIndexInQuickMenu = component.GetIl2CppType().GetFields(Il2CppSystem.Reflection.BindingFlags.NonPublic | Il2CppSystem.Reflection.BindingFlags.Instance).First(f => f.FieldType.IsEnum);
+            //        foreach (Il2CppSystem.Reflection.FieldInfo field in component.GetIl2CppType().GetFields())
+            //        {
+            //            if (field.FieldType.IsArray)
+            //            {
+            //                _existingTabsField = field;
+            //                break;
+            //            }
+            //        }
+            //        break;
+            //    }
+            //}
 
-            MonoBehaviour tabDescriptor = tabContainer.transform.GetChild(0).gameObject.GetComponents<MonoBehaviour>().First(c => c.GetIl2CppType().GetMethod("ShowTabContent") != null);
+            //MonoBehaviour tabDescriptor = tabContainer.transform.GetChild(0).gameObject.GetComponents<MonoBehaviour>().First(c => c.GetIl2CppType().GetMethod("ShowTabContent") != null);
 
-            _tabDescriptorType = tabDescriptor.GetIl2CppType();
-            _showTabContentMethod = _tabDescriptorType.GetMethod("ShowTabContent");
-            _setIndexOfTab = _tabDescriptorType.GetFields().First(f => f.FieldType.IsEnum);
+            //_tabDescriptorType = tabDescriptor.GetIl2CppType();
+            //_showTabContentMethod = _tabDescriptorType.GetMethod("ShowTabContent");
+            //_setIndexOfTab = _tabDescriptorType.GetFields().First(f => f.FieldType.IsEnum);
 
-            CurrentMenuStateController = GameObject.Find("UserInterface/Canvas_QuickMenu(Clone)").GetComponent<MenuStateController>();
+            QMStateController = GameObject.Find("UserInterface").transform.Find("Canvas_QuickMenu(Clone)").GetComponent<MenuStateController>();
 
             ButtonReaction buttonReaction = GameObject.Find("UserInterface/QuickMenu/UIElementsMenu/NameplatesOnButton").GetComponent<ButtonReaction>();
             FullOnButtonSprite = buttonReaction.field_Public_Sprite_0.name.Contains("Full_ON") ? buttonReaction.field_Public_Sprite_0 : buttonReaction.field_Public_Sprite_1;
@@ -543,27 +544,5 @@ namespace VRChatUtilityKit.Ui
         /// <param name="rightButtonClick">The onClick of the right button</param>
         /// <param name="additionalSetup">A callback called when the popup is initialized</param>
         public static void OpenPopup(string title, string description, string leftButtonText, Action leftButtonClick, string rightButtonText, Action rightButtonClick, Action<VRCUiPopup> additionalSetup = null) => _popupV2.Invoke(VRCUiPopupManager.prop_VRCUiPopupManager_0, new object[7] { title, description, leftButtonText, (Il2CppSystem.Action)leftButtonClick, rightButtonText, (Il2CppSystem.Action)rightButtonClick, (Il2CppSystem.Action<VRCUiPopup>)additionalSetup });
-
-        /// <summary>
-        /// Sets the index of the given tab.
-        /// </summary>
-        /// <param name="tabButton">The tab button to set the index of</param>
-        /// <param name="index">the index to set the tab button to</param>
-        public static void SetIndexOfTab(TabButton tabButton, int index) => _setIndexOfTab.SetValue(tabButton._tabDescriptor, new Il2CppSystem.Int32 { m_value = index }.BoxIl2CppObject());
-        /// <summary>
-        /// Shows the content of the tab.
-        /// </summary>
-        /// <param name="tabButton">The tab button whose content is shown</param>
-        public static void ShowTabContent(TabButton tabButton) => _showTabContentMethod.Invoke(tabButton._tabDescriptor, null);
-        /// <summary>
-        /// Shows the content of the tab.
-        /// </summary>
-        /// <param name="tabButton">The tab button whose content is shown</param>
-        public static void ShowTabContent(GameObject tabButton) => _showTabContentMethod.Invoke(tabButton.GetComponent(_tabDescriptorType), null);
-        /// <summary>
-        /// Sets the tab index in the QuickMenu.
-        /// </summary>
-        /// <param name="index">The index to set in the QuickMenu</param>
-        public static void SetTabIndexInQuickMenu(int index) => _setTabIndexInQuickMenu.SetValue(_tabContainerComponent, new Il2CppSystem.Int32 { m_value = index }.BoxIl2CppObject());
     }
 }
