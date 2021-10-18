@@ -13,7 +13,8 @@ namespace VRChatUtilityKit.Ui
         {
             Il2CppReferenceArray<UIPage> rootPages = UiManager.QMStateController.menuRootPages;
             Il2CppReferenceArray<UIPage> newRootPages = new Il2CppReferenceArray<UIPage>(rootPages.Count + 1);
-            rootPages.CopyTo(newRootPages, 0);
+            for (int i = 0; i < rootPages.Count; i++)
+                newRootPages[i] = rootPages[i];
             newRootPages[rootPages.Count] = uiPage;
             UiManager.QMStateController.menuRootPages = newRootPages;
         }
