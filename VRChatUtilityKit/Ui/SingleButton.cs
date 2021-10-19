@@ -1,38 +1,30 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.UI;
-
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+using VRC.DataModel.Core;
 
 namespace VRChatUtilityKit.Ui
 {
-    public class SingleButton : ElementWithText
+    /// <summary>
+    /// A wrapper holding a button.
+    /// </summary>
+    public class SingleButton : VRCSelectable
     {
-        public Button ButtonComponent { get; private set; }
-        public UiTooltip TooltipComponent { get; private set; }
+        /// <summary>
+        /// The OnClick of the button.
+        /// </summary>
+        public Action OnClick { get; set; }
 
-        public SingleButton(GameObject parent, GameObject template, Vector3 position, string text, Action onClick, string tooltip, string buttonName, bool resize = false, Color? textColor = null) : base(parent, template, position, text, buttonName, resize, textColor)
+        /// <summary>
+        /// Creates a new button.
+        /// </summary>
+        /// <param name="parent">The parent of the button</param>
+        /// <param name="onClick">The OnClick of the button</param>
+        /// <param name="icon">The icon for the button</param>
+        /// <param name="gameObjectName">The name of the button's GameObject</param>
+        public SingleButton(GameObject parent, Action onClick, Sprite icon, string gameObjectName) : base(parent, UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard/ScrollRect/Viewport/VerticalLayoutGroup/Buttons_QuickLinks/Button_Worlds").gameObject, icon, gameObjectName)
         {
-            ButtonComponent = gameObject.GetComponent<Button>();
-            ButtonComponent.onClick.AddListener(onClick);
-            ButtonComponent.colors = new ColorBlock()
-            {
-                colorMultiplier = ButtonComponent.colors.colorMultiplier,
-                fadeDuration = ButtonComponent.colors.fadeDuration,
-                disabledColor = ButtonComponent.colors.disabledColor,
-                highlightedColor = ButtonComponent.colors.highlightedColor,
-                normalColor = ButtonComponent.colors.normalColor,
-                pressedColor = ButtonComponent.colors.pressedColor,
-                selectedColor = ButtonComponent.colors.normalColor
-            };
-            TooltipComponent = gameObject.GetComponent<UiTooltip>();
-            TooltipComponent.field_Public_String_0 = tooltip;
-            TooltipComponent.field_Public_String_1 = tooltip;
-
-            Position = position;
+            OnClick = onClick;
+            BindingExtensions.Bind(ButtonComponent, new Action(() => OnClick?.Invoke()));
         }
-        public SingleButton(GameObject parent, Vector3 position, string text, Action onClick, string tooltip, string buttonName, bool resize = false, Color? textColor = null) : this(parent, GameObject.Find("UserInterface/QuickMenu/UIElementsMenu/NameplatesOnButton"), position, text, onClick, tooltip, buttonName, resize, textColor) { }
-        public SingleButton(string parent, string template, Vector3 position, string text, Action onClick, string tooltip, string buttonName, bool resize = false, Color? textColor = null) : this(GameObject.Find(parent), GameObject.Find(template), position, text, onClick, tooltip, buttonName, resize, textColor) { }
-        public SingleButton(string parent, Vector3 position, string text, Action onClick, string tooltip, string buttonName, bool resize = false, Color? textColor = null) : this(parent, "UserInterface/QuickMenu/UIElementsMenu/NameplatesOnButton", position, text, onClick, tooltip, buttonName, resize, textColor) { }
     }
 }

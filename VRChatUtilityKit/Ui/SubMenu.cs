@@ -21,24 +21,24 @@ namespace VRChatUtilityKit.Ui
         /// <summary>
         /// The VerticalLayoutGroup that holds all the buttons and elements of the sub menu.
         /// </summary>
-        public VerticalLayoutGroup pageLayoutGroup { get; private set; }
+        public VerticalLayoutGroup PageLayoutGroup { get; private set; }
 
         /// <summary>
         /// The back button of the sub menu.
         /// </summary>
-        public MenuBackButton backButton { get; private set; }
+        public MenuBackButton BackButton { get; private set; }
 
         /// <summary>
         /// The Text component of the title of the sub menu.
         /// </summary>
-        public TextMeshProUGUI titleText { get; private set; }
+        public TextMeshProUGUI TitleText { get; private set; }
         /// <summary>
         /// Gets or sets the title of the sub menu.
         /// </summary>
-        public string text
+        public string Text
         {
-            get => titleText.text;
-            set => titleText.text = value;
+            get => TitleText.text;
+            set => TitleText.text = value;
         }
 
         /// <summary>
@@ -53,12 +53,12 @@ namespace VRChatUtilityKit.Ui
             GameObject.DestroyImmediate(gameObject.GetComponent<UIPage>());
             GameObject.Destroy(rectTransform.Find("Header_H1/RightItemContainer/Button_QM_Expand").gameObject); // Dunno how the binding class works so
 
-            pageLayoutGroup = rectTransform.Find("ScrollRect/Viewport/VerticalLayoutGroup").GetComponent<VerticalLayoutGroup>();
-            for (int i = pageLayoutGroup.rectTransform.childCount - 1; i >= 0; i--)
-                GameObject.DestroyImmediate(pageLayoutGroup.transform.GetChild(i).gameObject);
+            PageLayoutGroup = rectTransform.Find("ScrollRect/Viewport/VerticalLayoutGroup").GetComponent<VerticalLayoutGroup>();
+            for (int i = PageLayoutGroup.rectTransform.childCount - 1; i >= 0; i--)
+                GameObject.DestroyImmediate(PageLayoutGroup.transform.GetChild(i).gameObject);
 
-            backButton = rectTransform.Find("Header_H1/LeftItemContainer/Button_Back").GetComponent<MenuBackButton>();
-            titleText = rectTransform.Find("Header_H1/LeftItemContainer/Text_Title").GetComponent<TextMeshProUGUI>();
+            BackButton = rectTransform.Find("Header_H1/LeftItemContainer/Button_Back").GetComponent<MenuBackButton>();
+            TitleText = rectTransform.Find("Header_H1/LeftItemContainer/Text_Title").GetComponent<TextMeshProUGUI>();
             uiPage = gameObject.AddComponent<UIPage>();
             uiPage._menuStateController = UiManager.QMStateController;
             uiPage.Name = pageName;
