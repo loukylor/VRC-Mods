@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+#pragma warning disable IDE1006 // Naming Styles
+
 namespace VRChatUtilityKit.Ui
 {
     /// <summary>
@@ -35,6 +37,17 @@ namespace VRChatUtilityKit.Ui
             set => Tooltip.alternateText = value;
         }
 
+
+        private readonly Image _image;
+        /// <summary>
+        /// The sprite of the tab button.
+        /// </summary>
+        public Sprite sprite
+        {
+            get => _image.sprite;
+            set => _image.sprite = value;
+        }
+
         /// <summary>
         /// Creates a new VRCSelectable.
         /// It is not recommended to call this manually.
@@ -46,6 +59,9 @@ namespace VRChatUtilityKit.Ui
         {
             ButtonComponent = gameObject.GetComponent<Button>();
             Tooltip = gameObject.GetComponent<VRC.UI.Elements.Tooltips.UiTooltip>();
+
+            _image = rectTransform.Find("Icon").GetComponent<Image>();
+            _image.sprite = sprite;
         }
     }
 }
