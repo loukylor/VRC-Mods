@@ -24,6 +24,48 @@
             The path of the GameObject
             </summary>
         </member>
+        <member name="T:VRChatUtilityKit.Ui.Extensions">
+            <summary>
+            A set of extensions only useful while working with VRC UI.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.Extensions.RegisterBinding(UnityEngine.GameObject,VRC.DataModel.Core.IBinding)">
+            <summary>
+            Registers the given binding on the given GameObject.
+            Will create the BindingComponent if not already present.
+            This makes a direct call to a VRC method, changes in behavior may happen unexpectedly.
+            </summary>
+            <param name="gameObject">The GameObject to register a binding to</param>
+            <param name="binding">The binding to register</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.Extensions.Bind(UnityEngine.Component,System.Action,System.Action)">
+            <summary>
+            
+            </summary>
+            <param name="component"></param>
+            <param name="source"></param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="T:VRChatUtilityKit.Ui.SingleButton">
+            <summary>
+            A wrapper holding a button.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.SingleButton.OnClick">
+            <summary>
+            The OnClick of the button.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.SingleButton.#ctor(UnityEngine.GameObject,System.Action,UnityEngine.Sprite,System.String)">
+            <summary>
+            Creates a new button.
+            </summary>
+            <param name="parent">The parent of the button</param>
+            <param name="onClick">The OnClick of the button</param>
+            <param name="icon">The icon for the button</param>
+            <param name="gameObjectName">The name of the button's GameObject</param>
+        </member>
         <member name="T:VRChatUtilityKit.Ui.SubMenu">
             <summary>
             A wrapper holding a sub menu.
@@ -34,22 +76,22 @@
             The UIPage attached to the sub menu.
             </summary>
         </member>
-        <member name="P:VRChatUtilityKit.Ui.SubMenu.pageLayoutGroup">
+        <member name="P:VRChatUtilityKit.Ui.SubMenu.PageLayoutGroup">
             <summary>
             The VerticalLayoutGroup that holds all the buttons and elements of the sub menu.
             </summary>
         </member>
-        <member name="P:VRChatUtilityKit.Ui.SubMenu.backButton">
+        <member name="P:VRChatUtilityKit.Ui.SubMenu.BackButton">
             <summary>
             The back button of the sub menu.
             </summary>
         </member>
-        <member name="P:VRChatUtilityKit.Ui.SubMenu.titleText">
+        <member name="P:VRChatUtilityKit.Ui.SubMenu.TitleText">
             <summary>
             The Text component of the title of the sub menu.
             </summary>
         </member>
-        <member name="P:VRChatUtilityKit.Ui.SubMenu.text">
+        <member name="P:VRChatUtilityKit.Ui.SubMenu.Text">
             <summary>
             Gets or sets the title of the sub menu.
             </summary>
@@ -91,11 +133,6 @@
         <member name="P:VRChatUtilityKit.Ui.TabButton.MenuTab">
             <summary>
             The MenuTab component on the tab button.
-            </summary>
-        </member>
-        <member name="P:VRChatUtilityKit.Ui.TabButton.TabSprite">
-            <summary>
-            The sprite of the tab button.
             </summary>
         </member>
         <member name="M:VRChatUtilityKit.Ui.TabButton.#ctor(UnityEngine.Sprite,System.String,System.String)">
@@ -520,13 +557,19 @@
             Gets or sets the selectable's tooltip's alternate text.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.VRCSelectable.#ctor(UnityEngine.GameObject,UnityEngine.GameObject,System.String)">
+        <member name="P:VRChatUtilityKit.Ui.VRCSelectable.sprite">
+            <summary>
+            The sprite of the tab button.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.VRCSelectable.#ctor(UnityEngine.GameObject,UnityEngine.GameObject,UnityEngine.Sprite,System.String)">
             <summary>
             Creates a new VRCSelectable.
             It is not recommended to call this manually.
             </summary>
             <param name="parent">The parent of the selectable</param>
             <param name="template">An existing selectable to instantiate a copy of</param>
+            <param name="icon">The icon of the selectable</param>
             <param name="gameObjectName">The name of the selectable's GameObject</param>
         </member>
         <member name="T:VRChatUtilityKit.Utilities.AsyncUtils">

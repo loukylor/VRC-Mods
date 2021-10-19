@@ -54,14 +54,15 @@ namespace VRChatUtilityKit.Ui
         /// </summary>
         /// <param name="parent">The parent of the selectable</param>
         /// <param name="template">An existing selectable to instantiate a copy of</param>
+        /// <param name="icon">The icon of the selectable</param>
         /// <param name="gameObjectName">The name of the selectable's GameObject</param>
-        public VRCSelectable(GameObject parent, GameObject template, string gameObjectName) : base(parent, template, gameObjectName)
+        public VRCSelectable(GameObject parent, GameObject template, Sprite icon, string gameObjectName) : base(parent, template, gameObjectName)
         {
             ButtonComponent = gameObject.GetComponent<Button>();
             Tooltip = gameObject.GetComponent<VRC.UI.Elements.Tooltips.UiTooltip>();
 
             _image = rectTransform.Find("Icon").GetComponent<Image>();
-            _image.sprite = sprite;
+            _image.sprite = icon;
         }
     }
 }

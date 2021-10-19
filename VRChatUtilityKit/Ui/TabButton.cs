@@ -20,31 +20,19 @@ namespace VRChatUtilityKit.Ui
         /// </summary>
         public MenuTab MenuTab { get; private set; }
 
-        private readonly Image _tabImage;
-        /// <summary>
-        /// The sprite of the tab button.
-        /// </summary>
-        public Sprite TabSprite 
-        {
-            get => _tabImage.sprite;
-            set => _tabImage.sprite = value;
-        }
-
         /// <summary>
         /// Creates a new tab button.
         /// </summary>
         /// <param name="sprite">The sprite of the tab button</param>
         /// <param name="pageName">The name of the tab menu's page</param>
         /// <param name="gameObjectName">The name of the tab button's GameObject</param>
-        public TabButton(Sprite sprite, string pageName, string gameObjectName) : base(UiManager.QMStateController.transform.Find("Container/Window/Page_Buttons_QM/HorizontalLayoutGroup").gameObject, UiManager.QMStateController.transform.Find("Container/Window/Page_Buttons_QM/HorizontalLayoutGroup/Page_Dashboard").gameObject, gameObjectName)
+        public TabButton(Sprite sprite, string pageName, string gameObjectName) : base(UiManager.QMStateController.transform.Find("Container/Window/Page_Buttons_QM/HorizontalLayoutGroup").gameObject, UiManager.QMStateController.transform.Find("Container/Window/Page_Buttons_QM/HorizontalLayoutGroup/Page_Dashboard").gameObject, sprite, gameObjectName)
         {
             MenuTab = gameObject.GetComponent<MenuTab>();
             MenuTab._menuStateController = UiManager.QMStateController;
             MenuTab.pageName = pageName;
 
             SubMenu = new TabMenu(pageName, $"Page_{pageName}");
-            _tabImage = rectTransform.Find("Icon").GetComponent<Image>();
-            _tabImage.sprite = sprite;
         }
 
 
