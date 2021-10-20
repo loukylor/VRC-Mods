@@ -21,6 +21,7 @@ namespace VRChatUtilityKit
             Instance = this;
             UiManager.Init();
             VRCUtils.Init();
+            KeybindAttribute.Init();
             VRCUtils.OnUiManagerInit += OnUiManagerInit;
         }
 
@@ -36,6 +37,7 @@ namespace VRChatUtilityKit
         {
             if (AsyncUtils._toMainThreadQueue.TryDequeue(out Action result))
                 result.Invoke();
+            KeybindAttribute.OnUpdate();
         }
     }
 }

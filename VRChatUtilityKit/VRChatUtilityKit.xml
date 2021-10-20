@@ -19,33 +19,151 @@
             Calls when the component is disabled.
             </summary>
         </member>
+        <member name="T:VRChatUtilityKit.Ui.ButtonGroup">
+            <summary>
+            A class that represents an optional button header and group of buttons.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.ButtonGroup.ParentMenu">
+            <summary>
+            The sub menu the group is in.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.ButtonGroup.Header">
+            <summary>
+            The group's header.
+            May be null.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.ButtonGroup.ButtonLayoutGroup">
+            <summary>
+            The layout all the buttons go into.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.ButtonGroup.Buttons">
+            <summary>
+            The buttons in the group.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.#ctor(System.String,System.String,System.Collections.Generic.List{VRChatUtilityKit.Ui.VRCSelectable})">
+            <summary>
+            Creates a new button group.
+            </summary>
+            <param name="name">The name of the group</param>
+            <param name="headerText">The text of the header</param>
+            <param name="buttons">The buttons on the group</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.AddButtonHeader(System.String,System.String)">
+            <summary>
+            Adds a new button header to the group.
+            </summary>
+            <param name="text">The text on the header</param>
+            <param name="gameObjectName">The name of the header GameObject</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.RemoveButtonHeader">
+            <summary>
+            Removes the button header from the group.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.AddButton(VRChatUtilityKit.Ui.VRCSelectable)">
+            <summary>
+            Adds the given button to the group.
+            </summary>
+            <param name="button">The button to add</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.AddButtonRange(System.Collections.Generic.IEnumerable{VRChatUtilityKit.Ui.VRCSelectable})">
+            <summary>
+            Adds the given range of buttons to the group.
+            </summary>
+            <param name="buttons">The range of buttons to add</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.RemoveButton(VRChatUtilityKit.Ui.VRCSelectable)">
+            <summary>
+            Removes the given button from the group.
+            </summary>
+            <param name="button">The button to remove</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.ClearButtons">
+            <summary>
+            Removes all buttons from the group.
+            </summary>
+        </member>
+        <member name="T:VRChatUtilityKit.Ui.ButtonHeader">
+            <summary>
+            A wrapper holding a set of buttons' header.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.ButtonHeader.TextComponent">
+            <summary>
+            The text mesh pro component on the button.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.ButtonHeader.Text">
+            <summary>
+            Gets or sets the text on the button.
+            </summary>
+        </member>
+        <member name="T:VRChatUtilityKit.Ui.ElementBase">
+            <summary>
+            A wrapper that holds a UI element.
+            </summary>
+        </member>
         <member name="P:VRChatUtilityKit.Ui.ElementBase.Path">
             <summary>
             The path of the GameObject
             </summary>
         </member>
-        <member name="T:VRChatUtilityKit.Ui.Extensions">
+        <member name="P:VRChatUtilityKit.Ui.ElementBase.gameObject">
             <summary>
-            A set of extensions only useful while working with VRC UI.
+            The GameObject of the element.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.Extensions.RegisterBinding(UnityEngine.GameObject,VRC.DataModel.Core.IBinding)">
+        <member name="P:VRChatUtilityKit.Ui.ElementBase.rectTransform">
             <summary>
-            Registers the given binding on the given GameObject.
-            Will create the BindingComponent if not already present.
-            This makes a direct call to a VRC method, changes in behavior may happen unexpectedly.
+            The RectTransform of the element.
             </summary>
-            <param name="gameObject">The GameObject to register a binding to</param>
-            <param name="binding">The binding to register</param>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.Extensions.Bind(UnityEngine.Component,System.Action,System.Action)">
+        <member name="P:VRChatUtilityKit.Ui.ElementBase.id">
             <summary>
-            
+            A unique ID of the element.
+            Does not persist through updates.
             </summary>
-            <param name="component"></param>
-            <param name="source"></param>
-            <param name="action"></param>
-            <returns></returns>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.ElementBase.#ctor(UnityEngine.Transform,UnityEngine.GameObject,System.String)">
+            <summary>
+            Creates a new ElementBase.
+            </summary>
+            <param name="parent">The parent of the element</param>
+            <param name="template">An existing element to create a copy of</param>
+            <param name="gameObjectName">The name of the element's GameObject</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.ElementBase.Equals(System.Object)">
+            <summary>
+            Determines whether two object instances are equal.
+            </summary>
+            <param name="obj">The object to compare with the current object</param>
+            <returns>true if the specified object is equal to the current object; otherwise, false</returns>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.ElementBase.GetHashCode">
+            <summary>
+            Returns a unique integer representing the element.
+            </summary>
+            <returns>A unique integer representing the element</returns>
+        </member>
+        <member name="T:VRChatUtilityKit.Ui.IElementWithText">
+            <summary>
+            An interface for wrappers that hold elements with text.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.IElementWithText.TextComponent">
+            <summary>
+            The text mesh pro component on the element.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.IElementWithText.Text">
+            <summary>
+            Gets or sets the text on the element.
+            </summary>
         </member>
         <member name="T:VRChatUtilityKit.Ui.SingleButton">
             <summary>
@@ -57,13 +175,28 @@
             The OnClick of the button.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.SingleButton.#ctor(UnityEngine.GameObject,System.Action,UnityEngine.Sprite,System.String)">
+        <member name="P:VRChatUtilityKit.Ui.SingleButton.JumpBadge">
+            <summary>
+            A small icon indicating this buttons jumps to the big menu.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.SingleButton.TextComponent">
+            <summary>
+            The text mesh pro component on the button.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.SingleButton.Text">
+            <summary>
+            Gets or sets the text on the button.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.SingleButton.#ctor(System.Action,UnityEngine.Sprite,System.String,System.String)">
             <summary>
             Creates a new button.
             </summary>
-            <param name="parent">The parent of the button</param>
             <param name="onClick">The OnClick of the button</param>
             <param name="icon">The icon for the button</param>
+            <param name="text">The text of the button</param>
             <param name="gameObjectName">The name of the button's GameObject</param>
         </member>
         <member name="T:VRChatUtilityKit.Ui.SubMenu">
@@ -96,16 +229,12 @@
             Gets or sets the title of the sub menu.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.SubMenu.#ctor(UnityEngine.GameObject,UnityEngine.GameObject,System.String,System.String)">
+        <member name="P:VRChatUtilityKit.Ui.SubMenu.ButtonGroups">
             <summary>
-            Creates a new sub menu.
+            The list of button groups on this menu.
             </summary>
-            <param name="parent">The parent of the sub menu</param>
-            <param name="subMenuBase">An existing sub menu to instantiate a copy of</param>
-            <param name="pageName">The name of the sub menu's page</param>
-            <param name="gameObjectName">The name of the sub menu's GameObject</param>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.SubMenu.#ctor(UnityEngine.GameObject,System.String,System.String)">
+        <member name="M:VRChatUtilityKit.Ui.SubMenu.#ctor(UnityEngine.Transform,System.String,System.String)">
             <summary>
             Creates a new sub menu.
             </summary>
@@ -119,6 +248,29 @@
             </summary>
             <param name="pageName">The name of the sub menu's page</param>
             <param name="gameObjectName">The name of the sub menu's GameObject</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.SubMenu.AddButtonGroup(VRChatUtilityKit.Ui.ButtonGroup)">
+            <summary>
+            Adds the given button group to the sub menu.
+            </summary>
+            <param name="buttonGroup">The button group to add</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.SubMenu.AddButtonGroupRange(System.Collections.Generic.IEnumerable{VRChatUtilityKit.Ui.ButtonGroup})">
+            <summary>
+            Adds the given range of button groups to the sub menu.
+            </summary>
+            <param name="buttonGroups">The range of button groups to add</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.SubMenu.RemoveButtonGroup(VRChatUtilityKit.Ui.ButtonGroup)">
+            <summary>
+            Removes the given button group from the sub menu.
+            </summary>
+            <param name="buttonGroup">The button group to remove</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.SubMenu.ClearButtonGroups">
+            <summary>
+            Removes all button groups from the submenu.
+            </summary>
         </member>
         <member name="T:VRChatUtilityKit.Ui.TabButton">
             <summary>
@@ -260,11 +412,6 @@
         <member name="P:VRChatUtilityKit.Ui.UiManager.QuickMenuIndexEnum">
             <summary>
             The type of the enum that is used for the QuickMenu index.
-            </summary>
-        </member>
-        <member name="P:VRChatUtilityKit.Ui.UiManager.ExistingTabs">
-            <summary>
-            The current list of tabs registered by the game.
             </summary>
         </member>
         <member name="P:VRChatUtilityKit.Ui.UiManager.FullOnButtonSprite">
@@ -559,13 +706,12 @@
         </member>
         <member name="P:VRChatUtilityKit.Ui.VRCSelectable.sprite">
             <summary>
-            The sprite of the tab button.
+            The sprite of the selectable.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.VRCSelectable.#ctor(UnityEngine.GameObject,UnityEngine.GameObject,UnityEngine.Sprite,System.String)">
+        <member name="M:VRChatUtilityKit.Ui.VRCSelectable.#ctor(UnityEngine.Transform,UnityEngine.GameObject,UnityEngine.Sprite,System.String)">
             <summary>
             Creates a new VRCSelectable.
-            It is not recommended to call this manually.
             </summary>
             <param name="parent">The parent of the selectable</param>
             <param name="template">An existing selectable to instantiate a copy of</param>
@@ -692,6 +838,27 @@
             </summary>
             <param name="value">The IUser to convert to APIUser</param>
             <returns></returns>
+        </member>
+        <member name="T:VRChatUtilityKit.Utilities.KeybindAttribute">
+            <summary>
+            An attribute that calls the method it is put on when the given key is pressed.
+            Meant primarily for debugging purposes, but can be utilised for easy keybind creation.
+            Can only be applied to static methods without parameters.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.KeybindAttribute.KeyCode">
+            <summary>
+            The key to press to call the attached method.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.KeybindAttribute.#ctor(UnityEngine.KeyCode)">
+            <summary>
+            Creates a new keybind. 
+            The method the attribute is put on will be called when the given key is pressed.
+            Meant primarily for debugging purposes, but can be utilised for easy keybind creation.
+            Can only be applied to static methods without parameters.
+            </summary>
+            <param name="keyCode">The key to press to call the attached method</param>
         </member>
         <member name="T:VRChatUtilityKit.Utilities.NetworkEvents">
             <summary>
