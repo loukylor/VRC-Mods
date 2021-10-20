@@ -40,7 +40,7 @@ namespace VRChatUtilityKit.Ui
 
         private readonly Image _image;
         /// <summary>
-        /// The sprite of the tab button.
+        /// The sprite of the selectable.
         /// </summary>
         public Sprite sprite
         {
@@ -50,13 +50,12 @@ namespace VRChatUtilityKit.Ui
 
         /// <summary>
         /// Creates a new VRCSelectable.
-        /// It is not recommended to call this manually.
         /// </summary>
         /// <param name="parent">The parent of the selectable</param>
         /// <param name="template">An existing selectable to instantiate a copy of</param>
         /// <param name="icon">The icon of the selectable</param>
         /// <param name="gameObjectName">The name of the selectable's GameObject</param>
-        public VRCSelectable(Transform parent, GameObject template, Sprite icon, string gameObjectName) : base(parent, template, gameObjectName)
+        protected VRCSelectable(Transform parent, GameObject template, Sprite icon, string gameObjectName) : base(parent, template, gameObjectName)
         {
             ButtonComponent = gameObject.GetComponent<Button>();
             Tooltip = gameObject.GetComponent<VRC.UI.Elements.Tooltips.UiTooltip>();
