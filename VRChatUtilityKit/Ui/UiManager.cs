@@ -94,20 +94,7 @@ namespace VRChatUtilityKit.Ui
         /// </summary>
         public static Type QuickMenuIndexEnum { get; private set; }
 
-        private static Il2CppSystem.Reflection.MethodInfo _showTabContentMethod;
-        private static Il2CppSystem.Reflection.FieldInfo _setIndexOfTab;
-        private static Il2CppSystem.Reflection.FieldInfo _setTabIndexInQuickMenu;
-        internal static Il2CppSystem.Type _tabDescriptorType;
-        private static Component _tabContainerComponent;
-        private static Il2CppSystem.Reflection.FieldInfo _existingTabsField;
-        /// <summary>
-        /// The current list of tabs registered by the game.
-        /// </summary>
-        public static List<GameObject> ExistingTabs
-        {
-            get { return _existingTabsField.GetValue(_tabContainerComponent).Cast<Il2CppReferenceArray<GameObject>>().ToList(); }
-            set { _existingTabsField.SetValue(_tabContainerComponent, new Il2CppReferenceArray<GameObject>(value.ToArray()).Cast<Il2CppSystem.Object>()); }
-        }
+        internal static Transform tempUIParent;
 
         /// <summary>
         /// The filled in button sprite.
@@ -201,6 +188,9 @@ namespace VRChatUtilityKit.Ui
             //_tabDescriptorType = tabDescriptor.GetIl2CppType();
             //_showTabContentMethod = _tabDescriptorType.GetMethod("ShowTabContent");
             //_setIndexOfTab = _tabDescriptorType.GetFields().First(f => f.FieldType.IsEnum);
+
+            tempUIParent = new GameObject("VRCUtilityKitTempUIParent").transform;
+            GameObject.DontDestroyOnLoad(tempUIParent.gameObject);
 
             QMStateController = GameObject.Find("UserInterface").transform.Find("Canvas_QuickMenu(Clone)").GetComponent<MenuStateController>();
 

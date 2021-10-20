@@ -39,7 +39,10 @@ namespace VRChatUtilityKit.Ui
         /// <param name="gameObjectName">The name of the element's GameObject</param>
         protected ElementBase(Transform parent, GameObject template, string gameObjectName)
         {
-            gameObject = Object.Instantiate(template, parent);
+            if (parent != null)
+                gameObject = Object.Instantiate(template, parent);
+            else
+                gameObject = Object.Instantiate(template, UiManager.tempUIParent);
             _id = gameObject.GetInstanceID();
             rectTransform = gameObject.GetComponent<RectTransform>();
             Path = gameObject.GetPath();

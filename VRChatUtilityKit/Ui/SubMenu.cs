@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using VRC.UI.Elements;
@@ -42,6 +43,12 @@ namespace VRChatUtilityKit.Ui
         }
 
         /// <summary>
+        /// The list of button groups on this menu.
+        /// </summary>
+        public IReadOnlyList<ButtonGroup> ButtonGroups => _buttonGroups;
+        private readonly List<ButtonGroup> _buttonGroups = new List<ButtonGroup>();
+
+        /// <summary>
         /// Creates a new sub menu.
         /// </summary>
         /// <param name="parent">The parent of the sub menu</param>
@@ -70,5 +77,52 @@ namespace VRChatUtilityKit.Ui
         /// <param name="pageName">The name of the sub menu's page</param>
         /// <param name="gameObjectName">The name of the sub menu's GameObject</param>
         public SubMenu(string pageName, string gameObjectName) : this(UiManager.QMStateController.transform.Find("Container/Window/QMParent"), pageName, gameObjectName) { }
+
+        /// <summary>
+        /// Adds the given button group to the sub menu.
+        /// </summary>
+        /// <param name="buttonGroup">The button group to add</param>
+        public void AddButtonGroup(ButtonGroup buttonGroup)
+        {
+            buttonGroup.ParentMenu = this;
+            if (buttonGroup.Header != null)
+                buttonGroup.Header.rectTransform.parent = PageLayoutGroup.rectTransform;
+            buttonGroup.rectTransform.parent = PageLayoutGroup.rectTransform;
+            _buttonGroups.Add(buttonGroup);
+        }
+
+        /// <summary>
+        /// Adds the given range of button groups to the sub menu.
+        /// </summary>
+        /// <param name="buttonGroups">The range of button groups to add</param>
+        public void AddButtonGroupRange(IEnumerable<ButtonGroup> buttonGroups)
+        {
+            foreach (ButtonGroup buttonGroup in buttonGroups)
+                AddButtonGroup(buttonGroup);
+        }
+
+        /// <summary>
+        /// Removes the given button group from the sub menu.
+        /// </summary>
+        /// <param name="buttonGroup">The button group to remove</param>
+        public void RemoveButtonGroup(ButtonGroup buttonGroup)
+        {
+            _buttonGroups.Remove(buttonGroup);
+            GameObject.DestroyImmediate(buttonGroup.gameObject);
+        }
+
+        /// <summary>
+        /// Removes all button groups from the submenu.
+        /// </summary>
+        public void ClearButtonGroups()
+        {
+            foreach (ButtonGroup buttonGroup in _buttonGroups)
+            {
+                if (buttonGroup.Header != null)
+                    GameObject.DestroyImmediate(buttonGroup.Header.gameObject);
+                GameObject.DestroyImmediate(buttonGroup.gameObject);
+            }
+            _buttonGroups.Clear();
+        }
     }
 }
