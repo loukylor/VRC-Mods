@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using VRC.UI.Elements.Controls;
 
 namespace VRChatUtilityKit.Ui
@@ -34,7 +33,5 @@ namespace VRChatUtilityKit.Ui
 
             SubMenu = new TabMenu(pageName, $"Page_{pageName}");
         }
-
-
     }
 }
