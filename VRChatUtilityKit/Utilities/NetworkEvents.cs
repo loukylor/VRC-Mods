@@ -14,6 +14,7 @@ namespace VRChatUtilityKit.Utilities
     /// <summary>
     /// A set of events pertaining to VRChat's network.
     /// </summary>
+    [MelonLoaderEvents]
     public static class NetworkEvents
     {
         /// <summary>
@@ -186,7 +187,7 @@ namespace VRChatUtilityKit.Utilities
             OnPlayerModerationRemoved?.DelegateSafeInvoke(__0, __1);
         }
 
-        internal static void NetworkInit()
+        private static void OnUiManagerInit()
         {
             var field0 = NetworkManager.field_Internal_Static_NetworkManager_0.field_Internal_VRCEventDelegate_1_Player_0;
             var field1 = NetworkManager.field_Internal_Static_NetworkManager_0.field_Internal_VRCEventDelegate_1_Player_1;

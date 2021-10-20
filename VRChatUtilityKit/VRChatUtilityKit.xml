@@ -860,6 +860,37 @@
             </summary>
             <param name="keyCode">The key to press to call the attached method</param>
         </member>
+        <member name="T:VRChatUtilityKit.Utilities.MelonLoaderEvents">
+            <summary>
+            A class that, when inherited, has methods that call at the same time as the MelonMod methods.
+            Primarily to make OnApplicationStart, UIInit, etc. easier to subscribe to.
+            Overrides for any Update methods are unavailable for performance reasons.
+            </summary>
+        </member>
+        <member name="T:VRChatUtilityKit.Utilities.MelonLoaderEventsAttribute">
+            <summary>
+            An attribute that effectively acts the same way as MelonLoaderEvents, except as an attribute and not inherited class.
+            Mainly meant so static classes don't need to be instance.
+            </summary>
+        </member>
+        <member name="T:VRChatUtilityKit.Utilities.MelonLoaderEventsPriorityAttribute">
+            <summary>
+            An attribute to dictate the priority of the MelonLoaderEvents attribute/class.
+            Lower is higher priority.
+            </summary>
+        </member>
+        <member name="F:VRChatUtilityKit.Utilities.MelonLoaderEventsPriorityAttribute.priority">
+            <summary>
+            The priority.
+            Lower is higher priority.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.MelonLoaderEventsPriorityAttribute.#ctor(System.Int32)">
+            <summary>
+            Creates a new MelonLoaderEventsPrority Attribute.
+            </summary>
+            <param name="priority">The priority of the attribute</param>
+        </member>
         <member name="T:VRChatUtilityKit.Utilities.NetworkEvents">
             <summary>
             A set of events pertaining to VRChat's network.
@@ -947,26 +978,6 @@
         <member name="E:VRChatUtilityKit.Utilities.NetworkEvents.OnPlayerModerationRemoved">
             <summary>
             Calls when a player moderation is removed by the local user.
-            </summary>
-        </member>
-        <member name="P:VRChatUtilityKit.Utilities.SemverVersion.Major">
-            <summary>
-            The major number of the version.
-            </summary>
-        </member>
-        <member name="P:VRChatUtilityKit.Utilities.SemverVersion.Minor">
-            <summary>
-            The minor number of the version.
-            </summary>
-        </member>
-        <member name="P:VRChatUtilityKit.Utilities.SemverVersion.Patch">
-            <summary>
-            The patch number of the version.
-            </summary>
-        </member>
-        <member name="P:VRChatUtilityKit.Utilities.SemverVersion.Type">
-            <summary>
-            The release type of the version.
             </summary>
         </member>
         <member name="T:VRChatUtilityKit.Utilities.VRCUtils">

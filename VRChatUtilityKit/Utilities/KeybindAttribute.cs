@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
+#pragma warning disable IDE0051 // Remove unused private members
+
 namespace VRChatUtilityKit.Utilities
 {
     /// <summary>
@@ -11,6 +13,7 @@ namespace VRChatUtilityKit.Utilities
     /// Meant primarily for debugging purposes, but can be utilised for easy keybind creation.
     /// Can only be applied to static methods without parameters.
     /// </summary>
+    [MelonLoaderEvents]
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
     public class KeybindAttribute : Attribute
     {
@@ -33,7 +36,7 @@ namespace VRChatUtilityKit.Utilities
 
         internal static ValueTuple<MethodInfo, KeybindAttribute>[] keybinds;
 
-        internal static void Init()
+        private static void OnApplicationStart()
         {
             // this is performant i swear
             keybinds = MelonHandler.Mods

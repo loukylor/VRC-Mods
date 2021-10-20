@@ -11,11 +11,14 @@ using VRC.Core;
 using VRC.Management;
 using VRC.UI;
 
+#pragma warning disable IDE0051 // Remove unused private members
+
 namespace VRChatUtilityKit.Utilities
 {
     /// <summary>
     /// A set of utilities pertaining to VRChat itself.
     /// </summary>
+    [MelonLoaderEvents]
     public static class VRCUtils
     {
         /// <summary>
@@ -74,7 +77,7 @@ namespace VRChatUtilityKit.Utilities
         private static MethodInfo _loadAvatarMethod;
         private static MethodInfo _reloadAllAvatarsMethod;
 
-        internal static void Init()
+        private static void OnApplicationStart()
         {
             NetworkEvents.OnInstanceChanged += new Action<ApiWorld, ApiWorldInstance>((world, instance) => StartEmmCheck(world));
             MelonCoroutines.Start(UiInitCoroutine());
@@ -90,14 +93,11 @@ namespace VRChatUtilityKit.Utilities
             while (GameObject.Find("UserInterface").transform.Find("Canvas_QuickMenu(Clone)") == null)
                 yield return null;
 
-            OnUiManagerInit?.Invoke();
-        }
-
-        internal static void UiInit()
-        {
             MenuControllerInstance = QuickMenu.prop_QuickMenu_0.field_Public_MenuController_0;
             WorldInfoInstance = GameObject.Find("UserInterface/MenuContent/Screens/WorldInfo").GetComponent<PageWorldInfo>();
             UserInfoInstance = GameObject.Find("UserInterface/MenuContent/Screens/UserInfo").GetComponent<PageUserInfo>();
+
+            OnUiManagerInit?.Invoke();
         }
 
         // Completely stolen from Psychloor's PlayerRotator (https://github.com/Psychloor/PlayerRotater)
