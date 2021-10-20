@@ -37,11 +37,18 @@ namespace VRChatUtilityKit.Ui
         /// <param name="onClick">The OnClick of the button</param>
         /// <param name="icon">The icon for the button</param>
         /// <param name="gameObjectName">The name of the button's GameObject</param>
-        public SingleButton(VerticalLayoutGroup parent, Action onClick, Sprite icon, string gameObjectName) : base(parent.gameObject, UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard/ScrollRect/Viewport/VerticalLayoutGroup/Buttons_QuickLinks/Button_Worlds").gameObject, icon, gameObjectName)
+        public SingleButton(Transform parent, Action onClick, Sprite icon, string gameObjectName) : base(parent, UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard/ScrollRect/Viewport/VerticalLayoutGroup/Buttons_QuickLinks/Button_Worlds").gameObject, icon, gameObjectName)
         {
             TextComponent = rectTransform.Find("Text_H4").GetComponent<TextMeshProUGUI>();
             OnClick = onClick;
             BindingExtensions.Bind(ButtonComponent, new Action(() => OnClick?.Invoke()));
         }
+        /// <summary>
+        /// Creates a new button without a parent.
+        /// </summary>
+        /// <param name="onClick">The OnClick of the button</param>
+        /// <param name="icon">The icon for the button</param>
+        /// <param name="gameObjectName">The name of the button's GameObject</param>
+        public SingleButton(Action onClick, Sprite icon, string gameObjectName) : this(null, onClick, icon, gameObjectName) { }
     }
 }

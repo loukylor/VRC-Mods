@@ -47,7 +47,7 @@ namespace VRChatUtilityKit.Ui
         /// <param name="parent">The parent of the sub menu</param>
         /// <param name="pageName">The name of the sub menu's page</param>
         /// <param name="gameObjectName">The name of the sub menu's GameObject</param>
-        public SubMenu(GameObject parent, string pageName, string gameObjectName) : base(parent, UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard").gameObject, gameObjectName)
+        public SubMenu(Transform parent, string pageName, string gameObjectName) : base(parent, UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard").gameObject, gameObjectName)
         {
             GameObject.DestroyImmediate(gameObject.GetComponent<UIPage>());
             GameObject.Destroy(rectTransform.Find("Header_H1/RightItemContainer/Button_QM_Expand").gameObject); // Dunno how the binding class works so
@@ -69,6 +69,6 @@ namespace VRChatUtilityKit.Ui
         /// </summary>
         /// <param name="pageName">The name of the sub menu's page</param>
         /// <param name="gameObjectName">The name of the sub menu's GameObject</param>
-        public SubMenu(string pageName, string gameObjectName) : this(UiManager.QMStateController.transform.Find("Container/Window/QMParent").gameObject, pageName, gameObjectName) { }
+        public SubMenu(string pageName, string gameObjectName) : this(UiManager.QMStateController.transform.Find("Container/Window/QMParent"), pageName, gameObjectName) { }
     }
 }
