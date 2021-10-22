@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnhollowerBaseLib.Attributes;
 using UnhollowerRuntimeLib.XrefScans;
 
 namespace VRChatUtilityKit.Utilities
@@ -124,5 +125,15 @@ namespace VRChatUtilityKit.Utilities
                 }
             }
         }
+
+        /// <summary>
+        /// DO NOT call this often. 
+        /// It is slow.
+        /// </summary>
+        /// <param name="obfuscatedName">The obfuscated name of the type</param>
+        /// <returns>The Unhollower processed name</returns>
+        public static Type GetTypeFromObfuscatedName(string obfuscatedName) => AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(assembly => assembly.GetTypes())
+            .First(type => type.GetCustomAttribute<ObfuscatedNameAttribute>() != null && type.GetCustomAttribute<ObfuscatedNameAttribute>().ObfuscatedName.Equals(obfuscatedName, StringComparison.InvariantCulture));
     }
 }
