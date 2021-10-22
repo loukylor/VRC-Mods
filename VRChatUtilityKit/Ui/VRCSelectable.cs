@@ -25,16 +25,16 @@ namespace VRChatUtilityKit.Ui
         /// </summary>
         public string TooltipText
         {
-            get => Tooltip.text;
-            set => Tooltip.text = value;
+            get => Tooltip.field_Public_String_0;
+            set => Tooltip.field_Public_String_0 = value;
         }
         /// <summary>
         /// Gets or sets the selectable's tooltip's alternate text.
         /// </summary>
         public string TooltipAltText
         {
-            get => Tooltip.alternateText;
-            set => Tooltip.alternateText = value;
+            get => Tooltip.field_Public_String_1;
+            set => Tooltip.field_Public_String_1 = value;
         }
 
 

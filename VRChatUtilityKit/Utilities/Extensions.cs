@@ -117,7 +117,7 @@ namespace VRChatUtilityKit.Utilities
         /// <returns></returns>
         public static IUser ToIUser(this APIUser value)
         {
-            return (IUser)apiUserToIUser.Invoke(DataModelManager.Instance.Cache, new object[2] { value.id, value });
+            return (IUser)apiUserToIUser.Invoke(DataModelManager.field_Private_Static_DataModelManager_0.field_Private_DataModelCache_0, new object[2] { value.id, value });
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace VRChatUtilityKit.Utilities
         /// <returns></returns>
         public static APIUser ToAPIUser(this IUser value)
         {
-            return value.Cast<DataModel<APIUser>>();
+            return value.Cast<DataModel<APIUser>>().field_Protected_TYPE_0;
         }
     }
 }

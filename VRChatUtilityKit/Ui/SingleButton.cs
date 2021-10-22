@@ -48,7 +48,7 @@ namespace VRChatUtilityKit.Ui
             TextComponent = rectTransform.Find("Text_H4").GetComponent<TextMeshProUGUI>();
             Text = text;
             OnClick = onClick;
-            BindingExtensions.Bind(ButtonComponent, new Action(() => OnClick?.Invoke()));
+            BindingExtensions.Method_Public_Static_ButtonBindingHelper_Button_Action_0(ButtonComponent, new Action(() => OnClick?.Invoke()));
         }
     }
 }

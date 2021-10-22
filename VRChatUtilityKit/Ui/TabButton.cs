@@ -28,8 +28,8 @@ namespace VRChatUtilityKit.Ui
         public TabButton(Sprite sprite, string pageName, string gameObjectName) : base(UiManager.QMStateController.transform.Find("Container/Window/Page_Buttons_QM/HorizontalLayoutGroup"), UiManager.QMStateController.transform.Find("Container/Window/Page_Buttons_QM/HorizontalLayoutGroup/Page_Dashboard").gameObject, sprite, gameObjectName)
         {
             MenuTab = gameObject.GetComponent<MenuTab>();
-            MenuTab._menuStateController = UiManager.QMStateController;
-            MenuTab.pageName = pageName;
+            MenuTab.field_Private_MenuStateController_0 = UiManager.QMStateController;
+            MenuTab.field_Public_String_0 = pageName;
 
             SubMenu = new TabMenu(pageName, $"Page_{pageName}");
         }
