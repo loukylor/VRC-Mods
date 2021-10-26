@@ -27,7 +27,7 @@ namespace VRChatUtilityKit.Ui
         /// <summary>
         /// The back button of the sub menu.
         /// </summary>
-        public MonoBehaviourPublicBuVoStVoOnVoVoVoVoVoUnique BackButton { get; private set; } // this is temp
+        public MonoBehaviourPublicBuVoStVoOnVoVoVoVoVo0 BackButton { get; private set; } // this is temp
 
         /// <summary>
         /// The Text component of the title of the sub menu.
@@ -63,7 +63,7 @@ namespace VRChatUtilityKit.Ui
             for (int i = PageLayoutGroup.rectTransform.childCount - 1; i >= 0; i--)
                 GameObject.DestroyImmediate(PageLayoutGroup.transform.GetChild(i).gameObject);
 
-            BackButton = rectTransform.Find("Header_H1/LeftItemContainer/Button_Back").GetComponent<MonoBehaviourPublicBuVoStVoOnVoVoVoVoVoUnique>(); // temp
+            BackButton = rectTransform.Find("Header_H1/LeftItemContainer/Button_Back").GetComponent<MonoBehaviourPublicBuVoStVoOnVoVoVoVoVo0>(); // temp
             TitleText = rectTransform.Find("Header_H1/LeftItemContainer/Text_Title").GetComponent<TextMeshProUGUI>();
             uiPage = gameObject.AddComponent<UIPage>();
             uiPage.field_Private_MenuStateController_0 = UiManager.QMStateController;

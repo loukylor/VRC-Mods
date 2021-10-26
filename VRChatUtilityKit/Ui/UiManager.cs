@@ -90,6 +90,8 @@ namespace VRChatUtilityKit.Ui
 
         private static MethodInfo _selectUserMethod;
         private static MethodInfo _selectUserForMoreInfoMethod;
+        internal static MethodInfo _pushPageMethod;
+        internal static MethodInfo _removePageMethod;
 
         private static PropertyInfo _quickMenuEnumProperty;
         /// <summary>
@@ -207,6 +209,11 @@ namespace VRChatUtilityKit.Ui
                 .ToArray();
             _selectUserMethod = selectedUserMethods[0];
             _selectUserForMoreInfoMethod = selectedUserMethods[1]; // This one has higher caller count
+
+            MethodInfo[] pageMethods = typeof(UIPage).GetMethods()
+                .Where(method => method.Name.StartsWith("Method_Public_Void_UIPage_")).ToArray();
+            _pushPageMethod = pageMethods.First(method => XrefUtils.CheckMethod(method, "ThrowArgumentOutOfRangeException"));
+            _removePageMethod = pageMethods.First(method => method != _pushPageMethod);
 
             ButtonReaction buttonReaction = GameObject.Find("UserInterface/QuickMenu/UIElementsMenu/NameplatesOnButton").GetComponent<ButtonReaction>();
             FullOnButtonSprite = buttonReaction.field_Public_Sprite_0.name.Contains("Full_ON") ? buttonReaction.field_Public_Sprite_0 : buttonReaction.field_Public_Sprite_1;
