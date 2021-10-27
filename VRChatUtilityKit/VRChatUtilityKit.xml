@@ -490,154 +490,17 @@
             </summary>
             <param name="showDefaultScreen">Whether to show the world menu after opening the big menu</param>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenUserInQuickMenu(VRC.DataModel.IUser)">
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenUserInQuickMenu(VRC.Core.APIUser)">
             <summary>
             Opens given user in the QuickMenu.
             </summary>
             <param name="playerToSelect">The player to select</param>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.AskConfirmOpenURL(System.String)">
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenUserForMoreInfoInQuickMenu(VRC.Core.APIUser)">
             <summary>
-            Opens the popup to confirm opening a link with the given link.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
+            Opens given user in the Open User For More Info QuickMenu.
             </summary>
-            <param name="link">The link to open</param>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.CloseMenu">
-            <summary>
-            Closes the QuickMenu or big menu.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.GoToHomeWorld">
-            <summary>
-            Goes to the home world WITHOUT opening the confirmation popup.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenActionMenu">
-            <summary>
-            Opens the ActionMenu.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenAvatarsMenu">
-            <summary>
-            Opens the Avatar big menu.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenCannedWorldSearch(System.String)">
-            <summary>
-            Opens the World Search big menu and searches the given searchTerm.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-            <param name="searchTerm">The term to search</param>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenChangeStatusMenu">
-            <summary>
-            Opens the Social big menu along with the Update Status popup.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenCreateNewWorldInstanceMenu">
-            <summary>
-            Opens the WorldInfo big menu along with the NewInstance popup.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenCurrentWorldMenu">
-            <summary>
-            Opens the current world in the WorldInfo big menu.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenEmotesActionMenu">
-            <summary>
-            Opens the avatar emotes ActionMenu.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenGalleryCameraMenu">
-            <summary>
-            Opens the Add Photo to Gallery menu in the QuickMenu.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenGalleryMenu">
-            <summary>
-            Opens the Gallery big menu.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenMainMenuTab">
-            <summary>
-            Opens the UserInfo big menu on the current user.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenProfileMenu">
-            <summary>
-            Opens the current user in the WorldInfo big menu.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenQuickMenuTab(System.String)">
-            <summary>
-            Opens given page in the QuickMenu.
-            A list of valid pages can be found in the CurrentMenuStateController's _wings dictionary.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-            <param name="pageName">The page to open</param>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenSafetyMenu">
-            <summary>
-            Opens the Safety big menu.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenSettingsMenu">
-            <summary>
-            Opens the Settings big menu.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenSocialMenu">
-            <summary>
-            Opens the Social big menu.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenUserIconCameraMenu">
-            <summary>
-            Opens the UserIcon menu in the QuickMenu.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenViewWorldAuthorMenu">
-            <summary>
-            Opens the current world author in the big menu. (I think) Equal to the on click of the world author button in the worlds menu.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenVRCPlusMenu">
-            <summary>
-            Opens the VRC+ big menu.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenWorldsMenu">
-            <summary>
-            Opens the worlds big menu.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons. Please report to me any weirdness this method has.)
-            </summary>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.ShowAlert(System.String)">
-            <summary>
-            Shows an alert at the bottom of the QuickMenu.
-            (This is a direct API to VRChat's UIManager that I could not expose directly for a few reasons)
-            </summary>
-            <param name="alertText">The text to show</param>
+            <param name="playerToSelect">The player to select</param>
         </member>
         <member name="M:VRChatUtilityKit.Ui.UiManager.ClosePopup">
             <summary>
@@ -744,26 +607,6 @@
             Returns the given coordinate converted from Unity units to emm units.
             </summary>
             <param name="unityPosition">The position to conver to emm units</param>
-        </member>
-        <member name="T:VRChatUtilityKit.Utilities.CursorUtils">
-            <summary>
-            A set of utilities pertaining to VRChat's cursor
-            </summary>
-        </member>
-        <member name="P:VRChatUtilityKit.Utilities.CursorUtils.CurrentCursor">
-            <summary>
-            Returns the current cursor being used by VRChat.
-            </summary>
-        </member>
-        <member name="P:VRChatUtilityKit.Utilities.CursorUtils.IsUseInputPressed">
-            <summary>
-            Returns whether the use input is being pressed on the current cursor.
-            </summary>
-        </member>
-        <member name="P:VRChatUtilityKit.Utilities.CursorUtils.HitPosition">
-            <summary>
-            Returns where the raycast of the current cursor is colliding.
-            </summary>
         </member>
         <member name="T:VRChatUtilityKit.Utilities.DataUtils">
             <summary>
@@ -1101,6 +944,14 @@
             This is for DEBUG PURPOSES ONLY.
             </summary>
             <param name="method">The method to dump information on</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.XrefUtils.GetTypeFromObfuscatedName(System.String)">
+            <summary>
+            DO NOT call this often. 
+            It is slow.
+            </summary>
+            <param name="obfuscatedName">The obfuscated name of the type</param>
+            <returns>The Unhollower processed name</returns>
         </member>
     </members>
 </doc>

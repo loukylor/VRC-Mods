@@ -102,11 +102,6 @@ namespace VRChatUtilityKit.Ui
         internal static Transform tempUIParent;
 
         /// <summary>
-        /// A tab for people to use, reducing the need for every mod to have a tab.
-        /// </summary>
-        public TabButton VRCUKTabButton { get; private set; }
-
-        /// <summary>
         /// The filled in button sprite.
         /// </summary>
         public static Sprite FullOnButtonSprite { get; private set; }
@@ -119,8 +114,6 @@ namespace VRChatUtilityKit.Ui
         /// The QuickMenu MenuStateController used by VRChat
         /// </summary>
         public static MenuStateController QMStateController { get; private set; }
-
-        private static Type _quickMenuContextualDisplayEnum;
 
         internal static void Init()
         {
@@ -158,9 +151,6 @@ namespace VRChatUtilityKit.Ui
             foreach (MethodInfo method in typeof(MenuController).GetMethods().Where(mi => mi.Name.StartsWith("Method_Public_Void_APIUser_") && !mi.Name.Contains("_PDM_")))
                 VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(method, postfix: new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnUserInfoOpen), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(AccessTools.Method(typeof(PageUserInfo), "Back"), postfix: new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnUserInfoClose), BindingFlags.NonPublic | BindingFlags.Static)));
-
-            _quickMenuContextualDisplayEnum = typeof(QuickMenuContextualDisplay).GetNestedTypes()
-                .First(type => type.Name.StartsWith("Enum"));
 
             _popupV2Small = typeof(VRCUiPopupManager).GetMethods()
                 .First(mb => mb.Name.StartsWith("Method_Public_Void_String_String_String_Action_Action_1_VRCUiPopup_") && !mb.Name.Contains("PDM") && XrefUtils.CheckMethod(mb, "UserInterface/MenuContent/Popups/StandardPopupV2") && XrefUtils.CheckUsedBy(mb, "OpenSaveSearchPopup"));
@@ -202,7 +192,8 @@ namespace VRChatUtilityKit.Ui
 
             QMStateController = GameObject.Find("UserInterface").transform.Find("Canvas_QuickMenu(Clone)").GetComponent<MenuStateController>();
 
-            Type selectedUserManager = XrefUtils.GetTypeFromObfuscatedName(GameObject.Find("_Application/UIManager/SelectedUserManager").GetComponents<MonoBehaviour>()[1].GetIl2CppType().Name);
+            // index 0 works because transform doesn't inherit from monobehavior
+            Type selectedUserManager = XrefUtils.GetTypeFromObfuscatedName(GameObject.Find("_Application/UIManager/SelectedUserManager").GetComponents<MonoBehaviour>()[0].GetIl2CppType().Name);
             MethodInfo[] selectedUserMethods = selectedUserManager.GetMethods()
                 .Where(method => method.Name.StartsWith("Method_Public_Void_APIUser_"))
                 .OrderBy(method => method.GetCustomAttribute<CallerCountAttribute>().Count)
@@ -212,7 +203,7 @@ namespace VRChatUtilityKit.Ui
 
             MethodInfo[] pageMethods = typeof(UIPage).GetMethods()
                 .Where(method => method.Name.StartsWith("Method_Public_Void_UIPage_")).ToArray();
-            _pushPageMethod = pageMethods.First(method => XrefUtils.CheckMethod(method, "ThrowArgumentOutOfRangeException"));
+            _pushPageMethod = pageMethods.First(method => XrefUtils.CheckUsing(method, "ThrowArgumentOutOfRangeException"));
             _removePageMethod = pageMethods.First(method => method != _pushPageMethod);
 
             ButtonReaction buttonReaction = GameObject.Find("UserInterface/QuickMenu/UIElementsMenu/NameplatesOnButton").GetComponent<ButtonReaction>();
