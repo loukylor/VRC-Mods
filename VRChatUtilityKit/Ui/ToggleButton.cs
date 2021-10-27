@@ -38,10 +38,16 @@ namespace VRChatUtilityKit.Ui
         /// <param name="altIcon">The off icon for the button</param>
         /// <param name="text">The text of the button</param>
         /// <param name="gameObjectName">The name of the button's GameObject</param>
-        public ToggleButton(Action<bool> onClick, Sprite icon, Sprite altIcon, string text, string gameObjectName) : base(UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard/ScrollRect/Viewport/VerticalLayoutGroup/Buttons_QuickLinks/Button_Worlds").gameObject, icon, text, gameObjectName)
+        /// <param name="tooltipText">The tooltip shown when the toggle is on</param>
+        /// <param name="tooltipAltText">The tooltip shown when the toggle is off</param>
+        public ToggleButton(Action<bool> onClick, Sprite icon, Sprite altIcon, string text, string gameObjectName, string tooltipText = "", string tooltipAltText = "") : base(UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Settings/Panel_QM_ScrollRect/Viewport/VerticalLayoutGroup/Buttons_UI_Elements_Row_1/Button_ToggleQMInfo").gameObject, icon, text, gameObjectName, tooltipText)
         {
             _altImage = rectTransform.Find("Icon_Off").GetComponent<Image>();
             AltSprite = altIcon;
+
+            ToggleComponent = gameObject.GetComponent<Toggle>();
+
+            TooltipAltText = tooltipAltText;
 
             OnClick = onClick;
             BindingExtensions.Method_Public_Static_ToggleBindingHelper_Toggle_Action_1_Boolean_0(ToggleComponent, new Action<bool>((state) => OnClick?.Invoke(state)));

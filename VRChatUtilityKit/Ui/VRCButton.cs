@@ -29,7 +29,8 @@ namespace VRChatUtilityKit.Ui
         /// <param name="icon">The icon of the button</param>
         /// <param name="text">The text on the button</param>
         /// <param name="gameObjectName">The name of the button's GameObject</param>
-        protected VRCButton(GameObject template, Sprite icon, string text, string gameObjectName) : base(null, template, icon, gameObjectName)
+        /// <param name="tooltipText">The tooltip of the button</param>
+        protected VRCButton(GameObject template, Sprite icon, string text, string gameObjectName, string tooltipText = "") : base(null, template, icon, gameObjectName, tooltipText)
         {
             TextComponent = rectTransform.Find("Text_H4").GetComponent<TextMeshProUGUI>();
             Text = text;

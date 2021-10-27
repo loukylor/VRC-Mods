@@ -27,7 +27,8 @@ namespace VRChatUtilityKit.Ui
         /// <param name="icon">The icon for the button</param>
         /// <param name="text">The text of the button</param>
         /// <param name="gameObjectName">The name of the button's GameObject</param>
-        public SingleButton(Action onClick, Sprite icon, string text, string gameObjectName) : base(UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard/ScrollRect/Viewport/VerticalLayoutGroup/Buttons_QuickLinks/Button_Worlds").gameObject, icon, text, gameObjectName)
+        /// <param name="tooltipText">The tooltip of the button</param>
+        public SingleButton(Action onClick, Sprite icon, string text, string gameObjectName, string tooltipText = "") : base(UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard/ScrollRect/Viewport/VerticalLayoutGroup/Buttons_QuickLinks/Button_Worlds").gameObject, icon, text, gameObjectName, tooltipText)
         {
             JumpBadge = rectTransform.Find("Badge_MMJump").gameObject;
             JumpBadge.SetActive(false);

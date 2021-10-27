@@ -45,7 +45,7 @@
             The buttons in the group.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.#ctor(System.String,System.String,System.Collections.Generic.List{VRChatUtilityKit.Ui.VRCSelectable})">
+        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.#ctor(System.String,System.String,System.Collections.Generic.List{VRChatUtilityKit.Ui.VRCButton})">
             <summary>
             Creates a new button group.
             </summary>
@@ -65,19 +65,19 @@
             Removes the button header from the group.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.AddButton(VRChatUtilityKit.Ui.VRCSelectable)">
+        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.AddButton(VRChatUtilityKit.Ui.VRCButton)">
             <summary>
             Adds the given button to the group.
             </summary>
             <param name="button">The button to add</param>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.AddButtonRange(System.Collections.Generic.IEnumerable{VRChatUtilityKit.Ui.VRCSelectable})">
+        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.AddButtonRange(System.Collections.Generic.IEnumerable{VRChatUtilityKit.Ui.VRCButton})">
             <summary>
             Adds the given range of buttons to the group.
             </summary>
             <param name="buttons">The range of buttons to add</param>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.RemoveButton(VRChatUtilityKit.Ui.VRCSelectable)">
+        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.RemoveButton(VRChatUtilityKit.Ui.VRCButton)">
             <summary>
             Removes the given button from the group.
             </summary>

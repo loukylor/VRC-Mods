@@ -25,7 +25,8 @@ namespace VRChatUtilityKit.Ui
         /// <param name="sprite">The sprite of the tab button</param>
         /// <param name="pageName">The name of the tab menu's page</param>
         /// <param name="gameObjectName">The name of the tab button's GameObject</param>
-        public TabButton(Sprite sprite, string pageName, string gameObjectName) : base(UiManager.QMStateController.transform.Find("Container/Window/Page_Buttons_QM/HorizontalLayoutGroup"), UiManager.QMStateController.transform.Find("Container/Window/Page_Buttons_QM/HorizontalLayoutGroup/Page_Dashboard").gameObject, sprite, gameObjectName)
+        /// <param name="tooltipText">The tooltip of the tab button</param>
+        public TabButton(Sprite sprite, string pageName, string gameObjectName, string tooltipText = "") : base(UiManager.QMStateController.transform.Find("Container/Window/Page_Buttons_QM/HorizontalLayoutGroup"), UiManager.QMStateController.transform.Find("Container/Window/Page_Buttons_QM/HorizontalLayoutGroup/Page_Dashboard").gameObject, sprite, gameObjectName, tooltipText)
         {
             MenuTab = gameObject.GetComponent<MenuTab>();
             MenuTab.field_Private_MenuStateController_0 = UiManager.QMStateController;

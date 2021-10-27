@@ -28,8 +28,8 @@ namespace VRChatUtilityKit.Ui
         /// <summary>
         /// The buttons in the group.
         /// </summary>
-        public IReadOnlyList<VRCSelectable> Buttons => _buttons;
-        private readonly List<VRCSelectable> _buttons = new List<VRCSelectable>();
+        public IReadOnlyList<VRCButton> Buttons => _buttons;
+        private readonly List<VRCButton> _buttons = new List<VRCButton>();
 
         /// <summary>
         /// Creates a new button group.
@@ -37,7 +37,7 @@ namespace VRChatUtilityKit.Ui
         /// <param name="name">The name of the group</param>
         /// <param name="headerText">The text of the header</param>
         /// <param name="buttons">The buttons on the group</param>
-        public ButtonGroup(string name, string headerText = null, List<VRCSelectable> buttons = null) : base(null, UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard/ScrollRect/Viewport/VerticalLayoutGroup/Buttons_QuickLinks").gameObject, $"Buttons_{name}")
+        public ButtonGroup(string name, string headerText = null, List<VRCButton> buttons = null) : base(null, UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard/ScrollRect/Viewport/VerticalLayoutGroup/Buttons_QuickLinks").gameObject, $"Buttons_{name}")
         {
             ButtonLayoutGroup = gameObject.GetComponent<GridLayoutGroup>();
             for (int i = ButtonLayoutGroup.transform.childCount - 1; i >= 0; i--)
@@ -75,7 +75,7 @@ namespace VRChatUtilityKit.Ui
         /// Adds the given button to the group.
         /// </summary>
         /// <param name="button">The button to add</param>
-        public ButtonGroup AddButton(VRCSelectable button)
+        public ButtonGroup AddButton(VRCButton button)
         {
             button.rectTransform.parent = ButtonLayoutGroup.transform;
             _buttons.Add(button);
@@ -86,9 +86,9 @@ namespace VRChatUtilityKit.Ui
         /// Adds the given range of buttons to the group.
         /// </summary>
         /// <param name="buttons">The range of buttons to add</param>
-        public ButtonGroup AddButtonRange(IEnumerable<VRCSelectable> buttons)
+        public ButtonGroup AddButtonRange(IEnumerable<VRCButton> buttons)
         {
-            foreach (VRCSelectable button in buttons)
+            foreach (VRCButton button in buttons)
                 AddButton(button);
             return this;
         }
@@ -97,7 +97,7 @@ namespace VRChatUtilityKit.Ui
         /// Removes the given button from the group.
         /// </summary>
         /// <param name="button">The button to remove</param>
-        public ButtonGroup RemoveButton(VRCSelectable button)
+        public ButtonGroup RemoveButton(VRCButton button)
         {
             _buttons.Remove(button);
             GameObject.DestroyImmediate(button.gameObject);
