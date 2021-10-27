@@ -1,5 +1,4 @@
 ﻿using System;
-using TMPro;
 using UnityEngine;
 using VRC.DataModel.Core;
 
@@ -8,8 +7,13 @@ namespace VRChatUtilityKit.Ui
     /// <summary>
     /// A wrapper holding a button.
     /// </summary>
-    public class SingleButton : VRCButton
+    public class SingleButton : VRCButton, IButtonGroupElement
     {
+        /// <summary>
+        /// The type of button this interface represents.
+        /// </summary>
+        public ElementType Type => ElementType.SingleButton;
+
         /// <summary>
         /// The OnClick of the button.
         /// </summary>
@@ -28,7 +32,7 @@ namespace VRChatUtilityKit.Ui
         /// <param name="text">The text of the button</param>
         /// <param name="gameObjectName">The name of the button's GameObject</param>
         /// <param name="tooltipText">The tooltip of the button</param>
-        public SingleButton(Action onClick, Sprite icon, string text, string gameObjectName, string tooltipText = "") : base(UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard/ScrollRect/Viewport/VerticalLayoutGroup/Buttons_QuickLinks/Button_Worlds").gameObject, icon, text, gameObjectName, tooltipText)
+        public SingleButton(Action onClick, Sprite icon, string text, string gameObjectName, string tooltipText = "") : base(UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Settings/Panel_QM_ScrollRect/Viewport/VerticalLayoutGroup/Buttons_UI_Elements_Row_1/Button_NameplateSettings").gameObject, icon, text, gameObjectName, tooltipText)
         {
             JumpBadge = rectTransform.Find("Badge_MMJump").gameObject;
             JumpBadge.SetActive(false);

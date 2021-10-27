@@ -8,8 +8,13 @@ namespace VRChatUtilityKit.Ui
     /// <summary>
     /// A class representing a toggle button in VRChat's UI.
     /// </summary>
-    public class ToggleButton : VRCButton
+    public class ToggleButton : VRCButton, IButtonGroupElement
     {
+        /// <summary>
+        /// The type of button this interface represents.
+        /// </summary>
+        public ElementType Type => ElementType.ToggleButton;
+
         /// <summary>
         /// The toggle on the component on the button.
         /// </summary>

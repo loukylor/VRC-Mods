@@ -45,7 +45,7 @@
             The buttons in the group.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.#ctor(System.String,System.String,System.Collections.Generic.List{VRChatUtilityKit.Ui.VRCButton})">
+        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.#ctor(System.String,System.String,System.Collections.Generic.List{VRChatUtilityKit.Ui.IButtonGroupElement})">
             <summary>
             Creates a new button group.
             </summary>
@@ -65,19 +65,19 @@
             Removes the button header from the group.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.AddButton(VRChatUtilityKit.Ui.VRCButton)">
+        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.AddButton(VRChatUtilityKit.Ui.IButtonGroupElement)">
             <summary>
             Adds the given button to the group.
             </summary>
             <param name="button">The button to add</param>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.AddButtonRange(System.Collections.Generic.IEnumerable{VRChatUtilityKit.Ui.VRCButton})">
+        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.AddButtonRange(System.Collections.Generic.IEnumerable{VRChatUtilityKit.Ui.IButtonGroupElement})">
             <summary>
             Adds the given range of buttons to the group.
             </summary>
             <param name="buttons">The range of buttons to add</param>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.RemoveButton(VRChatUtilityKit.Ui.VRCButton)">
+        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.RemoveButton(VRChatUtilityKit.Ui.IButtonGroupElement)">
             <summary>
             Removes the given button from the group.
             </summary>
@@ -123,10 +123,10 @@
             The RectTransform of the element.
             </summary>
         </member>
-        <member name="P:VRChatUtilityKit.Ui.ElementBase.id">
+        <member name="P:VRChatUtilityKit.Ui.ElementBase.Id">
             <summary>
             A unique ID of the element.
-            Does not persist through updates.
+            Does not persist through restarts.
             </summary>
         </member>
         <member name="M:VRChatUtilityKit.Ui.ElementBase.#ctor(UnityEngine.Transform,UnityEngine.GameObject,System.String)">
@@ -150,6 +150,47 @@
             </summary>
             <returns>A unique integer representing the element</returns>
         </member>
+        <member name="T:VRChatUtilityKit.Ui.IButtonGroupElement">
+            <summary>
+            An interface that represents elements that go in ButtonGroups
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.IButtonGroupElement.Path">
+            <summary>
+            The path of the GameObject
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.IButtonGroupElement.gameObject">
+            <summary>
+            The GameObject of the element.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.IButtonGroupElement.rectTransform">
+            <summary>
+            The RectTransform of the element.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.IButtonGroupElement.Id">
+            <summary>
+            A unique ID of the element.
+            Does not persist through restarts.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.IButtonGroupElement.Type">
+            <summary>
+            The type of button this interface represents.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.IButtonGroupElement.TextComponent">
+            <summary>
+            The text mesh pro component on the element.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.IButtonGroupElement.Text">
+            <summary>
+            Gets or sets the text on the element.
+            </summary>
+        </member>
         <member name="T:VRChatUtilityKit.Ui.IElementWithText">
             <summary>
             An interface for wrappers that hold elements with text.
@@ -165,9 +206,52 @@
             Gets or sets the text on the element.
             </summary>
         </member>
+        <member name="T:VRChatUtilityKit.Ui.Label">
+            <summary>
+            A wrapper that holds a UI element that only has text.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.Label.Type">
+            <summary>
+            The type of button this interface represents.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.Label.TextComponent">
+            <summary>
+            The text mesh pro component on the label.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.Label.Text">
+            <summary>
+            Gets or sets the text on the label.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.Label.SubtitleTextComponent">
+            <summary>
+            The subtitle text mesh pro component on the label.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.Label.SubtitleText">
+            <summary>
+            Gets or sets the subtitle text on the label.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.Label.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Creates a new label.
+            </summary>
+            <param name="text">The text of the label</param>
+            <param name="subtitleText">The subtitle text of the label</param>
+            <param name="gameObjectName">The name of the label's GameObject</param>
+        </member>
         <member name="T:VRChatUtilityKit.Ui.SingleButton">
             <summary>
             A wrapper holding a button.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.SingleButton.Type">
+            <summary>
+            The type of button this interface represents.
             </summary>
         </member>
         <member name="P:VRChatUtilityKit.Ui.SingleButton.OnClick">
@@ -180,7 +264,7 @@
             A small icon indicating this buttons jumps to the big menu.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.SingleButton.#ctor(System.Action,UnityEngine.Sprite,System.String,System.String)">
+        <member name="M:VRChatUtilityKit.Ui.SingleButton.#ctor(System.Action,UnityEngine.Sprite,System.String,System.String,System.String)">
             <summary>
             Creates a new button.
             </summary>
@@ -188,6 +272,7 @@
             <param name="icon">The icon for the button</param>
             <param name="text">The text of the button</param>
             <param name="gameObjectName">The name of the button's GameObject</param>
+            <param name="tooltipText">The tooltip of the button</param>
         </member>
         <member name="T:VRChatUtilityKit.Ui.SubMenu">
             <summary>
@@ -277,13 +362,14 @@
             The MenuTab component on the tab button.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.TabButton.#ctor(UnityEngine.Sprite,System.String,System.String)">
+        <member name="M:VRChatUtilityKit.Ui.TabButton.#ctor(UnityEngine.Sprite,System.String,System.String,System.String)">
             <summary>
             Creates a new tab button.
             </summary>
             <param name="sprite">The sprite of the tab button</param>
             <param name="pageName">The name of the tab menu's page</param>
             <param name="gameObjectName">The name of the tab button's GameObject</param>
+            <param name="tooltipText">The tooltip of the tab button</param>
         </member>
         <member name="T:VRChatUtilityKit.Ui.TabMenu">
             <summary>
@@ -353,6 +439,11 @@
             A class representing a toggle button in VRChat's UI.
             </summary>
         </member>
+        <member name="P:VRChatUtilityKit.Ui.ToggleButton.Type">
+            <summary>
+            The type of button this interface represents.
+            </summary>
+        </member>
         <member name="P:VRChatUtilityKit.Ui.ToggleButton.ToggleComponent">
             <summary>
             The toggle on the component on the button.
@@ -368,7 +459,7 @@
             The off sprite of the button.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.ToggleButton.#ctor(System.Action{System.Boolean},UnityEngine.Sprite,UnityEngine.Sprite,System.String,System.String)">
+        <member name="M:VRChatUtilityKit.Ui.ToggleButton.#ctor(System.Action{System.Boolean},UnityEngine.Sprite,UnityEngine.Sprite,System.String,System.String,System.String,System.String)">
             <summary>
             Creates a new toggle button.
             </summary>
@@ -377,6 +468,8 @@
             <param name="altIcon">The off icon for the button</param>
             <param name="text">The text of the button</param>
             <param name="gameObjectName">The name of the button's GameObject</param>
+            <param name="tooltipText">The tooltip shown when the toggle is on</param>
+            <param name="tooltipAltText">The tooltip shown when the toggle is off</param>
         </member>
         <member name="T:VRChatUtilityKit.Ui.UiManager">
             <summary>
@@ -576,7 +669,7 @@
             Gets or sets the text on the button.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.VRCButton.#ctor(UnityEngine.GameObject,UnityEngine.Sprite,System.String,System.String)">
+        <member name="M:VRChatUtilityKit.Ui.VRCButton.#ctor(UnityEngine.GameObject,UnityEngine.Sprite,System.String,System.String,System.String)">
             <summary>
             Creates a new VRCButton.
             </summary>
@@ -584,6 +677,7 @@
             <param name="icon">The icon of the button</param>
             <param name="text">The text on the button</param>
             <param name="gameObjectName">The name of the button's GameObject</param>
+            <param name="tooltipText">The tooltip of the button</param>
         </member>
         <member name="T:VRChatUtilityKit.Ui.VRCSelectable">
             <summary>
@@ -616,7 +710,7 @@
             The sprite of the selectable.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.VRCSelectable.#ctor(UnityEngine.Transform,UnityEngine.GameObject,UnityEngine.Sprite,System.String)">
+        <member name="M:VRChatUtilityKit.Ui.VRCSelectable.#ctor(UnityEngine.Transform,UnityEngine.GameObject,UnityEngine.Sprite,System.String,System.String)">
             <summary>
             Creates a new VRCSelectable.
             </summary>
@@ -624,6 +718,7 @@
             <param name="template">An existing selectable to instantiate a copy of</param>
             <param name="icon">The icon of the selectable</param>
             <param name="gameObjectName">The name of the selectable's GameObject</param>
+            <param name="tooltipText">The tooltip of the selectable</param>
         </member>
         <member name="T:VRChatUtilityKit.Utilities.AsyncUtils">
             <summary>

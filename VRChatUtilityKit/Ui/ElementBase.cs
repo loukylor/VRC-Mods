@@ -27,9 +27,9 @@ namespace VRChatUtilityKit.Ui
         private readonly int _id;
         /// <summary>
         /// A unique ID of the element.
-        /// Does not persist through updates.
+        /// Does not persist through restarts.
         /// </summary>
-        public int id => _id;
+        public int Id => _id;
 
         /// <summary>
         /// Creates a new ElementBase.
@@ -55,12 +55,12 @@ namespace VRChatUtilityKit.Ui
         /// </summary>
         /// <param name="obj">The object to compare with the current object</param>
         /// <returns>true if the specified object is equal to the current object; otherwise, false</returns>
-        public override bool Equals(object obj) => obj is ElementBase element && element.id == id;
+        public override bool Equals(object obj) => obj is ElementBase element && element.Id == Id;
 
         /// <summary>
         /// Returns a unique integer representing the element.
         /// </summary>
         /// <returns>A unique integer representing the element</returns>
-        public override int GetHashCode() => id;
+        public override int GetHashCode() => Id;
     }
 }
