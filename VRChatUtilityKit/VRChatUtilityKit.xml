@@ -180,16 +180,6 @@
             A small icon indicating this buttons jumps to the big menu.
             </summary>
         </member>
-        <member name="P:VRChatUtilityKit.Ui.SingleButton.TextComponent">
-            <summary>
-            The text mesh pro component on the button.
-            </summary>
-        </member>
-        <member name="P:VRChatUtilityKit.Ui.SingleButton.Text">
-            <summary>
-            Gets or sets the text on the button.
-            </summary>
-        </member>
         <member name="M:VRChatUtilityKit.Ui.SingleButton.#ctor(System.Action,UnityEngine.Sprite,System.String,System.String)">
             <summary>
             Creates a new button.
@@ -357,6 +347,36 @@
             The given page must already be in the stack.
             </summary>
             <param name="subMenu">The menu to open</param>
+        </member>
+        <member name="T:VRChatUtilityKit.Ui.ToggleButton">
+            <summary>
+            A class representing a toggle button in VRChat's UI.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.ToggleButton.ToggleComponent">
+            <summary>
+            The toggle on the component on the button.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.ToggleButton.OnClick">
+            <summary>
+            The OnClick of the button.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.ToggleButton.AltSprite">
+            <summary>
+            The off sprite of the button.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.ToggleButton.#ctor(System.Action{System.Boolean},UnityEngine.Sprite,UnityEngine.Sprite,System.String,System.String)">
+            <summary>
+            Creates a new toggle button.
+            </summary>
+            <param name="onClick">The OnClick of the button</param>
+            <param name="icon">The icon for the button</param>
+            <param name="altIcon">The off icon for the button</param>
+            <param name="text">The text of the button</param>
+            <param name="gameObjectName">The name of the button's GameObject</param>
         </member>
         <member name="T:VRChatUtilityKit.Ui.UiManager">
             <summary>
@@ -541,6 +561,30 @@
             <param name="rightButtonClick">The onClick of the right button</param>
             <param name="additionalSetup">A callback called when the popup is initialized</param>
         </member>
+        <member name="T:VRChatUtilityKit.Ui.VRCButton">
+            <summary>
+            A wrapper that holds a generic button used in VRChat's menus.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.VRCButton.TextComponent">
+            <summary>
+            The text mesh pro component on the button.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.VRCButton.Text">
+            <summary>
+            Gets or sets the text on the button.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.VRCButton.#ctor(UnityEngine.GameObject,UnityEngine.Sprite,System.String,System.String)">
+            <summary>
+            Creates a new VRCButton.
+            </summary>
+            <param name="template">The template of the button you want to make</param>
+            <param name="icon">The icon of the button</param>
+            <param name="text">The text on the button</param>
+            <param name="gameObjectName">The name of the button's GameObject</param>
+        </member>
         <member name="T:VRChatUtilityKit.Ui.VRCSelectable">
             <summary>
             A fairly low level wrapper representing something you can select.
@@ -607,6 +651,26 @@
             Returns the given coordinate converted from Unity units to emm units.
             </summary>
             <param name="unityPosition">The position to conver to emm units</param>
+        </member>
+        <member name="T:VRChatUtilityKit.Utilities.CursorUtils">
+            <summary>
+            A set of utilities pertaining to VRChat's cursor
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.CursorUtils.CurrentCursor">
+            <summary>
+            Returns the current cursor being used by VRChat.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.CursorUtils.IsUseInputPressed">
+            <summary>
+            Returns whether the use input is being pressed on the current cursor.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.CursorUtils.HitPosition">
+            <summary>
+            Returns where the raycast of the current cursor is colliding.
+            </summary>
         </member>
         <member name="T:VRChatUtilityKit.Utilities.DataUtils">
             <summary>

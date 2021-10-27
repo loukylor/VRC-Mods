@@ -60,7 +60,10 @@ namespace VRChatUtilityKit.Ui
             ButtonComponent = gameObject.GetComponent<Button>();
             Tooltip = gameObject.GetComponent<VRC.UI.Elements.Tooltips.UiTooltip>();
 
-            _image = rectTransform.Find("Icon").GetComponent<Image>();
+            if (rectTransform.Find("Icon") == null)
+                _image = rectTransform.Find("Icon_On").GetComponent<Image>();
+            else
+                _image = rectTransform.Find("Icon").GetComponent<Image>();
             _image.sprite = icon;
         }
     }
