@@ -153,9 +153,9 @@ namespace VRChatUtilityKit.Ui
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(AccessTools.Method(typeof(PageUserInfo), "Back"), postfix: new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnUserInfoClose), BindingFlags.NonPublic | BindingFlags.Static)));
 
             _popupV2Small = typeof(VRCUiPopupManager).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_String_String_String_Action_Action_1_VRCUiPopup_") && !mb.Name.Contains("PDM") && XrefUtils.CheckMethod(mb, "UserInterface/MenuContent/Popups/StandardPopupV2") && XrefUtils.CheckUsedBy(mb, "OpenSaveSearchPopup"));
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_String_String_String_Action_Action_1_VRCUiPopup_") && !mb.Name.Contains("PDM") && XrefUtils.CheckStrings(mb, "UserInterface/MenuContent/Popups/StandardPopupV2") && XrefUtils.CheckUsedBy(mb, "OpenSaveSearchPopup"));
             _popupV2 = typeof(VRCUiPopupManager).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_String_String_String_Action_String_Action_Action_1_VRCUiPopup_") && !mb.Name.Contains("PDM") && XrefUtils.CheckMethod(mb, "UserInterface/MenuContent/Popups/StandardPopupV2"));
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_String_String_String_Action_String_Action_Action_1_VRCUiPopup_") && !mb.Name.Contains("PDM") && XrefUtils.CheckStrings(mb, "UserInterface/MenuContent/Popups/StandardPopupV2"));
         }
 
         internal static void UiInit()
@@ -202,7 +202,8 @@ namespace VRChatUtilityKit.Ui
             _selectUserForMoreInfoMethod = selectedUserMethods[1]; // This one has higher caller count
 
             MethodInfo[] pageMethods = typeof(UIPage).GetMethods()
-                .Where(method => method.Name.StartsWith("Method_Public_Void_UIPage_")).ToArray();
+                .Where(method => method.Name.StartsWith("Method_Public_Void_UIPage_") && !method.Name.Contains("_PDM_"))
+                .ToArray();
             _pushPageMethod = pageMethods.First(method => XrefUtils.CheckUsing(method, "ThrowArgumentOutOfRangeException"));
             _removePageMethod = pageMethods.First(method => method != _pushPageMethod);
 

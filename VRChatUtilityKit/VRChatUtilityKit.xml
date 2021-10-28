@@ -1074,28 +1074,65 @@
             A set of utilites for Xref scanning.
             </summary>
         </member>
+        <member name="M:VRChatUtilityKit.Utilities.XrefUtils.CheckStrings(System.Reflection.MethodInfo,System.Func{System.String,System.Boolean})">
+            <summary>
+            Checks the strings in the given method's body.
+            </summary>
+            <param name="method">The method to check</param>
+            <param name="predicate">The predicate to check the strings against</param>
+            <returns>true if the predicate returned true any times, otherwise false</returns>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.XrefUtils.CheckStrings(System.Reflection.MethodInfo,System.String)">
+            <summary>
+            Returns if a string is contained within the given method's body.
+            </summary>
+            <param name="method">The method to check</param>
+            <param name="match">The string to check</param>
+            <returns>true if the given string literal is contained within the given method, otherwise false</returns>
+        </member>
         <member name="M:VRChatUtilityKit.Utilities.XrefUtils.CheckMethod(System.Reflection.MethodInfo,System.String)">
             <summary>
             Returns if a string is contained within the given method's body.
             </summary>
             <param name="method">The method to check</param>
             <param name="match">The string to check</param>
+            <returns>true if the given string literal is contained within the given method, otherwise false</returns>
         </member>
-        <member name="M:VRChatUtilityKit.Utilities.XrefUtils.CheckUsedBy(System.Reflection.MethodInfo,System.String,System.Type)">
+        <member name="M:VRChatUtilityKit.Utilities.XrefUtils.CheckUsedBy(System.Reflection.MethodBase,System.Func{System.Reflection.MethodBase,System.Boolean})">
+            <summary>
+            Checks the methods the given method is used by.
+            Note: the methods passed into the predicate may be false.
+            </summary>
+            <param name="method">The method to check</param>
+            <param name="predicate">The predicate to check the methods against</param>
+            <returns>true if the predicate returned true any times, otherwise false</returns>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.XrefUtils.CheckUsedBy(System.Reflection.MethodBase,System.String,System.Type)">
             <summary>
             Returns if the given method is called by the other given method.
             </summary>
             <param name="method">The method to check</param>
             <param name="methodName">The name of the method that uses the given method</param>
             <param name="type">The type of the method that uses the given method</param>
+            <returns>true if any of the given method is called by a method with the given name of the given type, otherwise false</returns>
         </member>
-        <member name="M:VRChatUtilityKit.Utilities.XrefUtils.CheckUsing(System.Reflection.MethodInfo,System.String,System.Type)">
+        <member name="M:VRChatUtilityKit.Utilities.XrefUtils.CheckUsing(System.Reflection.MethodBase,System.Func{System.Reflection.MethodBase,System.Boolean})">
+            <summary>
+            Checks the methods the given method uses.
+            Note: the methods passed into the predicate may be false.
+            </summary>
+            <param name="method">The method to check</param>
+            <param name="predicate">The predicate to check the methods against</param>
+            <returns>true if the predicate returned true any times, otherwise false</returns>
+        </member>
+        <member name="M:VRChatUtilityKit.Utilities.XrefUtils.CheckUsing(System.Reflection.MethodBase,System.String,System.Type)">
             <summary>
             Returns whether the given method is using another the other given method.
             </summary>
             <param name="method">The method to check</param>
             <param name="methodName">The name of the method that is used by the given method</param>
             <param name="type">The type of the method that is used by the given method</param>
+            <returns>true if any of the given method calls a method with the given name of the given type, otherwise false</returns>
         </member>
         <member name="M:VRChatUtilityKit.Utilities.XrefUtils.DumpXrefInfo(System.Reflection.MethodBase)">
             <summary>

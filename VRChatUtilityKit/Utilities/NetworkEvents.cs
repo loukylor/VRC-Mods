@@ -216,7 +216,7 @@ namespace VRChatUtilityKit.Utilities
 
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(FriendsListManager).GetMethod("Method_Private_Void_String_0"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnUnfriend), BindingFlags.NonPublic | BindingFlags.Static)));
 
-            MethodInfo onSetupFlagsReceivedMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.ReturnType.IsEnum && mi.GetParameters().Length == 1 && mi.GetParameters()[0].ParameterType == typeof(Il2CppSystem.Collections.Hashtable) && XrefUtils.CheckMethod(mi, "Failed to read showSocialRank for {0}"));
+            MethodInfo onSetupFlagsReceivedMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.ReturnType.IsEnum && mi.GetParameters().Length == 1 && mi.GetParameters()[0].ParameterType == typeof(Il2CppSystem.Collections.Hashtable) && XrefUtils.CheckStrings(mi, "Failed to read showSocialRank for {0}"));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(onSetupFlagsReceivedMethod, null, new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnSetupFlagsReceive), BindingFlags.NonPublic | BindingFlags.Static)));
 
             foreach (MethodInfo socialRankChangeMethod in typeof(ProfileWingMenu).GetMethods().Where(method => method.Name.StartsWith("Method_Private_Void_Boolean_")))
