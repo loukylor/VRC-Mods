@@ -93,6 +93,12 @@ namespace VRChatUtilityKit.Ui
         internal static MethodInfo _pushPageMethod;
         internal static MethodInfo _removePageMethod;
 
+        private static MethodInfo _openQuickMenuPageMethod;
+        private static MethodInfo _openQuickMenuMethod;
+
+        private static MethodInfo _closeMenuMethod;
+        private static MethodInfo _closeQuickMenuMethod;
+
         private static PropertyInfo _quickMenuEnumProperty;
         /// <summary>
         /// The type of the enum that is used for the QuickMenu index.
@@ -141,7 +147,7 @@ namespace VRChatUtilityKit.Ui
 
             MethodInfo _placeUiAfterPause = typeof(QuickMenu).GetNestedTypes().First(type => type.Name.Contains("IEnumerator")).GetMethod("MoveNext");
 
-            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(UIPage).GetMethod("Show"), new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnUIPageToggle), BindingFlags.NonPublic | BindingFlags.Static)));
+            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(UIPage).GetMethod("Method_Public_Void_Boolean_EnumNPublicSealedvaNoLeRiBoIn6vUnique_0"), new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnUIPageToggle), BindingFlags.NonPublic | BindingFlags.Static)));
 
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_openBigMenu, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnBigMenuOpen), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_closeBigMenu, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnBigMenuClose), BindingFlags.NonPublic | BindingFlags.Static)));
@@ -152,6 +158,22 @@ namespace VRChatUtilityKit.Ui
                 VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(method, postfix: new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnUserInfoOpen), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(AccessTools.Method(typeof(PageUserInfo), "Back"), postfix: new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnUserInfoClose), BindingFlags.NonPublic | BindingFlags.Static)));
 
+            _closeMenuMethod = typeof(UIManagerImpl).GetMethods()
+                .First(method => method.Name.StartsWith("Method_Public_Virtual_Final_New_Void_") && XrefScanner.XrefScan(method).Count() == 2);
+            _closeQuickMenuMethod = typeof(UIManagerImpl).GetMethods()
+                .First(method => method.Name.StartsWith("Method_Public_Void_Boolean_") && XrefUtils.CheckUsedBy(method, _closeMenuMethod.Name));
+            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_closeQuickMenuMethod, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnQuickMenuClose), BindingFlags.NonPublic | BindingFlags.Static)));
+
+            _openQuickMenuMethod = typeof(UIManagerImpl).GetMethods()
+                .First(method => method.Name.StartsWith("Method_Public_Void_") && method.Name.Length <= 21 && XrefUtils.CheckUsedBy(method, "RequestInvitation"));
+            _openQuickMenuPageMethod = typeof(UIManagerImpl).GetMethods()
+                .First(method => method.Name.StartsWith("Method_Public_Virtual_Final_New_Void_String_") && XrefUtils.CheckUsing(method, _openQuickMenuMethod.Name, _openQuickMenuMethod.DeclaringType));
+
+            // Patching the other method doesn't work for some reason you have to patch this
+            MethodInfo _onQuickMenuOpenedMethod = typeof(UIManagerImpl).GetMethods()
+                .First(method => method.Name.StartsWith("Method_Private_Void_Boolean_") && !method.Name.Contains("_PDM_") && XrefUtils.CheckUsedBy(method, _openQuickMenuMethod.Name));
+            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_onQuickMenuOpenedMethod, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnQuickMenuOpen), BindingFlags.NonPublic | BindingFlags.Static)));
+
             _popupV2Small = typeof(VRCUiPopupManager).GetMethods()
                 .First(mb => mb.Name.StartsWith("Method_Public_Void_String_String_String_Action_Action_1_VRCUiPopup_") && !mb.Name.Contains("PDM") && XrefUtils.CheckStrings(mb, "UserInterface/MenuContent/Popups/StandardPopupV2") && XrefUtils.CheckUsedBy(mb, "OpenSaveSearchPopup"));
             _popupV2 = typeof(VRCUiPopupManager).GetMethods()
@@ -160,33 +182,6 @@ namespace VRChatUtilityKit.Ui
 
         internal static void UiInit()
         {
-            //GameObject tabContainer = GameObject.Find("UserInterface/QuickMenu/QuickModeTabs");
-            //foreach (Component component in tabContainer.GetComponents<Component>())
-            //{
-            //    if (!component.GetIl2CppType().FullName.Contains("UnityEngine") && component.GetIl2CppType().GetMethods().Any(mi => mi.Name == "ShowTabContent"))
-            //    {
-            //        _tabContainerComponent = component;
-            //        _setTabIndexInQuickMenu = component.GetIl2CppType().GetFields(Il2CppSystem.Reflection.BindingFlags.NonPublic | Il2CppSystem.Reflection.BindingFlags.Instance).First(f => f.FieldType.IsEnum);
-            //        foreach (Il2CppSystem.Reflection.FieldInfo field in component.GetIl2CppType().GetFields())
-            //        {
-            //            if (field.FieldType.IsArray)
-            //            {
-            //                _existingTabsField = field;
-            //                break;
-            //            }
-            //        }
-            //        break;
-            //    }
-            //}
-
-            //MonoBehaviour tabDescriptor = tabContainer.transform.GetChild(0).gameObject.GetComponents<MonoBehaviour>().First(c => c.GetIl2CppType().GetMethod("ShowTabContent") != null);
-
-            //_tabDescriptorType = tabDescriptor.GetIl2CppType();
-            //_showTabContentMethod = _tabDescriptorType.GetMethod("ShowTabContent");
-            //_setIndexOfTab = _tabDescriptorType.GetFields().First(f => f.FieldType.IsEnum);
-
-
-
             tempUIParent = new GameObject("VRChatUtilityKitTempUIParent").transform;
             GameObject.DontDestroyOnLoad(tempUIParent.gameObject);
 
@@ -204,7 +199,7 @@ namespace VRChatUtilityKit.Ui
             MethodInfo[] pageMethods = typeof(UIPage).GetMethods()
                 .Where(method => method.Name.StartsWith("Method_Public_Void_UIPage_") && !method.Name.Contains("_PDM_"))
                 .ToArray();
-            _pushPageMethod = pageMethods.First(method => XrefUtils.CheckUsing(method, "ThrowArgumentOutOfRangeException"));
+            _pushPageMethod = pageMethods.First(method => XrefUtils.CheckUsing(method, "Add"));
             _removePageMethod = pageMethods.First(method => method != _pushPageMethod);
 
             ButtonReaction buttonReaction = GameObject.Find("UserInterface/QuickMenu/UIElementsMenu/NameplatesOnButton").GetComponent<ButtonReaction>();
@@ -302,7 +297,7 @@ namespace VRChatUtilityKit.Ui
         private static void OnUserInfoClose() => OnUserInfoMenuClosed?.DelegateSafeInvoke();
 
         private static void OnQuickMenuOpen() => OnQuickMenuOpened?.DelegateSafeInvoke();
-        private static void OnQuickMenuClose() => OnQuickMenuClosed?.DelegateSafeInvoke();
+        private static void OnQuickMenuClose() => OnQuickMenuClosed?.DelegateSafeInvoke(); 
 
         private static void OnUIPageToggle(UIPage __instance, bool __0) => OnUIPageToggled.DelegateSafeInvoke(__instance, __0);
 
@@ -326,6 +321,21 @@ namespace VRChatUtilityKit.Ui
         /// </summary>
         /// <param name="playerToSelect">The player to select</param>
         public static void OpenUserForMoreInfoInQuickMenu(APIUser playerToSelect) => _selectUserForMoreInfoMethod.Invoke(VRCData.field_Public_Static_IUserSelection_0, new object[1] { playerToSelect });
+
+        /// <summary>
+        /// Opens the QuickMenu.
+        /// </summary>
+        public static void OpenQuickMenu() => _openQuickMenuMethod?.Invoke(UIManagerImpl.prop_UIManagerImpl_0, null);
+
+        /// <summary>
+        /// Closes the QuickMenu.
+        /// </summary>
+        public static void CloseQuickMenu() => _closeQuickMenuMethod?.Invoke(UIManagerImpl.prop_UIManagerImpl_0, new object[1] { false });
+
+        /// <summary>
+        /// Closes all open menus.
+        /// </summary>
+        public static void CloseMenu() => _closeMenuMethod?.Invoke(UIManagerImpl.prop_UIManagerImpl_0, null);
 
         /// <summary>
         /// Closes the current open popup
