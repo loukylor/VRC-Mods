@@ -2,26 +2,32 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using UnhollowerRuntimeLib;
 using UnityEngine;
 using VRC.Core;
 using VRC.DataModel;
 using VRC.DataModel.Core;
 
 #pragma warning disable CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
+#pragma warning disable IDE0051 // Remove unused private members
 
 namespace VRChatUtilityKit.Utilities
 {
     /// <summary>
     /// A set of extensions for various things.
     /// </summary>
+    [MelonLoaderEvents]
     public static class Extensions
     {
-        private static MethodInfo apiUserToIUser;
-        internal static void Init()
+        private static MethodInfo _apiUserToIUser;
+        private static void OnApplicationStart()
         {
-            Type iUserParent = typeof(VRCPlayer).Assembly.GetTypes().First(type => type.Name.StartsWith("DataModel1APIUserPublicIUser"));
-            apiUserToIUser = typeof(DataModelCache).GetMethod("GetOrCreate");
-            apiUserToIUser = apiUserToIUser.MakeGenericMethod(iUserParent, typeof(APIUser));
+            Type iUserParent = typeof(VRCPlayer).Assembly.GetTypes()
+                .First(type => type.GetMethods()
+                    .FirstOrDefault(method => method.Name.StartsWith("Method_Private_Void_Action_1_ApiWorldInstance_Action_1_String_")) != null && type.GetMethods()
+                    .FirstOrDefault(method => method.Name.StartsWith("Method_Public_Virtual_Final_New_Observable_1_List_1_String_")) == null);
+            _apiUserToIUser = typeof(DataModelCache).GetMethod("Method_Public_TYPE_String_TYPE2_Boolean_0");
+            _apiUserToIUser = _apiUserToIUser.MakeGenericMethod(iUserParent, typeof(APIUser));
         }
 
         /// <summary>
@@ -117,7 +123,7 @@ namespace VRChatUtilityKit.Utilities
         /// <returns></returns>
         public static IUser ToIUser(this APIUser value)
         {
-            return (IUser)apiUserToIUser.Invoke(DataModelManager.field_Private_Static_DataModelManager_0.field_Private_DataModelCache_0, new object[2] { value.id, value });
+            return ((Il2CppSystem.Object)_apiUserToIUser.Invoke(DataModelManager.field_Private_Static_DataModelManager_0.field_Private_DataModelCache_0, new object[3] { value.id, value, false })).Cast<IUser>();
         }
 
         /// <summary>
