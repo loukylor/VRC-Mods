@@ -612,12 +612,6 @@
             </summary>
             <param name="playerToSelect">The player to select</param>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenUserForMoreInfoInQuickMenu(VRC.Core.APIUser)">
-            <summary>
-            Opens given user in the Open User For More Info QuickMenu.
-            </summary>
-            <param name="playerToSelect">The player to select</param>
-        </member>
         <member name="M:VRChatUtilityKit.Ui.UiManager.OpenQuickMenu">
             <summary>
             Opens the QuickMenu.

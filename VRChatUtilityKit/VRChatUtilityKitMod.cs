@@ -89,8 +89,8 @@ namespace VRChatUtilityKit
 
             foreach (object subscriber in melonLoaderEventSubscribers)
             {
-                try 
-                { 
+                try
+                {
                     if (subscriber is Type subscriberAsType)
                     {
                         try
@@ -114,12 +114,12 @@ namespace VRChatUtilityKit
             }
         }
 
-        public override void OnSceneWasLoaded(int buildIndex, string sceneName) 
+        public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
             foreach (object subscriber in melonLoaderEventSubscribers)
             {
-                try 
-                { 
+                try
+                {
                     if (subscriber is Type subscriberAsType)
                     {
                         try
@@ -143,7 +143,7 @@ namespace VRChatUtilityKit
             }
         }
 
-        public override void OnSceneWasInitialized(int buildIndex, string sceneName) 
+        public override void OnSceneWasInitialized(int buildIndex, string sceneName)
         {
             foreach (object subscriber in melonLoaderEventSubscribers)
             {
@@ -172,7 +172,7 @@ namespace VRChatUtilityKit
             }
         }
 
-        public override void OnSceneWasUnloaded(int buildIndex, string sceneName) 
+        public override void OnSceneWasUnloaded(int buildIndex, string sceneName)
         {
             foreach (object subscriber in melonLoaderEventSubscribers)
             {
@@ -200,8 +200,8 @@ namespace VRChatUtilityKit
                 }
             }
         }
-        
-        public override void OnApplicationQuit() 
+
+        public override void OnApplicationQuit()
         {
             foreach (object subscriber in melonLoaderEventSubscribers)
             {

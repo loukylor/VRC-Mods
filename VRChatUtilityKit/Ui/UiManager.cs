@@ -89,7 +89,6 @@ namespace VRChatUtilityKit.Ui
         public static event Action<UIPage, bool> OnUIPageToggled;
 
         private static MethodInfo _selectUserMethod;
-        private static MethodInfo _selectUserForMoreInfoMethod;
         internal static MethodInfo _pushPageMethod;
         internal static MethodInfo _removePageMethod;
 
@@ -188,12 +187,8 @@ namespace VRChatUtilityKit.Ui
 
             // index 0 works because transform doesn't inherit from monobehavior
             Type selectedUserManager = XrefUtils.GetTypeFromObfuscatedName(GameObject.Find("_Application/UIManager/SelectedUserManager").GetComponents<MonoBehaviour>()[0].GetIl2CppType().Name);
-            MethodInfo[] selectedUserMethods = selectedUserManager.GetMethods()
-                .Where(method => method.Name.StartsWith("Method_Public_Void_APIUser_"))
-                .OrderBy(method => method.GetCustomAttribute<CallerCountAttribute>().Count)
-                .ToArray();
-            _selectUserMethod = selectedUserMethods[0];
-            _selectUserForMoreInfoMethod = selectedUserMethods[1]; // This one has higher caller count
+            _selectUserMethod = selectedUserManager.GetMethods()
+                .First(method => method.Name.StartsWith("Method_Public_Void_APIUser_") && !method.Name.Contains("_PDM_") && XrefUtils.CheckUsedBy(method, "Method_Public_Virtual_Final_New_Void_IUser_"));
 
             MethodInfo[] pageMethods = typeof(UIPage).GetMethods()
                 .Where(method => method.Name.StartsWith("Method_Public_Void_UIPage_") && !method.Name.Contains("_PDM_"))
@@ -296,7 +291,7 @@ namespace VRChatUtilityKit.Ui
         private static void OnUserInfoClose() => OnUserInfoMenuClosed?.DelegateSafeInvoke();
 
         private static void OnQuickMenuOpen() => OnQuickMenuOpened?.DelegateSafeInvoke();
-        private static void OnQuickMenuClose() => OnQuickMenuClosed?.DelegateSafeInvoke(); 
+        private static void OnQuickMenuClose() => OnQuickMenuClosed?.DelegateSafeInvoke();
 
         private static void OnUIPageToggle(UIPage __instance, bool __0) => OnUIPageToggled.DelegateSafeInvoke(__instance, __0);
 
@@ -313,13 +308,7 @@ namespace VRChatUtilityKit.Ui
         /// Opens given user in the QuickMenu.
         /// </summary>
         /// <param name="playerToSelect">The player to select</param>
-        public static void OpenUserInQuickMenu(APIUser playerToSelect) => _selectUserMethod.Invoke(VRCData.field_Public_Static_IUserSelection_0, new object[1] { playerToSelect });
-
-        /// <summary>
-        /// Opens given user in the Open User For More Info QuickMenu.
-        /// </summary>
-        /// <param name="playerToSelect">The player to select</param>
-        public static void OpenUserForMoreInfoInQuickMenu(APIUser playerToSelect) => _selectUserForMoreInfoMethod.Invoke(VRCData.field_Public_Static_IUserSelection_0, new object[1] { playerToSelect });
+        public static void OpenUserInQuickMenu(APIUser playerToSelect) => _selectUserMethod.Invoke(UserSelectionManager.prop_UserSelectionManager_0, new object[1] { playerToSelect });
 
         /// <summary>
         /// Opens the QuickMenu.
