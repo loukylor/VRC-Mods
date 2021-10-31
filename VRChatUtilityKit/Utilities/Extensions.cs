@@ -1,6 +1,11 @@
 ﻿using MelonLoader;
 using System;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
+using VRC.Core;
+using VRC.DataModel;
+using VRC.DataModel.Core;
 
 #pragma warning disable CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
 
@@ -11,6 +16,14 @@ namespace VRChatUtilityKit.Utilities
     /// </summary>
     public static class Extensions
     {
+        private static MethodInfo apiUserToIUser;
+        internal static void Init()
+        {
+            Type iUserParent = typeof(VRCPlayer).Assembly.GetTypes().First(type => type.Name.StartsWith("DataModel1APIUserPublicIUser"));
+            apiUserToIUser = typeof(DataModelCache).GetMethod("GetOrCreate");
+            apiUserToIUser = apiUserToIUser.MakeGenericMethod(iUserParent, typeof(APIUser));
+        }
+
         /// <summary>
         /// Returns the path of the given GameObject.
         /// </summary>
@@ -94,6 +107,28 @@ namespace VRChatUtilityKit.Utilities
                     MelonLogger.Error("Error while invoking delegate:\n" + ex.ToString());
                 }
             }
+        }
+
+        /// <summary>
+        /// Converts the given APIUser to an IUser.
+        /// Try not to use this too often; make sure to cache your IUser object. The operation is fairly slow. 
+        /// </summary>
+        /// <param name="value">The APIUser to convert to IUser</param>
+        /// <returns></returns>
+        public static IUser ToIUser(this APIUser value)
+        {
+            return (IUser)apiUserToIUser.Invoke(DataModelManager.field_Private_Static_DataModelManager_0.field_Private_DataModelCache_0, new object[2] { value.id, value });
+        }
+
+        /// <summary>
+        /// Converts the given IUser to an APIUser.
+        /// Thanks knah for providing this.
+        /// </summary>
+        /// <param name="value">The IUser to convert to APIUser</param>
+        /// <returns></returns>
+        public static APIUser ToAPIUser(this IUser value)
+        {
+            return value.Cast<DataModel<APIUser>>().field_Protected_TYPE_0;
         }
     }
 }

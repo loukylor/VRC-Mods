@@ -1,26 +1,60 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
-
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace VRChatUtilityKit.Ui
 {
-    public class Label : ElementWithText
+    /// <summary>
+    /// A wrapper that holds a UI element that only has text.
+    /// </summary>
+    public class Label : ElementBase, IElementWithText, IButtonGroupElement
     {
-        public Label(string parent, Vector3 position, string text, string labelName, int fontSize = 72, bool resize = false, Color? textColor = null) : this(GameObject.Find(parent), position, text, labelName, fontSize, resize, textColor) { }
-        public Label(GameObject parent, Vector3 position, string text, string labelName, int fontSize = 72, bool resize = false, Color? textColor = null) : base(parent, GameObject.Find("UserInterface/QuickMenu/UIElementsMenu/NameplatesOnButton"), position, text, labelName, resize, textColor)
-        {
-            Object.DestroyImmediate(gameObject.GetComponent<Button>());
-            Object.DestroyImmediate(gameObject.GetComponent<UiTooltip>());
-            Object.DestroyImmediate(gameObject.GetComponent<Image>());
-            
-            TextComponent = gameObject.AddComponent<Text>();
-            TextComponent.font = gameObject.transform.GetChild(0).GetComponent<Text>().font;
-            TextComponent.fontSize = fontSize;
-            TextComponent.alignment = TextAnchor.MiddleCenter;
-            TextComponent.text = text;
+        /// <summary>
+        /// The type of button this interface represents.
+        /// </summary>
+        public ElementType Type => ElementType.Label;
 
-            Object.DestroyImmediate(gameObject.transform.GetChild(0).gameObject);
+        /// <summary>
+        /// The text mesh pro component on the label.
+        /// </summary>
+        public TextMeshProUGUI TextComponent { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the text on the label.
+        /// </summary>
+        public string Text
+        {
+            get => TextComponent.text;
+            set => TextComponent.text = value;
+        }
+
+        /// <summary>
+        /// The subtitle text mesh pro component on the label.
+        /// </summary>
+        public TextMeshProUGUI SubtitleTextComponent { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the subtitle text on the label.
+        /// </summary>
+        public string SubtitleText
+        {
+            get => SubtitleTextComponent.text;
+            set => SubtitleTextComponent.text = value;
+        }
+
+        /// <summary>
+        /// Creates a new label.
+        /// </summary>
+        /// <param name="text">The text of the label</param>
+        /// <param name="subtitleText">The subtitle text of the label</param>
+        /// <param name="gameObjectName">The name of the label's GameObject</param>
+        public Label(string text, string subtitleText, string gameObjectName) : base(null, UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Settings/Panel_QM_ScrollRect/Viewport/VerticalLayoutGroup/Buttons_Debug/Button_FPS").gameObject, gameObjectName)
+        {
+            TextComponent = rectTransform.Find("Text_H1").GetComponent<TextMeshProUGUI>();
+            Text = text;
+
+            SubtitleTextComponent = rectTransform.Find("Text_H4").GetComponent<TextMeshProUGUI>();
+            SubtitleText = subtitleText;
         }
     }
 }

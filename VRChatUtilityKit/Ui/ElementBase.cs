@@ -1,45 +1,66 @@
 ﻿using VRChatUtilityKit.Utilities;
 using UnityEngine;
+using System.Collections.Generic;
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 #pragma warning disable IDE1006 // Naming Styles
 
 namespace VRChatUtilityKit.Ui
 {
+    /// <summary>
+    /// A wrapper that holds a UI element.
+    /// </summary>
     public class ElementBase
     {
         /// <summary>
         /// The path of the GameObject
         /// </summary>
         public string Path { get; private set; }
+        /// <summary>
+        /// The GameObject of the element.
+        /// </summary>
         public GameObject gameObject { get; private set; }
-        public RectTransform Rect { get; private set; }
+        /// <summary>
+        /// The RectTransform of the element.
+        /// </summary>
+        public RectTransform rectTransform { get; private set; }
 
-        private Vector3 _position;
-        public Vector3 Position
-        {
-            get => Converters.ConvertToEmmUnits(_position); 
-            set
-            {
-                gameObject.transform.localPosition = Converters.ConvertToUnityUnits(value);
-                _position = value;
-            }
-        }
+        private readonly int _id;
+        /// <summary>
+        /// A unique ID of the element.
+        /// Does not persist through restarts.
+        /// </summary>
+        public int Id => _id;
 
-        public ElementBase(GameObject parent, GameObject template, Vector3 position, string name)
+        /// <summary>
+        /// Creates a new ElementBase.
+        /// </summary>
+        /// <param name="parent">The parent of the element</param>
+        /// <param name="template">An existing element to create a copy of</param>
+        /// <param name="gameObjectName">The name of the element's GameObject</param>
+        protected ElementBase(Transform parent, GameObject template, string gameObjectName)
         {
-            gameObject = Object.Instantiate(template, parent.transform);
-            Rect = gameObject.GetComponent<RectTransform>();
+            if (parent != null)
+                gameObject = Object.Instantiate(template, parent);
+            else
+                gameObject = Object.Instantiate(template, UiManager.tempUIParent);
+            _id = gameObject.GetInstanceID();
+            rectTransform = gameObject.GetComponent<RectTransform>();
             Path = gameObject.GetPath();
 
-            Position = position;
-
-            gameObject.name = name;
+            gameObject.name = gameObjectName;
         }
 
-        public void Destroy()
-        {
-            Object.Destroy(gameObject);
-        }
+        /// <summary>
+        /// Determines whether two object instances are equal.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object</param>
+        /// <returns>true if the specified object is equal to the current object; otherwise, false</returns>
+        public override bool Equals(object obj) => obj is ElementBase element && element.Id == Id;
+
+        /// <summary>
+        /// Returns a unique integer representing the element.
+        /// </summary>
+        /// <returns>A unique integer representing the element</returns>
+        public override int GetHashCode() => Id;
     }
 }

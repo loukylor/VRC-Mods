@@ -1,38 +1,43 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.UI;
-
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+using VRC.DataModel.Core;
 
 namespace VRChatUtilityKit.Ui
 {
-    public class SingleButton : ElementWithText
+    /// <summary>
+    /// A wrapper holding a button.
+    /// </summary>
+    public class SingleButton : VRCButton, IButtonGroupElement
     {
-        public Button ButtonComponent { get; private set; }
-        public UiTooltip TooltipComponent { get; private set; }
+        /// <summary>
+        /// The type of button this interface represents.
+        /// </summary>
+        public ElementType Type => ElementType.SingleButton;
 
-        public SingleButton(GameObject parent, GameObject template, Vector3 position, string text, Action onClick, string tooltip, string buttonName, bool resize = false, Color? textColor = null) : base(parent, template, position, text, buttonName, resize, textColor)
+        /// <summary>
+        /// The OnClick of the button.
+        /// </summary>
+        public Action OnClick { get; set; }
+
+        /// <summary>
+        /// A small icon indicating this buttons jumps to the big menu.
+        /// </summary>
+        public GameObject JumpBadge { get; private set; }
+
+        /// <summary>
+        /// Creates a new button.
+        /// </summary>
+        /// <param name="onClick">The OnClick of the button</param>
+        /// <param name="icon">The icon for the button</param>
+        /// <param name="text">The text of the button</param>
+        /// <param name="gameObjectName">The name of the button's GameObject</param>
+        /// <param name="tooltipText">The tooltip of the button</param>
+        public SingleButton(Action onClick, Sprite icon, string text, string gameObjectName, string tooltipText = "") : base(UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Settings/Panel_QM_ScrollRect/Viewport/VerticalLayoutGroup/Buttons_UI_Elements_Row_1/Button_NameplateSettings").gameObject, icon, text, gameObjectName, tooltipText)
         {
-            ButtonComponent = gameObject.GetComponent<Button>();
-            ButtonComponent.onClick.AddListener(onClick);
-            ButtonComponent.colors = new ColorBlock()
-            {
-                colorMultiplier = ButtonComponent.colors.colorMultiplier,
-                fadeDuration = ButtonComponent.colors.fadeDuration,
-                disabledColor = ButtonComponent.colors.disabledColor,
-                highlightedColor = ButtonComponent.colors.highlightedColor,
-                normalColor = ButtonComponent.colors.normalColor,
-                pressedColor = ButtonComponent.colors.pressedColor,
-                selectedColor = ButtonComponent.colors.normalColor
-            };
-            TooltipComponent = gameObject.GetComponent<UiTooltip>();
-            TooltipComponent.field_Public_String_0 = tooltip;
-            TooltipComponent.field_Public_String_1 = tooltip;
-
-            Position = position;
+            JumpBadge = rectTransform.Find("Badge_MMJump").gameObject;
+            JumpBadge.SetActive(false);
+            OnClick = onClick;
+            BindingExtensions.Method_Public_Static_ButtonBindingHelper_Button_Action_0(ButtonComponent, new Action(() => OnClick?.Invoke()));
         }
-        public SingleButton(GameObject parent, Vector3 position, string text, Action onClick, string tooltip, string buttonName, bool resize = false, Color? textColor = null) : this(parent, GameObject.Find("UserInterface/QuickMenu/UIElementsMenu/NameplatesOnButton"), position, text, onClick, tooltip, buttonName, resize, textColor) { }
-        public SingleButton(string parent, string template, Vector3 position, string text, Action onClick, string tooltip, string buttonName, bool resize = false, Color? textColor = null) : this(GameObject.Find(parent), GameObject.Find(template), position, text, onClick, tooltip, buttonName, resize, textColor) { }
-        public SingleButton(string parent, Vector3 position, string text, Action onClick, string tooltip, string buttonName, bool resize = false, Color? textColor = null) : this(parent, "UserInterface/QuickMenu/UIElementsMenu/NameplatesOnButton", position, text, onClick, tooltip, buttonName, resize, textColor) { }
     }
 }

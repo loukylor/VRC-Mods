@@ -7,6 +7,7 @@ using VRC;
 using VRC.Core;
 using VRC.Management;
 using VRC.UI;
+using VRC.UI.Elements;
 
 namespace VRChatUtilityKit.Utilities
 {
@@ -14,6 +15,7 @@ namespace VRChatUtilityKit.Utilities
     /// <summary>
     /// A set of events pertaining to VRChat's network.
     /// </summary>
+    [MelonLoaderEvents]
     public static class NetworkEvents
     {
         /// <summary>
@@ -139,11 +141,11 @@ namespace VRChatUtilityKit.Utilities
         {
             OnAvatarChanged?.DelegateSafeInvoke(__instance, __instance.prop_GameObject_0);
         }
-        private static MethodInfo addOnAvatarInstantiateEvent;
-        private static MethodInfo convertActionToOnAvatarInstantiateEvent;
         private static void OnPlayerAwake(VRCPlayer __instance)
         {
-            addOnAvatarInstantiateEvent.Invoke(__instance, new object[] { convertActionToOnAvatarInstantiateEvent.Invoke(null, new object[] { new Action(() => OnAvatarInstantiate(__instance.prop_VRCAvatarManager_0, __instance.field_Private_ApiAvatar_0, __instance.field_Internal_GameObject_0))}) });
+            __instance.Method_Public_add_Void_OnAvatarIsReady_0(new Action(()
+                => OnAvatarInstantiate(__instance.prop_VRCAvatarManager_0, __instance.field_Private_ApiAvatar_0, __instance.field_Internal_GameObject_0))
+            );
         }
         private static void OnAvatarInstantiate(VRCAvatarManager manager, ApiAvatar apiAvatar, GameObject avatar)
         {
@@ -186,7 +188,7 @@ namespace VRChatUtilityKit.Utilities
             OnPlayerModerationRemoved?.DelegateSafeInvoke(__0, __1);
         }
 
-        internal static void NetworkInit()
+        private static void OnUiManagerInit()
         {
             var field0 = NetworkManager.field_Internal_Static_NetworkManager_0.field_Internal_VRCEventDelegate_1_Player_0;
             var field1 = NetworkManager.field_Internal_Static_NetworkManager_0.field_Internal_VRCEventDelegate_1_Player_1;
@@ -202,9 +204,6 @@ namespace VRChatUtilityKit.Utilities
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(NetworkManager).GetMethod("OnJoinedRoom"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnRoomJoin), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(VRCAvatarManager).GetMethods().First(mb => mb.Name.StartsWith("Method_Private_Boolean_GameObject_String_Single_String_")), null, new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnAvatarChange), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(VRCPlayer).GetMethods().First(mb => mb.Name.StartsWith("Awake")), null, new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnPlayerAwake), BindingFlags.NonPublic | BindingFlags.Static)));
-            Type onAvatarInstantiateEvent = typeof(VRCPlayer).GetNestedTypes().First(type => type.Name.StartsWith("MulticastDelegate"));
-            convertActionToOnAvatarInstantiateEvent = onAvatarInstantiateEvent.GetMethod("op_Implicit");
-            addOnAvatarInstantiateEvent = typeof(VRCPlayer).GetMethod($"Method_Public_add_Void_{onAvatarInstantiateEvent.Name}_0");
             foreach (MethodInfo method in typeof(ModerationManager).GetMethods().Where(mb => mb.Name.StartsWith("Method_Private_ApiPlayerModeration_String_String_ModerationType_")))
                 VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(method, new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnPlayerModerationSend1), BindingFlags.NonPublic | BindingFlags.Static)));
             foreach (MethodInfo method in typeof(ModerationManager).GetMethods().Where(mb => mb.Name.StartsWith("Method_Private_Void_String_ModerationType_Action_1_ApiPlayerModeration_Action_1_String_")))
@@ -217,12 +216,11 @@ namespace VRChatUtilityKit.Utilities
 
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(FriendsListManager).GetMethod("Method_Private_Void_String_0"), new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnUnfriend), BindingFlags.NonPublic | BindingFlags.Static)));
 
-            MethodInfo onSetupFlagsReceivedMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.ReturnType.IsEnum && mi.GetParameters().Length == 1 && mi.GetParameters()[0].ParameterType == typeof(Il2CppSystem.Collections.Hashtable) && XrefUtils.CheckMethod(mi, "Failed to read showSocialRank for {0}"));
+            MethodInfo onSetupFlagsReceivedMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.ReturnType.IsEnum && mi.GetParameters().Length == 1 && mi.GetParameters()[0].ParameterType == typeof(Il2CppSystem.Collections.Hashtable) && XrefUtils.CheckStrings(mi, "Failed to read showSocialRank for {0}"));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(onSetupFlagsReceivedMethod, null, new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnSetupFlagsReceive), BindingFlags.NonPublic | BindingFlags.Static)));
 
-            MethodInfo OnShowSocialRankChangeMethod = typeof(QuickMenu).GetMethods()
-                .First(mi => mi.Name.StartsWith("Method_Public_Void_") && mi.GetParameters().Length == 0 && XrefUtils.CheckUsing(mi, "Method_Public_Static_Void_EnumNPublicSealed", typeof(VRCInputManager))); // && (!mi.Name.EndsWith("1") && !mi.Name.EndsWith("8") && !mi.Name.EndsWith("12") && !mi.Name.EndsWith("17") && !mi.Name.EndsWith("6"))))
-            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(OnShowSocialRankChangeMethod, null, new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnShowSocialRankChange), BindingFlags.NonPublic | BindingFlags.Static)));
+            foreach (MethodInfo socialRankChangeMethod in typeof(ProfileWingMenu).GetMethods().Where(method => method.Name.StartsWith("Method_Private_Void_Boolean_")))
+                VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(socialRankChangeMethod, null, new HarmonyMethod(typeof(NetworkEvents).GetMethod(nameof(OnShowSocialRankChange), BindingFlags.NonPublic | BindingFlags.Static)));
         }
     }
 }

@@ -1,51 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
-
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-#pragma warning disable IDE0044 // Add readonly modifier
+﻿using UnityEngine;
+using VRC.UI.Elements.Controls;
 
 namespace VRChatUtilityKit.Ui
 {
     // Credit for Slaynash (https://gist.github.com/Slaynash/018d6de4e8d27faf08c0fe4a6c2854de) to act as reference
-    public class TabButton : ElementBase
+    /// <summary>
+    /// A wrapper that holds a tab button.
+    /// </summary>
+    public class TabButton : VRCSelectable
     {
-        public readonly int index;
+        /// <summary>
+        /// The tab menu attached to the tab button.
+        /// </summary>
+        public TabMenu SubMenu { get; private set; }
 
-        public Button ButtonComponent { get; private set; }
+        /// <summary>
+        /// The MenuTab component on the tab button.
+        /// </summary>
+        public MenuTab MenuTab { get; private set; }
 
-        public SubMenu SubMenu { get; set; }
-
-        private Image _tabImage;
-        public Sprite TabSprite 
+        /// <summary>
+        /// Creates a new tab button.
+        /// </summary>
+        /// <param name="sprite">The sprite of the tab button</param>
+        /// <param name="pageName">The name of the tab menu's page</param>
+        /// <param name="gameObjectName">The name of the tab button's GameObject</param>
+        /// <param name="tooltipText">The tooltip of the tab button</param>
+        /// <param name="headerText">The text of the sub menu's header</param>
+        public TabButton(Sprite sprite, string pageName, string gameObjectName, string headerText, string tooltipText = "") : base(UiManager.QMStateController.transform.Find("Container/Window/Page_Buttons_QM/HorizontalLayoutGroup"), UiManager.QMStateController.transform.Find("Container/Window/Page_Buttons_QM/HorizontalLayoutGroup/Page_Dashboard").gameObject, sprite, gameObjectName, tooltipText)
         {
-            get => _tabImage.sprite;
-            set => _tabImage.sprite = value;
+            MenuTab = gameObject.GetComponent<MenuTab>();
+            MenuTab.field_Private_MenuStateController_0 = UiManager.QMStateController;
+            MenuTab.field_Public_String_0 = pageName;
+
+            SubMenu = new TabMenu(pageName, $"Menu_{pageName}", headerText);
         }
-
-        internal Il2CppSystem.Object _tabDescriptor;
-
-        public TabButton(Sprite sprite, SubMenu subMenu, Action onClick = null) : base(GameObject.Find("UserInterface/QuickMenu/QuickModeTabs"), GameObject.Find("UserInterface/QuickMenu/QuickModeTabs/HomeTab"), Vector3.zero, "PlayerListTab")
-        {
-            UiManager.ExistingTabs = UiManager.ExistingTabs.Concat(new List<GameObject>() { gameObject }).ToList(); // Inefficient code is my motto
-            index = UiManager.ExistingTabs.Count;
-
-            _tabImage = gameObject.transform.Find("Icon").GetComponent<Image>();
-            _tabImage.sprite = sprite;
-
-            ButtonComponent = gameObject.GetComponent<Button>();
-            ButtonComponent.onClick = new Button.ButtonClickedEvent();
-            if (onClick != null)
-                ButtonComponent.onClick.AddListener(onClick);
-
-            _tabDescriptor = gameObject.GetComponent(UiManager._tabDescriptorType);
-
-            SubMenu = subMenu;
-            UiManager.SetIndexOfTab(this, UiManager.ExistingTabs.Count);
-        }
-
-        public void OpenTabMenu(bool setCurrentMenu = true, bool setCurrentTab = true) => UiManager.OpenTabMenu(this, SubMenu.gameObject, setCurrentMenu, setCurrentTab);
     }
 }
