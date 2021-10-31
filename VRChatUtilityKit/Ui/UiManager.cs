@@ -147,7 +147,7 @@ namespace VRChatUtilityKit.Ui
 
             MethodInfo _placeUiAfterPause = typeof(QuickMenu).GetNestedTypes().First(type => type.Name.Contains("IEnumerator")).GetMethod("MoveNext");
 
-            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(UIPage).GetMethod("Method_Public_Void_Boolean_EnumNPublicSealedvaNoLeRiBoIn6vUnique_0"), new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnUIPageToggle), BindingFlags.NonPublic | BindingFlags.Static)));
+            VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(typeof(UIPage).GetMethod("Method_Public_Void_Boolean_TransitionType_0"), new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnUIPageToggle), BindingFlags.NonPublic | BindingFlags.Static)));
 
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_openBigMenu, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnBigMenuOpen), BindingFlags.NonPublic | BindingFlags.Static)));
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_closeBigMenu, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnBigMenuClose), BindingFlags.NonPublic | BindingFlags.Static)));
