@@ -294,7 +294,7 @@
             The back button of the sub menu.
             </summary>
         </member>
-        <member name="P:VRChatUtilityKit.Ui.SubMenu.TitleText">
+        <member name="P:VRChatUtilityKit.Ui.SubMenu.TextComponent">
             <summary>
             The Text component of the title of the sub menu.
             </summary>
@@ -309,20 +309,22 @@
             The list of button groups on this menu.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.SubMenu.#ctor(UnityEngine.Transform,System.String,System.String)">
+        <member name="M:VRChatUtilityKit.Ui.SubMenu.#ctor(UnityEngine.Transform,System.String,System.String,System.String)">
             <summary>
             Creates a new sub menu.
             </summary>
             <param name="parent">The parent of the sub menu</param>
             <param name="pageName">The name of the sub menu's page</param>
             <param name="gameObjectName">The name of the sub menu's GameObject</param>
+            <param name="headerText">The text of the sub menu's header</param>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.SubMenu.#ctor(System.String,System.String)">
+        <member name="M:VRChatUtilityKit.Ui.SubMenu.#ctor(System.String,System.String,System.String)">
             <summary>
             Creates a new sub menu.
             </summary>
             <param name="pageName">The name of the sub menu's page</param>
             <param name="gameObjectName">The name of the sub menu's GameObject</param>
+            <param name="headerText">The text of the sub menu's header</param>
         </member>
         <member name="M:VRChatUtilityKit.Ui.SubMenu.AddButtonGroup(VRChatUtilityKit.Ui.ButtonGroup)">
             <summary>
@@ -362,7 +364,7 @@
             The MenuTab component on the tab button.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.TabButton.#ctor(UnityEngine.Sprite,System.String,System.String,System.String)">
+        <member name="M:VRChatUtilityKit.Ui.TabButton.#ctor(UnityEngine.Sprite,System.String,System.String,System.String,System.String)">
             <summary>
             Creates a new tab button.
             </summary>
@@ -370,6 +372,7 @@
             <param name="pageName">The name of the tab menu's page</param>
             <param name="gameObjectName">The name of the tab button's GameObject</param>
             <param name="tooltipText">The tooltip of the tab button</param>
+            <param name="headerText">The text of the sub menu's header</param>
         </member>
         <member name="T:VRChatUtilityKit.Ui.TabMenu">
             <summary>
@@ -614,6 +617,21 @@
             Opens given user in the Open User For More Info QuickMenu.
             </summary>
             <param name="playerToSelect">The player to select</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenQuickMenu">
+            <summary>
+            Opens the QuickMenu.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.CloseQuickMenu">
+            <summary>
+            Closes the QuickMenu.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.CloseMenu">
+            <summary>
+            Closes all open menus.
+            </summary>
         </member>
         <member name="M:VRChatUtilityKit.Ui.UiManager.ClosePopup">
             <summary>
@@ -1072,6 +1090,12 @@
         <member name="T:VRChatUtilityKit.Utilities.XrefUtils">
             <summary>
             A set of utilites for Xref scanning.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.XrefUtils.PrintMethod">
+            <summary>
+            A method that prints the name of the original method when used in a patch.
+            Useful when figuring out Xrefs.
             </summary>
         </member>
         <member name="M:VRChatUtilityKit.Utilities.XrefUtils.CheckStrings(System.Reflection.MethodInfo,System.Func{System.String,System.Boolean})">

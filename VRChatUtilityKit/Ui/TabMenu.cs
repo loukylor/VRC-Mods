@@ -9,8 +9,10 @@ namespace VRChatUtilityKit.Ui
     /// </summary>
     public class TabMenu : SubMenu
     {
-        internal TabMenu(string name, string pageName) : base(name, pageName)
+        internal TabMenu(string name, string pageName, string headerText) : base(name, pageName, headerText)
         {
+            BackButton.gameObject.SetActive(false);
+
             Il2CppReferenceArray<UIPage> rootPages = UiManager.QMStateController.field_Public_ArrayOf_UIPage_0;
             Il2CppReferenceArray<UIPage> newRootPages = new Il2CppReferenceArray<UIPage>(rootPages.Count + 1);
             for (int i = 0; i < rootPages.Count; i++)
@@ -23,7 +25,7 @@ namespace VRChatUtilityKit.Ui
         /// Opens a the specified menu as a sub menu of the tab menu.
         /// </summary>
         /// <param name="uiPage">The page to open</param>
-        public void OpenSubMenu(UIPage uiPage) => UiManager._pushPageMethod.Invoke(uiPage, new object[1] { uiPage });
+        public void OpenSubMenu(UIPage uiPage) => UiManager._pushPageMethod.Invoke(this.uiPage, new object[1] { uiPage });
 
         /// <summary>
         /// Opens a the specified menu as a sub menu of the tab menu.

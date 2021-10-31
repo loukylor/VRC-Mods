@@ -12,7 +12,7 @@ namespace VRChatUtilityKit.Ui
     /// <summary>
     /// A wrapper holding a sub menu.
     /// </summary>
-    public class SubMenu : ElementBase
+    public class SubMenu : ElementBase, IElementWithText
     {
         /// <summary>
         /// The UIPage attached to the sub menu.
@@ -27,19 +27,19 @@ namespace VRChatUtilityKit.Ui
         /// <summary>
         /// The back button of the sub menu.
         /// </summary>
-        public MonoBehaviourPublicBuVoStVoOnVoVoVoVoVo0 BackButton { get; private set; } // this is temp
+        public MenuBackButton BackButton { get; private set; } 
 
         /// <summary>
         /// The Text component of the title of the sub menu.
         /// </summary>
-        public TextMeshProUGUI TitleText { get; private set; }
+        public TextMeshProUGUI TextComponent { get; private set; }
         /// <summary>
         /// Gets or sets the title of the sub menu.
         /// </summary>
         public string Text
         {
-            get => TitleText.text;
-            set => TitleText.text = value;
+            get => TextComponent.text;
+            set => TextComponent.text = value;
         }
 
         /// <summary>
@@ -54,7 +54,8 @@ namespace VRChatUtilityKit.Ui
         /// <param name="parent">The parent of the sub menu</param>
         /// <param name="pageName">The name of the sub menu's page</param>
         /// <param name="gameObjectName">The name of the sub menu's GameObject</param>
-        public SubMenu(Transform parent, string pageName, string gameObjectName) : base(parent, UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard").gameObject, gameObjectName)
+        /// <param name="headerText">The text of the sub menu's header</param>
+        public SubMenu(Transform parent, string pageName, string gameObjectName, string headerText) : base(parent, UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard").gameObject, gameObjectName)
         {
             GameObject.DestroyImmediate(gameObject.GetComponent<UIPage>());
             GameObject.Destroy(rectTransform.Find("Header_H1/RightItemContainer/Button_QM_Expand").gameObject); // Dunno how the binding class works so
@@ -63,8 +64,10 @@ namespace VRChatUtilityKit.Ui
             for (int i = PageLayoutGroup.rectTransform.childCount - 1; i >= 0; i--)
                 GameObject.DestroyImmediate(PageLayoutGroup.transform.GetChild(i).gameObject);
 
-            BackButton = rectTransform.Find("Header_H1/LeftItemContainer/Button_Back").GetComponent<MonoBehaviourPublicBuVoStVoOnVoVoVoVoVo0>(); // temp
-            TitleText = rectTransform.Find("Header_H1/LeftItemContainer/Text_Title").GetComponent<TextMeshProUGUI>();
+            BackButton = rectTransform.Find("Header_H1/LeftItemContainer/Button_Back").GetComponent<MenuBackButton>();
+            BackButton.gameObject.SetActive(true);
+            TextComponent = rectTransform.Find("Header_H1/LeftItemContainer/Text_Title").GetComponent<TextMeshProUGUI>();
+            Text = headerText;
             uiPage = gameObject.AddComponent<UIPage>();
             uiPage.field_Private_MenuStateController_0 = UiManager.QMStateController;
             uiPage.field_Public_String_0 = pageName;
@@ -76,7 +79,8 @@ namespace VRChatUtilityKit.Ui
         /// </summary>
         /// <param name="pageName">The name of the sub menu's page</param>
         /// <param name="gameObjectName">The name of the sub menu's GameObject</param>
-        public SubMenu(string pageName, string gameObjectName) : this(UiManager.QMStateController.transform.Find("Container/Window/QMParent"), pageName, gameObjectName) { }
+        /// <param name="headerText">The text of the sub menu's header</param>
+        public SubMenu(string pageName, string gameObjectName, string headerText) : this(UiManager.QMStateController.transform.Find("Container/Window/QMParent"), pageName, gameObjectName, headerText) { }
 
         /// <summary>
         /// Adds the given button group to the sub menu.
