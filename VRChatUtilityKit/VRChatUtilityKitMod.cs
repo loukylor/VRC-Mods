@@ -36,6 +36,7 @@ namespace VRChatUtilityKit
                 .ToArray();
 
             // Keep some calls normal because they need to run before everything else
+            XrefUtils.Init();
             try
             {
                 UiManager.Init();

@@ -1,4 +1,5 @@
-﻿using MelonLoader;
+﻿using HarmonyLib;
+using MelonLoader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,24 @@ namespace VRChatUtilityKit.Utilities
     /// </summary>
     public static class XrefUtils
     {
+        internal static void Init()
+        {
+            _printMethod = typeof(XrefUtils).GetMethod(nameof(Print), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod();
+        }
+
+        private static HarmonyMethod _printMethod;
+        /// <summary>
+        /// A method that prints the name of the original method when used in a patch.
+        /// Useful when figuring out Xrefs.
+        /// </summary>
+        public static HarmonyMethod PrintMethod => _printMethod;
+        private static void Print(MethodInfo __originalMethod)
+        {
+            MelonLogger.Msg(__originalMethod.Name);
+            MelonLogger.Msg(__originalMethod.DeclaringType.FullName);
+            MelonLogger.Msg("");
+        }
+
         /// <summary>
         /// Checks the strings in the given method's body.
         /// </summary>
