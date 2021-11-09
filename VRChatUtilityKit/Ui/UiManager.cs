@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using UnhollowerBaseLib.Attributes;
 using UnhollowerRuntimeLib.XrefScans;
 using UnityEngine;
 using VRC;
@@ -109,15 +108,6 @@ namespace VRChatUtilityKit.Ui
         internal static Transform tempUIParent;
 
         /// <summary>
-        /// The filled in button sprite.
-        /// </summary>
-        public static Sprite FullOnButtonSprite { get; private set; }
-        /// <summary>
-        /// The regular button sprite.
-        /// </summary>
-        public static Sprite RegularButtonSprite { get; private set; }
-
-        /// <summary>
         /// The QuickMenu MenuStateController used by VRChat
         /// </summary>
         public static MenuStateController QMStateController { get; private set; }
@@ -198,10 +188,6 @@ namespace VRChatUtilityKit.Ui
                 .ToArray();
             _pushPageMethod = pageMethods.First(method => XrefUtils.CheckUsing(method, "Add"));
             _removePageMethod = pageMethods.First(method => method != _pushPageMethod);
-
-            ButtonReaction buttonReaction = GameObject.Find("UserInterface/QuickMenu/UIElementsMenu/NameplatesOnButton").GetComponent<ButtonReaction>();
-            FullOnButtonSprite = buttonReaction.field_Public_Sprite_0.name.Contains("Full_ON") ? buttonReaction.field_Public_Sprite_0 : buttonReaction.field_Public_Sprite_1;
-            RegularButtonSprite = buttonReaction.field_Public_Sprite_0.name.Contains("White") ? buttonReaction.field_Public_Sprite_0 : buttonReaction.field_Public_Sprite_1;
         }
 
         private static void OnBigMenuOpen() => OnBigMenuOpened?.DelegateSafeInvoke();
@@ -362,5 +348,26 @@ namespace VRChatUtilityKit.Ui
         /// <param name="rightButtonClick">The onClick of the right button</param>
         /// <param name="additionalSetup">A callback called when the popup is initialized</param>
         public static void OpenPopup(string title, string description, string leftButtonText, Action leftButtonClick, string rightButtonText, Action rightButtonClick, Action<VRCUiPopup> additionalSetup = null) => _popupV2.Invoke(VRCUiPopupManager.prop_VRCUiPopupManager_0, new object[7] { title, description, leftButtonText, (Il2CppSystem.Action)leftButtonClick, rightButtonText, (Il2CppSystem.Action)rightButtonClick, (Il2CppSystem.Action<VRCUiPopup>)additionalSetup });
+
+        /// <summary>
+        /// Adds a button to an existing group of buttons.
+        /// </summary>
+        /// <param name="groupGameObject">The GameObject of the button group. VRChat ones generally end with the suffix -"_Buttons".</param>
+        /// <param name="button">The button to add to the group</param>
+        public static void AddButtonToExistingGroup(GameObject groupGameObject, SingleButton button) 
+        {
+            button.gameObject.transform.parent = groupGameObject.transform.parent;
+        }
+
+        /// <summary>
+        /// Adds a button group to an existing menu.
+        /// </summary>
+        /// <param name="menuGameObject">The GameObject of the existing menu. This should have a VerticalLayoutGroup attached.</param>
+        /// <param name="buttonGroup">The button to add to the group</param>
+        public static void AddButtonGroupToExistingMenu(GameObject menuGameObject, ButtonGroup buttonGroup)
+        {
+            buttonGroup.Header.gameObject.transform.parent = menuGameObject.transform.parent;
+            buttonGroup.gameObject.transform.parent = menuGameObject.transform.parent;
+        }
     }
 }
