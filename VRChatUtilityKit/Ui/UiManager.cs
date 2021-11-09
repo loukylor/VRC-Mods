@@ -295,7 +295,12 @@ namespace VRChatUtilityKit.Ui
         /// Opens given user in the QuickMenu.
         /// </summary>
         /// <param name="playerToSelect">The player to select</param>
-        public static void OpenUserInQuickMenu(APIUser playerToSelect) => _selectUserMethod.Invoke(UserSelectionManager.prop_UserSelectionManager_0, new object[1] { playerToSelect });
+        public static void OpenUserInQuickMenu(APIUser playerToSelect)
+        {
+            if (playerToSelect == null)
+                throw new ArgumentNullException("Given APIUser was null.");
+            _selectUserMethod.Invoke(UserSelectionManager.prop_UserSelectionManager_0, new object[1] { playerToSelect });
+        }
 
         /// <summary>
         /// Opens the QuickMenu.
