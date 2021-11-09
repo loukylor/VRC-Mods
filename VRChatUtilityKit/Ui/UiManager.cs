@@ -351,7 +351,7 @@ namespace VRChatUtilityKit.Ui
         /// <summary>
         /// Adds a button to an existing group of buttons.
         /// </summary>
-        /// <param name="groupGameObject">The GameObject of the button group. VRChat ones generally end with the suffix -"_Buttons".</param>
+        /// <param name="groupGameObject">The GameObject of the button group. VRChat ones generally end with the prefix "Buttons_".</param>
         /// <param name="button">The button to add to the group</param>
         public static void AddButtonToExistingGroup(GameObject groupGameObject, SingleButton button) 
         {
