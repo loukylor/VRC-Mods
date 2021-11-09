@@ -27,7 +27,7 @@ namespace VRChatUtilityKit.Ui
         /// <summary>
         /// The back button of the sub menu.
         /// </summary>
-        public MenuBackButton BackButton { get; private set; } 
+        public GameObject BackButton { get; private set; } 
 
         /// <summary>
         /// The Text component of the title of the sub menu.
@@ -64,7 +64,7 @@ namespace VRChatUtilityKit.Ui
             for (int i = PageLayoutGroup.rectTransform.childCount - 1; i >= 0; i--)
                 GameObject.DestroyImmediate(PageLayoutGroup.transform.GetChild(i).gameObject);
 
-            BackButton = rectTransform.Find("Header_H1/LeftItemContainer/Button_Back").GetComponent<MenuBackButton>();
+            BackButton = rectTransform.Find("Header_H1/LeftItemContainer/Button_Back").gameObject;
             BackButton.gameObject.SetActive(true);
             TextComponent = rectTransform.Find("Header_H1/LeftItemContainer/Text_Title").GetComponent<TextMeshProUGUI>();
             Text = headerText;
