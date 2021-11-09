@@ -86,7 +86,6 @@ namespace VRChatUtilityKit.Ui
         /// </summary>
         public static event Action<UIPage, bool> OnUIPageToggled;
 
-        internal static Type _selectedUserManagerType;
         internal static object _selectedUserManagerObject;
         private static MethodInfo _selectUserMethod;
         internal static MethodInfo _pushPageMethod;
@@ -177,9 +176,9 @@ namespace VRChatUtilityKit.Ui
             QMStateController = GameObject.Find("UserInterface").transform.Find("Canvas_QuickMenu(Clone)").GetComponent<MenuStateController>();
 
             // index 0 works because transform doesn't inherit from monobehavior
-            _selectedUserManagerObject = GameObject.Find("_Application/UIManager/SelectedUserManager").GetComponents<MonoBehaviour>()[0];
-            _selectedUserManagerType = XrefUtils.GetTypeFromObfuscatedName(((Il2CppSystem.Object)_selectedUserManagerObject).GetIl2CppType().Name);
-            _selectUserMethod = _selectedUserManagerType.GetMethods()
+            _selectedUserManagerObject = GameObject.Find("_Application/UIManager/SelectedUserManager").GetComponent<UserSelectionManager>();
+
+            _selectUserMethod = typeof(UserSelectionManager).GetMethods()
                 .First(method => method.Name.StartsWith("Method_Public_Void_APIUser_") && !method.Name.Contains("_PDM_") && XrefUtils.CheckUsedBy(method, "Method_Public_Virtual_Final_New_Void_IUser_"));
 
             MethodInfo[] pageMethods = typeof(UIPage).GetMethods()

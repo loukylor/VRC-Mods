@@ -8,6 +8,7 @@ using MelonLoader;
 using UnityEngine;
 using VRC;
 using VRC.Core;
+using VRC.DataModel;
 using VRC.Management;
 using VRC.UI;
 using VRChatUtilityKit.Ui;
@@ -90,7 +91,7 @@ namespace VRChatUtilityKit.Utilities
 
             OnUiManagerInit?.Invoke();
 
-            _activeUserInUserInfoMenuField = UiManager._selectedUserManagerType.GetProperty("field_Private_APIUser_1");
+            _activeUserInUserInfoMenuField = typeof(UserSelectionManager).GetProperty("field_Private_APIUser_1");
         }
 
         // Completely stolen from Psychloor's PlayerRotator (https://github.com/Psychloor/PlayerRotater)
