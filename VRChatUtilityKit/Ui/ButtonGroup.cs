@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -37,7 +38,8 @@ namespace VRChatUtilityKit.Ui
         /// <param name="name">The name of the group</param>
         /// <param name="headerText">The text of the header</param>
         /// <param name="buttons">The buttons on the group</param>
-        public ButtonGroup(string name, string headerText = null, List<IButtonGroupElement> buttons = null) : base(null, UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard/ScrollRect/Viewport/VerticalLayoutGroup/Buttons_QuickLinks").gameObject, $"Buttons_{name}")
+        /// <param name="creationCallback">An action that is called with the group object when the group is created</param>
+        public ButtonGroup(string name, string headerText = null, List<IButtonGroupElement> buttons = null, Action<ButtonGroup> creationCallback = null) : base(null, UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard/ScrollRect/Viewport/VerticalLayoutGroup/Buttons_QuickLinks").gameObject, $"Buttons_{name}")
         {
             ButtonLayoutGroup = gameObject.GetComponent<GridLayoutGroup>();
             for (int i = ButtonLayoutGroup.transform.childCount - 1; i >= 0; i--)
@@ -47,6 +49,8 @@ namespace VRChatUtilityKit.Ui
                 AddButtonHeader(headerText, $"Header_{name}");
             if (buttons != null)
                 AddButtonRange(buttons);
+
+            creationCallback?.Invoke(this);
         }
 
         /// <summary>

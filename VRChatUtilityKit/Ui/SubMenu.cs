@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -55,7 +56,8 @@ namespace VRChatUtilityKit.Ui
         /// <param name="pageName">The name of the sub menu's page</param>
         /// <param name="gameObjectName">The name of the sub menu's GameObject</param>
         /// <param name="headerText">The text of the sub menu's header</param>
-        public SubMenu(Transform parent, string pageName, string gameObjectName, string headerText) : base(parent, UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard").gameObject, gameObjectName)
+        /// <param name="creationCallback">An action that is called with the submenu object when the submenu is created</param>
+        public SubMenu(Transform parent, string pageName, string gameObjectName, string headerText, Action<SubMenu> creationCallback = null) : base(parent, UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard").gameObject, gameObjectName)
         {
             GameObject.DestroyImmediate(gameObject.GetComponent<UIPage>());
             GameObject.Destroy(rectTransform.Find("Header_H1/RightItemContainer/Button_QM_Expand").gameObject); // Dunno how the binding class works so
@@ -73,6 +75,8 @@ namespace VRChatUtilityKit.Ui
             uiPage.field_Public_String_0 = pageName;
 
             UiManager.QMStateController.field_Private_Dictionary_2_String_UIPage_0.Add(pageName, uiPage);
+
+            creationCallback?.Invoke(this);
         }
         /// <summary>
         /// Creates a new sub menu.
@@ -80,7 +84,8 @@ namespace VRChatUtilityKit.Ui
         /// <param name="pageName">The name of the sub menu's page</param>
         /// <param name="gameObjectName">The name of the sub menu's GameObject</param>
         /// <param name="headerText">The text of the sub menu's header</param>
-        public SubMenu(string pageName, string gameObjectName, string headerText) : this(UiManager.QMStateController.transform.Find("Container/Window/QMParent"), pageName, gameObjectName, headerText) { }
+        /// <param name="creationCallback">An action that is called with the submenu object when the submenu is created</param>
+        public SubMenu(string pageName, string gameObjectName, string headerText, Action<SubMenu> creationCallback = null) : this(UiManager.QMStateController.transform.Find("Container/Window/QMParent"), pageName, gameObjectName, headerText, creationCallback) { }
 
         /// <summary>
         /// Adds the given button group to the sub menu.

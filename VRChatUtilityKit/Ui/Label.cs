@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -48,13 +49,16 @@ namespace VRChatUtilityKit.Ui
         /// <param name="text">The text of the label</param>
         /// <param name="subtitleText">The subtitle text of the label</param>
         /// <param name="gameObjectName">The name of the label's GameObject</param>
-        public Label(string text, string subtitleText, string gameObjectName) : base(null, UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Settings/Panel_QM_ScrollRect/Viewport/VerticalLayoutGroup/Buttons_Debug/Button_FPS").gameObject, gameObjectName)
+        /// <param name="creationCallback">An action that is called with the label object when the label is created</param>
+        public Label(string text, string subtitleText, string gameObjectName, Action<Label> creationCallback = null) : base(null, UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Settings/Panel_QM_ScrollRect/Viewport/VerticalLayoutGroup/Buttons_Debug/Button_FPS").gameObject, gameObjectName)
         {
             TextComponent = rectTransform.Find("Text_H1").GetComponent<TextMeshProUGUI>();
             Text = text;
 
             SubtitleTextComponent = rectTransform.Find("Text_H4").GetComponent<TextMeshProUGUI>();
             SubtitleText = subtitleText;
+
+            creationCallback?.Invoke(this);
         }
     }
 }

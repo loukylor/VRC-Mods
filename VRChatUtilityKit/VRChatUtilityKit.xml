@@ -45,13 +45,14 @@
             The buttons in the group.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.#ctor(System.String,System.String,System.Collections.Generic.List{VRChatUtilityKit.Ui.IButtonGroupElement})">
+        <member name="M:VRChatUtilityKit.Ui.ButtonGroup.#ctor(System.String,System.String,System.Collections.Generic.List{VRChatUtilityKit.Ui.IButtonGroupElement},System.Action{VRChatUtilityKit.Ui.ButtonGroup})">
             <summary>
             Creates a new button group.
             </summary>
             <param name="name">The name of the group</param>
             <param name="headerText">The text of the header</param>
             <param name="buttons">The buttons on the group</param>
+            <param name="creationCallback">An action that is called with the group object when the group is created</param>
         </member>
         <member name="M:VRChatUtilityKit.Ui.ButtonGroup.AddButtonHeader(System.String,System.String)">
             <summary>
@@ -236,13 +237,14 @@
             Gets or sets the subtitle text on the label.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.Label.#ctor(System.String,System.String,System.String)">
+        <member name="M:VRChatUtilityKit.Ui.Label.#ctor(System.String,System.String,System.String,System.Action{VRChatUtilityKit.Ui.Label})">
             <summary>
             Creates a new label.
             </summary>
             <param name="text">The text of the label</param>
             <param name="subtitleText">The subtitle text of the label</param>
             <param name="gameObjectName">The name of the label's GameObject</param>
+            <param name="creationCallback">An action that is called with the label object when the label is created</param>
         </member>
         <member name="T:VRChatUtilityKit.Ui.SingleButton">
             <summary>
@@ -264,7 +266,7 @@
             A small icon indicating this buttons jumps to the big menu.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.SingleButton.#ctor(System.Action,UnityEngine.Sprite,System.String,System.String,System.String)">
+        <member name="M:VRChatUtilityKit.Ui.SingleButton.#ctor(System.Action,UnityEngine.Sprite,System.String,System.String,System.String,System.Action{VRChatUtilityKit.Ui.SingleButton})">
             <summary>
             Creates a new button.
             </summary>
@@ -273,6 +275,7 @@
             <param name="text">The text of the button</param>
             <param name="gameObjectName">The name of the button's GameObject</param>
             <param name="tooltipText">The tooltip of the button</param>
+            <param name="creationCallback">An action that is called with the button object when the button is created</param>
         </member>
         <member name="T:VRChatUtilityKit.Ui.SubMenu">
             <summary>
@@ -309,7 +312,7 @@
             The list of button groups on this menu.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.SubMenu.#ctor(UnityEngine.Transform,System.String,System.String,System.String)">
+        <member name="M:VRChatUtilityKit.Ui.SubMenu.#ctor(UnityEngine.Transform,System.String,System.String,System.String,System.Action{VRChatUtilityKit.Ui.SubMenu})">
             <summary>
             Creates a new sub menu.
             </summary>
@@ -317,14 +320,16 @@
             <param name="pageName">The name of the sub menu's page</param>
             <param name="gameObjectName">The name of the sub menu's GameObject</param>
             <param name="headerText">The text of the sub menu's header</param>
+            <param name="creationCallback">An action that is called with the submenu object when the submenu is created</param>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.SubMenu.#ctor(System.String,System.String,System.String)">
+        <member name="M:VRChatUtilityKit.Ui.SubMenu.#ctor(System.String,System.String,System.String,System.Action{VRChatUtilityKit.Ui.SubMenu})">
             <summary>
             Creates a new sub menu.
             </summary>
             <param name="pageName">The name of the sub menu's page</param>
             <param name="gameObjectName">The name of the sub menu's GameObject</param>
             <param name="headerText">The text of the sub menu's header</param>
+            <param name="creationCallback">An action that is called with the submenu object when the submenu is created</param>
         </member>
         <member name="M:VRChatUtilityKit.Ui.SubMenu.AddButtonGroup(VRChatUtilityKit.Ui.ButtonGroup)">
             <summary>
@@ -370,7 +375,7 @@
             The MenuTab component on the tab button.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.TabButton.#ctor(UnityEngine.Sprite,System.String,System.String,System.String,System.String)">
+        <member name="M:VRChatUtilityKit.Ui.TabButton.#ctor(UnityEngine.Sprite,System.String,System.String,System.String,System.String,System.Action{VRChatUtilityKit.Ui.TabButton})">
             <summary>
             Creates a new tab button.
             </summary>
@@ -379,6 +384,7 @@
             <param name="gameObjectName">The name of the tab button's GameObject</param>
             <param name="tooltipText">The tooltip of the tab button</param>
             <param name="headerText">The text of the sub menu's header</param>
+            <param name="creationCallback">An action that is called with the tabbutton object when the tabbutton is created</param>
         </member>
         <member name="T:VRChatUtilityKit.Ui.TabMenu">
             <summary>
@@ -468,7 +474,7 @@
             The off sprite of the button.
             </summary>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.ToggleButton.#ctor(System.Action{System.Boolean},UnityEngine.Sprite,UnityEngine.Sprite,System.String,System.String,System.String,System.String)">
+        <member name="M:VRChatUtilityKit.Ui.ToggleButton.#ctor(System.Action{System.Boolean},UnityEngine.Sprite,UnityEngine.Sprite,System.String,System.String,System.String,System.String,System.Action{VRChatUtilityKit.Ui.ToggleButton})">
             <summary>
             Creates a new toggle button.
             </summary>
@@ -479,6 +485,7 @@
             <param name="gameObjectName">The name of the button's GameObject</param>
             <param name="tooltipText">The tooltip shown when the toggle is on</param>
             <param name="tooltipAltText">The tooltip shown when the toggle is off</param>
+            <param name="creationCallback">An action that is called with the button object when the button is created</param>
         </member>
         <member name="T:VRChatUtilityKit.Ui.UiManager">
             <summary>

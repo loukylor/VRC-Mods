@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using VRC.UI.Elements.Controls;
 
 namespace VRChatUtilityKit.Ui
@@ -27,13 +28,16 @@ namespace VRChatUtilityKit.Ui
         /// <param name="gameObjectName">The name of the tab button's GameObject</param>
         /// <param name="tooltipText">The tooltip of the tab button</param>
         /// <param name="headerText">The text of the sub menu's header</param>
-        public TabButton(Sprite sprite, string pageName, string gameObjectName, string headerText, string tooltipText = "") : base(UiManager.QMStateController.transform.Find("Container/Window/Page_Buttons_QM/HorizontalLayoutGroup"), UiManager.QMStateController.transform.Find("Container/Window/Page_Buttons_QM/HorizontalLayoutGroup/Page_Dashboard").gameObject, sprite, gameObjectName, tooltipText)
+        /// <param name="creationCallback">An action that is called with the tabbutton object when the tabbutton is created</param>
+        public TabButton(Sprite sprite, string pageName, string gameObjectName, string headerText, string tooltipText = "", Action<TabButton> creationCallback = null) : base(UiManager.QMStateController.transform.Find("Container/Window/Page_Buttons_QM/HorizontalLayoutGroup"), UiManager.QMStateController.transform.Find("Container/Window/Page_Buttons_QM/HorizontalLayoutGroup/Page_Dashboard").gameObject, sprite, gameObjectName, tooltipText)
         {
             MenuTab = gameObject.GetComponent<MenuTab>();
             MenuTab.field_Private_MenuStateController_0 = UiManager.QMStateController;
             MenuTab.field_Public_String_0 = pageName;
 
             SubMenu = new TabMenu(pageName, $"Menu_{pageName}", headerText);
+
+            creationCallback?.Invoke(this);
         }
     }
 }
