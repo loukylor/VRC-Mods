@@ -128,5 +128,14 @@ namespace VRChatUtilityKit.Ui
             }
             _buttonGroups.Clear();
         }
+
+        /// <summary>
+        /// Toggles the 
+        /// </summary>
+        /// <param name="active"></param>
+        public void ToggleScrollbar(bool active)
+        {
+            UiManager.ToggleScrollRectOnExistingMenu(PageLayoutGroup.gameObject, active);
+        }
     }
 }

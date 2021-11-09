@@ -349,6 +349,12 @@
             Removes all button groups from the submenu.
             </summary>
         </member>
+        <member name="M:VRChatUtilityKit.Ui.SubMenu.ToggleScrollbar(System.Boolean)">
+            <summary>
+            Toggles the 
+            </summary>
+            <param name="active"></param>
+        </member>
         <member name="T:VRChatUtilityKit.Ui.TabButton">
             <summary>
             A wrapper that holds a tab button.
@@ -530,16 +536,6 @@
             The type of the enum that is used for the QuickMenu index.
             </summary>
         </member>
-        <member name="P:VRChatUtilityKit.Ui.UiManager.FullOnButtonSprite">
-            <summary>
-            The filled in button sprite.
-            </summary>
-        </member>
-        <member name="P:VRChatUtilityKit.Ui.UiManager.RegularButtonSprite">
-            <summary>
-            The regular button sprite.
-            </summary>
-        </member>
         <member name="P:VRChatUtilityKit.Ui.UiManager.QMStateController">
             <summary>
             The QuickMenu MenuStateController used by VRChat
@@ -665,6 +661,27 @@
             <param name="rightButtonText">The text of the right button</param>
             <param name="rightButtonClick">The onClick of the right button</param>
             <param name="additionalSetup">A callback called when the popup is initialized</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.AddButtonToExistingGroup(UnityEngine.GameObject,VRChatUtilityKit.Ui.SingleButton)">
+            <summary>
+            Adds a button to an existing group of buttons.
+            </summary>
+            <param name="groupGameObject">The GameObject of the button group. VRChat ones generally end with the suffix -"_Buttons".</param>
+            <param name="button">The button to add to the group</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.AddButtonGroupToExistingMenu(UnityEngine.GameObject,VRChatUtilityKit.Ui.ButtonGroup)">
+            <summary>
+            Adds a button group to an existing menu.
+            </summary>
+            <param name="menuGameObject">The GameObject of the existing menu. This should have a VerticalLayoutGroup attached.</param>
+            <param name="buttonGroup">The button to add to the group</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.ToggleScrollRectOnExistingMenu(UnityEngine.GameObject,System.Boolean)">
+            <summary>
+            Toggles the scrollbar on the given menu.
+            </summary>
+            <param name="menuGameObject">The menu to toggle the scrollbar on</param>
+            <param name="active">Whether to enable or disable the scrollbar</param>
         </member>
         <member name="T:VRChatUtilityKit.Ui.VRCButton">
             <summary>

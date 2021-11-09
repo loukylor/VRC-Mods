@@ -5,11 +5,10 @@ using System.Linq;
 using System.Reflection;
 using UnhollowerRuntimeLib.XrefScans;
 using UnityEngine;
-using VRC;
+using UnityEngine.UI;
 using VRC.Core;
 using VRC.DataModel;
 using VRC.UI;
-using VRC.UI.Core;
 using VRC.UI.Elements;
 using VRChatUtilityKit.Utilities;
 
@@ -356,7 +355,7 @@ namespace VRChatUtilityKit.Ui
         /// <param name="button">The button to add to the group</param>
         public static void AddButtonToExistingGroup(GameObject groupGameObject, SingleButton button) 
         {
-            button.gameObject.transform.parent = groupGameObject.transform.parent;
+            button.gameObject.transform.SetParent(groupGameObject.transform);
         }
 
         /// <summary>
@@ -366,8 +365,22 @@ namespace VRChatUtilityKit.Ui
         /// <param name="buttonGroup">The button to add to the group</param>
         public static void AddButtonGroupToExistingMenu(GameObject menuGameObject, ButtonGroup buttonGroup)
         {
-            buttonGroup.Header.gameObject.transform.parent = menuGameObject.transform.parent;
-            buttonGroup.gameObject.transform.parent = menuGameObject.transform.parent;
+            buttonGroup.Header.gameObject.transform.SetParent(menuGameObject.transform);
+            buttonGroup.gameObject.transform.SetParent(menuGameObject.transform);
+        }
+
+        /// <summary>
+        /// Toggles the scrollbar on the given menu.
+        /// </summary>
+        /// <param name="menuGameObject">The menu to toggle the scrollbar on</param>
+        /// <param name="active">Whether to enable or disable the scrollbar</param>
+        public static void ToggleScrollRectOnExistingMenu(GameObject menuGameObject, bool active)
+        {
+            ScrollRect scrollRect = menuGameObject.transform.parent.parent.GetComponent<ScrollRect>();
+            Scrollbar scrollbar = menuGameObject.transform.parent.parent.Find("Scrollbar").GetComponent<Scrollbar>();
+
+            scrollbar.gameObject.SetActive(active);
+            scrollRect.verticalScrollbar = scrollbar;
         }
     }
 }
