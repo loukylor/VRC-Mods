@@ -18,7 +18,7 @@ namespace VRChatUtilityKit.Ui
     /// <summary>
     /// A UiManager that contains many utilites pertaining to VRChat's UI.
     /// </summary>
-    public class UiManager
+    public static class UiManager
     {
         private static MethodInfo _popupV2;
         private static MethodInfo _popupV2Small;
@@ -329,6 +329,65 @@ namespace VRChatUtilityKit.Ui
         /// <param name="rightButtonClick">The onClick of the right button</param>
         /// <param name="additionalSetup">A callback called when the popup is initialized</param>
         public static void OpenPopup(string title, string description, string leftButtonText, Action leftButtonClick, string rightButtonText, Action rightButtonClick, Action<VRCUiPopup> additionalSetup = null) => _popupV2.Invoke(VRCUiPopupManager.prop_VRCUiPopupManager_0, new object[7] { title, description, leftButtonText, (Il2CppSystem.Action)leftButtonClick, rightButtonText, (Il2CppSystem.Action)rightButtonClick, (Il2CppSystem.Action<VRCUiPopup>)additionalSetup });
+
+        /// <summary>
+        /// Opens a the specified menu as a sub menu of the given root page.
+        /// </summary>
+        /// <param name="rootPage">The page to open the submenu on</param>
+        /// <param name="uiPage">The page to open</param>
+        public static void OpenSubMenu(UIPage rootPage, UIPage uiPage) => _pushPageMethod.Invoke(rootPage, new object[1] { uiPage });
+
+        /// <summary>
+        /// Closes all sub menus of the given root page.
+        /// </summary>
+        /// <param name="rootPage">The page to close all submenus of</param>
+        public static void CloseAllSubMenus(UIPage rootPage) => rootPage.Method_Public_Void_Predicate_1_UIPage_0(null);
+
+        /// <summary>
+        /// Closes the most recently open sub menu of the given root page.
+        /// </summary>
+        /// <param name="rootPage">The page to pop a submenu from</param>
+        public static void PopSubMenu(UIPage rootPage) => _removePageMethod.Invoke(rootPage, new object[1] { CurrentPage(rootPage) });
+
+        /// <summary>
+        /// Returns the most recently open menu of the given root page.
+        /// </summary>
+        /// <param name="rootPage">The page to grab the current page of</param>
+        /// <returns>The most recently open menu of the tab menu</returns>
+        public static UIPage CurrentPage(UIPage rootPage) => rootPage.field_Private_List_1_UIPage_0[rootPage.field_Private_List_1_UIPage_0.Count - 1];
+
+        /// <summary>
+        /// Removes the given sub menu from the given root page's stack.
+        /// </summary>
+        /// <param name="rootPage">The root page to remove a page from</param>
+        /// <param name="uiPage">The page to remove</param>
+        /// <returns>The page that was removed</returns>
+        public static UIPage RemovePageFromStack(UIPage rootPage, UIPage uiPage) => rootPage.Method_Private_UIPage_UIPage_0(uiPage);
+
+        /// <summary>
+        /// Goes to the given page in the root page's stack.
+        /// Closes any other pages above it in the stack.
+        /// The given page must already be in the stack.
+        /// </summary>
+        /// <param name="rootPage">The root page to go back to a menu on</param>
+        /// <param name="uiPage">The page to open</param>
+        public static void GoBackToMenu(UIPage rootPage, UIPage uiPage)
+        {
+            bool isInStack = false;
+            foreach (UIPage stackPage in rootPage.field_Private_List_1_UIPage_0)
+            {
+                if (stackPage.field_Public_String_0 == uiPage.field_Public_String_0)
+                {
+                    isInStack = true;
+                    break;
+                }
+            }
+            if (!isInStack)
+                throw new ArgumentException("Given UIPage was not in the screen stack");
+
+            while (CurrentPage(rootPage).field_Public_String_0 != uiPage.field_Public_String_0)
+                PopSubMenu(rootPage);
+        }
 
         /// <summary>
         /// Adds a button to an existing group of buttons.

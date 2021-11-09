@@ -1,5 +1,4 @@
-﻿using System;
-using UnhollowerBaseLib;
+﻿using UnhollowerBaseLib;
 using VRC.UI.Elements;
 
 namespace VRChatUtilityKit.Ui
@@ -25,7 +24,7 @@ namespace VRChatUtilityKit.Ui
         /// Opens a the specified menu as a sub menu of the tab menu.
         /// </summary>
         /// <param name="uiPage">The page to open</param>
-        public void OpenSubMenu(UIPage uiPage) => UiManager._pushPageMethod.Invoke(this.uiPage, new object[1] { uiPage });
+        public void OpenSubMenu(UIPage uiPage) => UiManager.OpenSubMenu(this.uiPage, uiPage);
 
         /// <summary>
         /// Opens a the specified menu as a sub menu of the tab menu.
@@ -36,25 +35,25 @@ namespace VRChatUtilityKit.Ui
         /// <summary>
         /// Closes all sub menus of the tab menu.
         /// </summary>
-        public void CloseAllSubMenus() => uiPage.Method_Public_Void_Predicate_1_UIPage_0(null);
+        public void CloseAllSubMenus() => UiManager.CloseAllSubMenus(uiPage);
 
         /// <summary>
         /// Closes the most recently open sub menu of the tab menu.
         /// </summary>
-        public void PopSubMenu() => UiManager._removePageMethod.Invoke(uiPage, new object[1] { CurrentPage() });
+        public void PopSubMenu() => UiManager.PopSubMenu(uiPage);
 
         /// <summary>
         /// Returns the most recently open menu of the tab menu.
         /// </summary>
         /// <returns>The most recently open menu of the tab menu</returns>
-        public UIPage CurrentPage() => uiPage.field_Private_List_1_UIPage_0[uiPage.field_Private_List_1_UIPage_0.Count - 1];
+        public UIPage CurrentPage() => UiManager.CurrentPage(uiPage);
 
         /// <summary>
         /// Removes the given sub menu from the tab menu's stack.
         /// </summary>
         /// <param name="uiPage">The page to remove</param>
         /// <returns>The page that was removed</returns>
-        public UIPage RemovePageFromStack(UIPage uiPage) => this.uiPage.Method_Private_UIPage_UIPage_0(uiPage);
+        public UIPage RemovePageFromStack(UIPage uiPage) => UiManager.RemovePageFromStack(this.uiPage, uiPage);
         /// <summary>
         /// Removes the given sub menu from the tab menu's stack.
         /// </summary>
@@ -68,23 +67,7 @@ namespace VRChatUtilityKit.Ui
         /// The given page must already be in the stack.
         /// </summary>
         /// <param name="uiPage">The page to open</param>
-        public void GoBackToMenu(UIPage uiPage)
-        {
-            bool isInStack = false;
-            foreach (UIPage stackPage in this.uiPage.field_Private_List_1_UIPage_0)
-            {
-                if (stackPage.field_Public_String_0 == uiPage.field_Public_String_0)
-                {
-                    isInStack = true;
-                    break;
-                }
-            }
-            if (!isInStack)
-                throw new ArgumentException("Given UIPage was not in the screen stack");
-
-            while (CurrentPage().field_Public_String_0 != uiPage.field_Public_String_0)
-                PopSubMenu();
-        }
+        public void GoBackToMenu(UIPage uiPage) => UiManager.GoBackToMenu(this.uiPage, uiPage);
 
         /// <summary>
         /// Goes to the given page in the tab menu's stack.

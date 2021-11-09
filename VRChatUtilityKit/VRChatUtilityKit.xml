@@ -653,6 +653,49 @@
             <param name="rightButtonClick">The onClick of the right button</param>
             <param name="additionalSetup">A callback called when the popup is initialized</param>
         </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenSubMenu(VRC.UI.Elements.UIPage,VRC.UI.Elements.UIPage)">
+            <summary>
+            Opens a the specified menu as a sub menu of the given root page.
+            </summary>
+            <param name="rootPage">The page to open the submenu on</param>
+            <param name="uiPage">The page to open</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.CloseAllSubMenus(VRC.UI.Elements.UIPage)">
+            <summary>
+            Closes all sub menus of the given root page.
+            </summary>
+            <param name="rootPage">The page to close all submenus of</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.PopSubMenu(VRC.UI.Elements.UIPage)">
+            <summary>
+            Closes the most recently open sub menu of the given root page.
+            </summary>
+            <param name="rootPage">The page to pop a submenu from</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.CurrentPage(VRC.UI.Elements.UIPage)">
+            <summary>
+            Returns the most recently open menu of the given root page.
+            </summary>
+            <param name="rootPage">The page to grab the current page of</param>
+            <returns>The most recently open menu of the tab menu</returns>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.RemovePageFromStack(VRC.UI.Elements.UIPage,VRC.UI.Elements.UIPage)">
+            <summary>
+            Removes the given sub menu from the given root page's stack.
+            </summary>
+            <param name="rootPage">The root page to remove a page from</param>
+            <param name="uiPage">The page to remove</param>
+            <returns>The page that was removed</returns>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.UiManager.GoBackToMenu(VRC.UI.Elements.UIPage,VRC.UI.Elements.UIPage)">
+            <summary>
+            Goes to the given page in the root page's stack.
+            Closes any other pages above it in the stack.
+            The given page must already be in the stack.
+            </summary>
+            <param name="rootPage">The root page to go back to a menu on</param>
+            <param name="uiPage">The page to open</param>
+        </member>
         <member name="M:VRChatUtilityKit.Ui.UiManager.AddButtonToExistingGroup(UnityEngine.GameObject,VRChatUtilityKit.Ui.SingleButton)">
             <summary>
             Adds a button to an existing group of buttons.
