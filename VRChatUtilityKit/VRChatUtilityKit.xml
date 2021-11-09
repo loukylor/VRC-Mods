@@ -1020,11 +1020,6 @@
             Returns whether UIExpansionKit is loaded.
             </summary>
         </member>
-        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.MenuControllerInstance">
-            <summary>
-            Returns the instance of the MenuController.
-            </summary>
-        </member>
         <member name="P:VRChatUtilityKit.Utilities.VRCUtils.WorldInfoInstance">
             <summary>
             Returns the instance of the WorldInfo component.
@@ -1038,16 +1033,6 @@
         <member name="P:VRChatUtilityKit.Utilities.VRCUtils.ActiveUserInUserInfoMenu">
             <summary>
             Returns the active user in the user info menu.
-            </summary>
-        </member>
-        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.ActiveUserInQuickMenu">
-            <summary>
-            Returns the active user in the QuickMenu.
-            </summary>
-        </member>
-        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.ActivePlayerInQuickMenu">
-            <summary>
-            Returns the active player in the QuickMenu.
             </summary>
         </member>
         <member name="M:VRChatUtilityKit.Utilities.VRCUtils.IsAvatarExplcitlyShown(VRC.Core.APIUser)">

@@ -88,6 +88,8 @@ namespace VRChatUtilityKit.Ui
         /// </summary>
         public static event Action<UIPage, bool> OnUIPageToggled;
 
+        internal static Type _selectedUserManagerType;
+        internal static object _selectedUserManagerObject;
         private static MethodInfo _selectUserMethod;
         internal static MethodInfo _pushPageMethod;
         internal static MethodInfo _removePageMethod;
@@ -163,7 +165,7 @@ namespace VRChatUtilityKit.Ui
             VRChatUtilityKitMod.Instance.HarmonyInstance.Patch(_closeQuickMenuMethod, null, new HarmonyMethod(typeof(UiManager).GetMethod(nameof(OnQuickMenuClose), BindingFlags.NonPublic | BindingFlags.Static)));
 
             _openQuickMenuMethod = typeof(UIManagerImpl).GetMethods()
-                .First(method => method.Name.StartsWith("Method_Public_Void_") && method.Name.Length <= 21 && XrefUtils.CheckUsedBy(method, "RequestInvitation"));
+                .First(method => method.Name.StartsWith("Method_Public_Void_Boolean_") && method.Name.Length <= 29 && XrefUtils.CheckUsing(method, "Method_Private_Void_"));
             _openQuickMenuPageMethod = typeof(UIManagerImpl).GetMethods()
                 .First(method => method.Name.StartsWith("Method_Public_Virtual_Final_New_Void_String_") && XrefUtils.CheckUsing(method, _openQuickMenuMethod.Name, _openQuickMenuMethod.DeclaringType));
 
@@ -186,8 +188,9 @@ namespace VRChatUtilityKit.Ui
             QMStateController = GameObject.Find("UserInterface").transform.Find("Canvas_QuickMenu(Clone)").GetComponent<MenuStateController>();
 
             // index 0 works because transform doesn't inherit from monobehavior
-            Type selectedUserManager = XrefUtils.GetTypeFromObfuscatedName(GameObject.Find("_Application/UIManager/SelectedUserManager").GetComponents<MonoBehaviour>()[0].GetIl2CppType().Name);
-            _selectUserMethod = selectedUserManager.GetMethods()
+            _selectedUserManagerObject = GameObject.Find("_Application/UIManager/SelectedUserManager").GetComponents<MonoBehaviour>()[0];
+            _selectedUserManagerType = XrefUtils.GetTypeFromObfuscatedName(((Il2CppSystem.Object)_selectedUserManagerObject).GetIl2CppType().Name);
+            _selectUserMethod = _selectedUserManagerType.GetMethods()
                 .First(method => method.Name.StartsWith("Method_Public_Void_APIUser_") && !method.Name.Contains("_PDM_") && XrefUtils.CheckUsedBy(method, "Method_Public_Virtual_Final_New_Void_IUser_"));
 
             MethodInfo[] pageMethods = typeof(UIPage).GetMethods()

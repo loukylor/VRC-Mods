@@ -10,6 +10,7 @@ using VRC;
 using VRC.Core;
 using VRC.Management;
 using VRC.UI;
+using VRChatUtilityKit.Ui;
 
 #pragma warning disable IDE0051 // Remove unused private members
 
@@ -48,11 +49,6 @@ namespace VRChatUtilityKit.Utilities
         public static bool IsUIXPresent => MelonHandler.Mods.Any(x => x.Info.Name.Equals("UI Expansion Kit"));
 
         /// <summary>
-        /// Returns the instance of the MenuController.
-        /// </summary>
-        public static MenuController MenuControllerInstance { get; private set; }
-
-        /// <summary>
         /// Returns the instance of the WorldInfo component.
         /// </summary>
         public static PageWorldInfo WorldInfoInstance { get; private set; }
@@ -61,18 +57,11 @@ namespace VRChatUtilityKit.Utilities
         /// </summary>
         public static PageUserInfo UserInfoInstance { get; private set; }
 
+        private static PropertyInfo _activeUserInUserInfoMenuField;
         /// <summary>
         /// Returns the active user in the user info menu.
         /// </summary>
-        public static APIUser ActiveUserInUserInfoMenu => MenuControllerInstance.activeUser;
-        /// <summary>
-        /// Returns the active user in the QuickMenu.
-        /// </summary>
-        public static APIUser ActiveUserInQuickMenu => QuickMenu.prop_QuickMenu_0.prop_APIUser_0;
-        /// <summary>
-        /// Returns the active player in the QuickMenu.
-        /// </summary>
-        public static Player ActivePlayerInQuickMenu => QuickMenu.prop_QuickMenu_0.field_Private_Player_0; 
+        public static APIUser ActiveUserInUserInfoMenu => (APIUser)_activeUserInUserInfoMenuField.GetValue(UiManager._selectedUserManagerObject);
 
         private static MethodInfo _loadAvatarMethod;
         private static MethodInfo _reloadAllAvatarsMethod;
@@ -81,6 +70,8 @@ namespace VRChatUtilityKit.Utilities
         {
             NetworkEvents.OnInstanceChanged += new Action<ApiWorld, ApiWorldInstance>((world, instance) => StartEmmCheck(world));
             MelonCoroutines.Start(UiInitCoroutine());
+
+            _activeUserInUserInfoMenuField = UiManager._selectedUserManagerType.GetProperty("field_Private_APIUser_1");
 
             _loadAvatarMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.Name.StartsWith("Method_Private_Void_Boolean_") && mi.Name.Length < 31 && mi.GetParameters().Any(pi => pi.IsOptional) && XrefUtils.CheckUsedBy(mi, "ReloadAvatarNetworkedRPC"));
             _reloadAllAvatarsMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.Name.StartsWith("Method_Public_Void_Boolean_") && mi.Name.Length < 30 && mi.GetParameters().All(pi => pi.IsOptional) && XrefUtils.CheckUsedBy(mi, "Method_Public_Void_", typeof(FeaturePermissionManager)));// Both methods seem to do the same thing;
@@ -93,7 +84,6 @@ namespace VRChatUtilityKit.Utilities
             while (GameObject.Find("UserInterface").transform.Find("Canvas_QuickMenu(Clone)") == null)
                 yield return null;
 
-            MenuControllerInstance = QuickMenu.prop_QuickMenu_0.field_Public_MenuController_0;
             WorldInfoInstance = GameObject.Find("UserInterface/MenuContent/Screens/WorldInfo").GetComponent<PageWorldInfo>();
             UserInfoInstance = GameObject.Find("UserInterface/MenuContent/Screens/UserInfo").GetComponent<PageUserInfo>();
 
