@@ -43,10 +43,11 @@ namespace VRChatUtilityKit.Utilities
         }
         private static bool _areRiskyFunctionsAllowed;
 
+        private static bool _isUIXPresent;
         /// <summary>
         /// Returns whether UIExpansionKit is loaded.
         /// </summary>
-        public static bool IsUIXPresent => MelonHandler.Mods.Any(x => x.Info.Name.Equals("UI Expansion Kit"));
+        public static bool IsUIXPresent => _isUIXPresent;
 
         /// <summary>
         /// Returns the instance of the WorldInfo component.
@@ -68,10 +69,10 @@ namespace VRChatUtilityKit.Utilities
 
         private static void OnApplicationStart()
         {
+            _isUIXPresent = MelonHandler.Mods.Any(x => x.Info.Name.Equals("UI Expansion Kit"));
+
             NetworkEvents.OnInstanceChanged += new Action<ApiWorld, ApiWorldInstance>((world, instance) => StartEmmCheck(world));
             MelonCoroutines.Start(UiInitCoroutine());
-
-            _activeUserInUserInfoMenuField = UiManager._selectedUserManagerType.GetProperty("field_Private_APIUser_1");
 
             _loadAvatarMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.Name.StartsWith("Method_Private_Void_Boolean_") && mi.Name.Length < 31 && mi.GetParameters().Any(pi => pi.IsOptional) && XrefUtils.CheckUsedBy(mi, "ReloadAvatarNetworkedRPC"));
             _reloadAllAvatarsMethod = typeof(VRCPlayer).GetMethods().First(mi => mi.Name.StartsWith("Method_Public_Void_Boolean_") && mi.Name.Length < 30 && mi.GetParameters().All(pi => pi.IsOptional) && XrefUtils.CheckUsedBy(mi, "Method_Public_Void_", typeof(FeaturePermissionManager)));// Both methods seem to do the same thing;
@@ -88,6 +89,8 @@ namespace VRChatUtilityKit.Utilities
             UserInfoInstance = GameObject.Find("UserInterface/MenuContent/Screens/UserInfo").GetComponent<PageUserInfo>();
 
             OnUiManagerInit?.Invoke();
+
+            _activeUserInUserInfoMenuField = UiManager._selectedUserManagerType.GetProperty("field_Private_APIUser_1");
         }
 
         // Completely stolen from Psychloor's PlayerRotator (https://github.com/Psychloor/PlayerRotater)
