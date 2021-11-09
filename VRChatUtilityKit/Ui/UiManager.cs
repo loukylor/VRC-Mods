@@ -34,7 +34,6 @@ namespace VRChatUtilityKit.Ui
 
         private static MethodInfo _closeBigMenu;
         private static MethodBase _openBigMenu;
-        private static MethodInfo _mainMenu;
         private static bool _shouldSkipPlaceUiAfterPause;
         private static bool _shouldChangeScreenStackValue;
         private static bool _newScreenStackValue;
@@ -119,20 +118,9 @@ namespace VRChatUtilityKit.Ui
 
             BigMenuIndexEnum = quickMenuNestedEnums.First(type => type.IsEnum && type != QuickMenuIndexEnum);
             _closeBigMenu = typeof(VRCUiManager).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_Boolean_") && !mb.Name.Contains("_PDM_") && XrefUtils.CheckUsedBy(mb, "Method_Public_Void_Player_"));
-            _mainMenu = typeof(QuickMenu).GetMethods()
-                .First(mb => mb.Name.StartsWith("Method_Public_Void_Enum") && mb.GetParameters().Length == 2 && mb.GetParameters()[0].ParameterType == BigMenuIndexEnum && mb.GetParameters()[1].ParameterType == typeof(bool));
-            foreach (XrefInstance instance in XrefScanner.XrefScan(_mainMenu))
-            {
-                if (instance.Type != XrefType.Method || instance.TryResolve() == null)
-                    continue;
-
-                if (_openBigMenu == null && instance.TryResolve().Name.StartsWith("Method_Public_Void_Boolean_Boolean_"))
-                {
-                    _openBigMenu = instance.TryResolve();
-                    break;
-                }
-            }
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_Boolean_") && !mb.Name.Contains("_PDM_") && XrefUtils.CheckUsedBy(mb, "ChangeToSelectedAvatar"));
+            _openBigMenu = typeof(VRCUiManager).GetMethods()
+                .First(mb => mb.Name.StartsWith("Method_Public_Void_Boolean_Boolean_") && !mb.Name.Contains("_PDM_") && XrefUtils.CheckStrings(mb, "UserInterface/MenuContent/Backdrop/Backdrop"));
 
             MethodInfo _placeUiAfterPause = typeof(QuickMenu).GetNestedTypes().First(type => type.Name.Contains("IEnumerator")).GetMethod("MoveNext");
 
@@ -237,29 +225,19 @@ namespace VRChatUtilityKit.Ui
             _shouldChangeScreenStackValue = true;
             _newScreenStackValue = addToScreenStack;
             _shouldSkipPlaceUiAfterPause = !rePlaceUi;
-            _mainMenu.Invoke(QuickMenu.prop_QuickMenu_0, new object[2] { index, !openUi });
+            if (openUi)
+                OpenBigMenu(false);
+            VRCUiManager.field_Private_Static_VRCUiManager_0.Method_Public_Void_String_Boolean_0(_bigMenuIndexToPathTable[index]);
         }
         /// <summary>
         /// Opens the given user in the user info page. 
-        /// Does not open with big menu along with the page.
         /// </summary>
         /// <param name="user">The user to open</param>
-        public static void OpenUserInUserInfoPage(APIUser user)
+        public static void OpenUserInUserInfoPage(IUser user)
         {
-            QuickMenu.prop_QuickMenu_0.prop_APIUser_0 = user ?? throw new ArgumentNullException("Given APIUser was null.");
-            MainMenu(4, false, false, false);
+            UIManagerImpl.prop_UIManagerImpl_0.Method_Public_Void_IUser_0(user);
         }
-        /// <summary>
-        /// Opens the given user in the user info page. 
-        /// Does not open with big menu along with the page.
-        /// </summary>
-        /// <param name="user">The user to open</param>
-        /// <param name="addToScreenStack"></param>
-        public static void OpenUserInUserInfoPage(APIUser user, bool addToScreenStack)
-        {
-            QuickMenu.prop_QuickMenu_0.prop_APIUser_0 = user ?? throw new ArgumentNullException("Given APIUser was null.");
-            MainMenu(4, false, addToScreenStack, false);
-        }
+
         /// <summary>
         /// Closes the big menu.
         /// </summary>

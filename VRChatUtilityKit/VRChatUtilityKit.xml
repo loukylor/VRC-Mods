@@ -571,20 +571,11 @@
             <param name="addToScreenStack">Whether the new screen opened should be added to the screen stack</param>
             <param name="rePlaceUi">Whether to recalculate and reposition the UI</param>
         </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenUserInUserInfoPage(VRC.Core.APIUser)">
+        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenUserInUserInfoPage(VRC.DataModel.IUser)">
             <summary>
             Opens the given user in the user info page. 
-            Does not open with big menu along with the page.
             </summary>
             <param name="user">The user to open</param>
-        </member>
-        <member name="M:VRChatUtilityKit.Ui.UiManager.OpenUserInUserInfoPage(VRC.Core.APIUser,System.Boolean)">
-            <summary>
-            Opens the given user in the user info page. 
-            Does not open with big menu along with the page.
-            </summary>
-            <param name="user">The user to open</param>
-            <param name="addToScreenStack"></param>
         </member>
         <member name="M:VRChatUtilityKit.Ui.UiManager.CloseBigMenu">
             <summary>
