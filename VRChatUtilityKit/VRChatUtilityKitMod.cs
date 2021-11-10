@@ -26,7 +26,7 @@ namespace VRChatUtilityKit
             melonLoaderEventSubscribers = MelonHandler.Mods
                 .Select(mod => mod.Assembly.GetTypes())
                 .SelectMany(types => types)
-                .Where(type => type.IsSubclassOf(typeof(MelonLoaderEvents)) || Attribute.GetCustomAttribute(type, typeof(MelonLoaderEventsAttribute)) != null)
+                .Where(type => { try { return type.IsSubclassOf(typeof(MelonLoaderEvents)) || Attribute.GetCustomAttribute(type, typeof(MelonLoaderEventsAttribute)) != null; } catch { return false; } })
                 .OrderBy((type) =>
                 {
                     MelonLoaderEventsPriorityAttribute priority = (MelonLoaderEventsPriorityAttribute)Attribute.GetCustomAttribute(type, typeof(MelonLoaderEventsPriorityAttribute));

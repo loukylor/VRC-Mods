@@ -44,7 +44,7 @@ namespace VRChatUtilityKit.Utilities
                 .SelectMany(types => types)
                 // Include instance bindingflag so users get a granular error
                 .SelectMany(type => type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
-                .Where(method => method.GetCustomAttribute<KeybindAttribute>() != null)
+                .Where(method => { try { return method.GetCustomAttribute<KeybindAttribute>() != null; } catch { return false; } })
                 .Select(method => new ValueTuple<MethodInfo, KeybindAttribute>(method, method.GetCustomAttribute<KeybindAttribute>()))
                 .ToArray();
         }
