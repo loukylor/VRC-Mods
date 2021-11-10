@@ -421,6 +421,7 @@ namespace VRChatUtilityKit.Ui
             Scrollbar scrollbar = menuGameObject.transform.parent.parent.Find("Scrollbar").GetComponent<Scrollbar>();
 
             scrollbar.gameObject.SetActive(active);
+            scrollRect.enabled = active;
             scrollRect.verticalScrollbar = scrollbar;
         }
     }
