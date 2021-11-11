@@ -1088,9 +1088,30 @@
             Returns the instance of the UserInfo component.
             </summary>
         </member>
+        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.MenuControllerInstance">
+            <summary>
+             Returns the instance of the MenuController.
+            </summary>
+        </member>
         <member name="P:VRChatUtilityKit.Utilities.VRCUtils.ActiveUserInUserInfoMenu">
             <summary>
             Returns the active user in the user info menu.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.ActivePlayerInUserInfoMenu">
+            <summary>
+            Returns the active player in the user info menu.
+            Will be null if the player isn't in the instance.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.ActiveUserInUserSelectMenu">
+            <summary>
+            Returns the selected user in the user select menu
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.ActivePlayerInUserSelectMenu">
+            <summary>
+            Returns the active player in the user select menu.
             </summary>
         </member>
         <member name="M:VRChatUtilityKit.Utilities.VRCUtils.IsAvatarExplcitlyShown(VRC.Core.APIUser)">
