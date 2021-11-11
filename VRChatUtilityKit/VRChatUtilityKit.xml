@@ -1104,14 +1104,19 @@
             Will be null if the player isn't in the instance.
             </summary>
         </member>
-        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.ActiveUserInUserSelectMenu">
+        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.SelectedUser">
             <summary>
-            Returns the selected user in the user select menu
+            Returns the user selected via the cursor.
             </summary>
         </member>
-        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.ActivePlayerInUserSelectMenu">
+        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.SelectedPlayer">
             <summary>
-            Returns the active player in the user select menu.
+            Returns the player selected via the cursor.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Utilities.VRCUtils.ActiveUserInUserSelectMenu">
+            <summary>
+            Returns the active user in the user select menu.
             </summary>
         </member>
         <member name="M:VRChatUtilityKit.Utilities.VRCUtils.IsAvatarExplcitlyShown(VRC.Core.APIUser)">
