@@ -22,12 +22,15 @@ namespace VRChatUtilityKit.Utilities
         private static MethodInfo _apiUserToIUser;
         private static void OnApplicationStart()
         {
-            Type iUserParent = typeof(VRCPlayer).Assembly.GetTypes()
-                .First(type => type.GetMethods()
-                    .FirstOrDefault(method => method.Name.StartsWith("Method_Private_Void_Action_1_ApiWorldInstance_Action_1_String_")) != null && type.GetMethods()
-                    .FirstOrDefault(method => method.Name.StartsWith("Method_Public_Virtual_Final_New_Observable_1_List_1_String_")) == null);
-            _apiUserToIUser = typeof(DataModelCache).GetMethod("Method_Public_TYPE_String_TYPE2_Boolean_0");
-            _apiUserToIUser = _apiUserToIUser.MakeGenericMethod(iUserParent, typeof(APIUser));
+            // This fixes the frame drops because it seems calling `GetMethods` on a type calls it static constructor
+            Type iUserImpl = typeof(VRCPlayer).Assembly.GetTypes()
+                .First(type => !type.ContainsGenericParameters && 
+                                typeof(DataModel<APIUser>).IsAssignableFrom(type) && 
+                                Il2CppType.From(typeof(DataModel<APIUser>)).IsAssignableFrom(Il2CppType.From(type)) && 
+                                Il2CppType.Of<IUser>().IsAssignableFrom(Il2CppType.From(type)) && 
+                                type.GetProperty("prop_Observable_1_List_1_String_0") == null);            
+
+            _apiUserToIUser = typeof(DataModelCache).GetMethod("Method_Public_TYPE_String_TYPE2_Boolean_0").MakeGenericMethod(iUserImpl, typeof(APIUser));
         }
 
         /// <summary>
