@@ -49,7 +49,8 @@ namespace VRChatUtilityKit.Ui
         public ToggleButton(Action<bool> onClick, Sprite icon, Sprite altIcon, string text, string gameObjectName, string tooltipText = "", string tooltipAltText = "", Action<ToggleButton> creationCallback = null) : base(UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Settings/Panel_QM_ScrollRect/Viewport/VerticalLayoutGroup/Buttons_UI_Elements_Row_1/Button_ToggleQMInfo").gameObject, icon, text, gameObjectName, tooltipText)
         {
             _altImage = rectTransform.Find("Icon_Off").GetComponent<Image>();
-            AltSprite = altIcon;
+            if (altIcon != null)
+                AltSprite = altIcon;
 
             ToggleComponent = gameObject.GetComponent<Toggle>();
 

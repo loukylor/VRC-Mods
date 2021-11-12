@@ -66,7 +66,9 @@ namespace VRChatUtilityKit.Ui
                 _image = rectTransform.Find("Icon_On").GetComponent<Image>();
             else
                 _image = rectTransform.Find("Icon").GetComponent<Image>();
-            _image.sprite = icon;
+
+            if (sprite != null)
+                _image.sprite = icon;
         }
     }
 }
