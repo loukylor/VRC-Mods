@@ -404,6 +404,7 @@ namespace VRChatUtilityKit.Ui
         /// </summary>
         /// <param name="menuGameObject">The GameObject of the existing menu. This should have a VerticalLayoutGroup attached.</param>
         /// <param name="buttonGroup">The button to add to the group</param>
+        [Obsolete("Use ButtonRow instead. Button groups could cause overlaps.")]
         public static void AddButtonGroupToExistingMenu(GameObject menuGameObject, ButtonGroup buttonGroup)
         {
             buttonGroup.Header.gameObject.transform.SetParent(menuGameObject.transform);

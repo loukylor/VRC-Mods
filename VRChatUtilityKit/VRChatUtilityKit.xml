@@ -104,6 +104,82 @@
             Gets or sets the text on the button.
             </summary>
         </member>
+        <member name="T:VRChatUtilityKit.Ui.ButtonRow">
+            <summary>
+            A class that represents an optional button header and row of buttons.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.ButtonRow.ParentMenu">
+            <summary>
+            The sub menu the group is in.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.ButtonRow.Header">
+            <summary>
+            The group's header.
+            May be null.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.ButtonRow.ButtonLayoutGroup">
+            <summary>
+            The layout all the buttons go into.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.ButtonRow.Buttons">
+            <summary>
+            The buttons in the group.
+            </summary>
+        </member>
+        <member name="P:VRChatUtilityKit.Ui.ButtonRow.RowWidth">
+            <summary>
+            The number of buttons this row can contain.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.ButtonRow.#ctor(System.String,System.String,System.Collections.Generic.List{VRChatUtilityKit.Ui.IButtonGroupElement},System.Int32,System.Action{VRChatUtilityKit.Ui.ButtonRow})">
+            <summary>
+            Creates a new button group.
+            </summary>
+            <param name="name">The name of the group</param>
+            <param name="headerText">The text of the header</param>
+            <param name="buttons">The buttons on the group</param>
+            <param name="rowWidth">The number of buttons the row should hold</param>
+            <param name="creationCallback">An action that is called with the group object when the group is created</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.ButtonRow.AddButtonHeader(System.String,System.String)">
+            <summary>
+            Adds a new button header to the group.
+            </summary>
+            <param name="text">The text on the header</param>
+            <param name="gameObjectName">The name of the header GameObject</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.ButtonRow.RemoveButtonHeader">
+            <summary>
+            Removes the button header from the group.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.ButtonRow.AddButton(VRChatUtilityKit.Ui.IButtonGroupElement)">
+            <summary>
+            Adds the given button to the group.
+            </summary>
+            <param name="button">The button to add</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.ButtonRow.AddButtonRange(System.Collections.Generic.IEnumerable{VRChatUtilityKit.Ui.IButtonGroupElement})">
+            <summary>
+            Adds the given range of buttons to the group.
+            </summary>
+            <param name="buttons">The range of buttons to add</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.ButtonRow.RemoveButton(VRChatUtilityKit.Ui.IButtonGroupElement)">
+            <summary>
+            Removes the given button from the group.
+            </summary>
+            <param name="button">The button to remove</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.ButtonRow.ClearButtons">
+            <summary>
+            Removes all buttons from the group.
+            </summary>
+        </member>
         <member name="T:VRChatUtilityKit.Ui.ElementBase">
             <summary>
             A wrapper that holds a UI element.
@@ -312,6 +388,11 @@
             The list of button groups on this menu.
             </summary>
         </member>
+        <member name="P:VRChatUtilityKit.Ui.SubMenu.ButtonRows">
+            <summary>
+            The list of button rows on this menu.
+            </summary>
+        </member>
         <member name="M:VRChatUtilityKit.Ui.SubMenu.#ctor(UnityEngine.Transform,System.String,System.String,System.String,System.Action{VRChatUtilityKit.Ui.SubMenu})">
             <summary>
             Creates a new sub menu.
@@ -350,6 +431,29 @@
             <param name="buttonGroup">The button group to remove</param>
         </member>
         <member name="M:VRChatUtilityKit.Ui.SubMenu.ClearButtonGroups">
+            <summary>
+            Removes all button groups from the submenu.
+            </summary>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.SubMenu.AddButtonRow(VRChatUtilityKit.Ui.ButtonRow)">
+            <summary>
+            Adds the given button group to the sub menu.
+            </summary>
+            <param name="buttonRow">The button group to add</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.SubMenu.AddButtonRowRange(System.Collections.Generic.IEnumerable{VRChatUtilityKit.Ui.ButtonRow})">
+            <summary>
+            Adds the given range of button groups to the sub menu.
+            </summary>
+            <param name="buttonRows">The range of button groups to add</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.SubMenu.RemoveButtonRow(VRChatUtilityKit.Ui.ButtonRow)">
+            <summary>
+            Removes the given button group from the sub menu.
+            </summary>
+            <param name="buttonrow">The button group to remove</param>
+        </member>
+        <member name="M:VRChatUtilityKit.Ui.SubMenu.ClearButtonRows">
             <summary>
             Removes all button groups from the submenu.
             </summary>

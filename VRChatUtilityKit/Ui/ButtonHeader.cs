@@ -1,5 +1,6 @@
 ﻿using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace VRChatUtilityKit.Ui
 {
@@ -25,6 +26,7 @@ namespace VRChatUtilityKit.Ui
         internal ButtonHeader(Transform parent, string text, string gameObjectName) : base(parent, UiManager.QMStateController.transform.Find("Container/Window/QMParent/Menu_Dashboard/ScrollRect/Viewport/VerticalLayoutGroup/Header_QuickLinks").gameObject, gameObjectName)
         {
             TextComponent = rectTransform.Find("LeftItemContainer/Text_Title").GetComponent<TextMeshProUGUI>();
+            gameObject.GetComponent<LayoutElement>().preferredHeight = 96;
             Text = text;
         }
     }
