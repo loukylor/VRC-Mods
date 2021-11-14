@@ -4,7 +4,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using VRC.UI.Elements;
-using VRC.UI.Elements.Controls;
 
 #pragma warning disable IDE1006 // Naming Styles
 
@@ -46,16 +45,8 @@ namespace VRChatUtilityKit.Ui
         /// <summary>
         /// The list of button groups on this menu.
         /// </summary>
-        [Obsolete("Use ButtonRow instead. Button groups could cause overlaps.")]
         public IReadOnlyList<ButtonGroup> ButtonGroups => _buttonGroups;
-        [Obsolete]
         private readonly List<ButtonGroup> _buttonGroups = new List<ButtonGroup>();
-
-        /// <summary>
-        /// The list of button rows on this menu.
-        /// </summary>
-        public IReadOnlyList<ButtonRow> ButtonRows => _buttonRows;
-        private readonly List<ButtonRow> _buttonRows = new List<ButtonRow>();
 
         /// <summary>
         /// Creates a new sub menu.
@@ -96,13 +87,10 @@ namespace VRChatUtilityKit.Ui
         /// <param name="creationCallback">An action that is called with the submenu object when the submenu is created</param>
         public SubMenu(string pageName, string gameObjectName, string headerText, Action<SubMenu> creationCallback = null) : this(UiManager.QMStateController.transform.Find("Container/Window/QMParent"), pageName, gameObjectName, headerText, creationCallback) { }
 
-        #region obsolete things
-
         /// <summary>
         /// Adds the given button group to the sub menu.
         /// </summary>
         /// <param name="buttonGroup">The button group to add</param>
-        [Obsolete("Use ButtonRow instead. Button groups could cause overlaps.")]
         public void AddButtonGroup(ButtonGroup buttonGroup)
         {
             buttonGroup.ParentMenu = this;
@@ -116,7 +104,6 @@ namespace VRChatUtilityKit.Ui
         /// Adds the given range of button groups to the sub menu.
         /// </summary>
         /// <param name="buttonGroups">The range of button groups to add</param>
-        [Obsolete("Use ButtonRow instead. Button groups could cause overlaps.")]
         public void AddButtonGroupRange(IEnumerable<ButtonGroup> buttonGroups)
         {
             foreach (ButtonGroup buttonGroup in buttonGroups)
@@ -127,7 +114,6 @@ namespace VRChatUtilityKit.Ui
         /// Removes the given button group from the sub menu.
         /// </summary>
         /// <param name="buttonGroup">The button group to remove</param>
-        [Obsolete("Use ButtonRow instead. Button groups could cause overlaps.")]
         public void RemoveButtonGroup(ButtonGroup buttonGroup)
         {
             _buttonGroups.Remove(buttonGroup);
@@ -137,7 +123,6 @@ namespace VRChatUtilityKit.Ui
         /// <summary>
         /// Removes all button groups from the submenu.
         /// </summary>
-        [Obsolete("Use ButtonRow instead. Button groups could cause overlaps.")]
         public void ClearButtonGroups()
         {
             foreach (ButtonGroup buttonGroup in _buttonGroups)
@@ -147,55 +132,6 @@ namespace VRChatUtilityKit.Ui
                 GameObject.DestroyImmediate(buttonGroup.gameObject);
             }
             _buttonGroups.Clear();
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Adds the given button group to the sub menu.
-        /// </summary>
-        /// <param name="buttonRow">The button group to add</param>
-        public void AddButtonRow(ButtonRow buttonRow)
-        {
-            buttonRow.ParentMenu = this;
-            if (buttonRow.Header != null)
-                buttonRow.Header.rectTransform.parent = PageLayoutGroup.rectTransform;
-            buttonRow.rectTransform.parent = PageLayoutGroup.rectTransform;
-            _buttonRows.Add(buttonRow);
-        }
-
-        /// <summary>
-        /// Adds the given range of button groups to the sub menu.
-        /// </summary>
-        /// <param name="buttonRows">The range of button groups to add</param>
-        public void AddButtonRowRange(IEnumerable<ButtonRow> buttonRows)
-        {
-            foreach (ButtonRow buttonRow in buttonRows)
-                AddButtonRow(buttonRow);
-        }
-
-        /// <summary>
-        /// Removes the given button group from the sub menu.
-        /// </summary>
-        /// <param name="buttonrow">The button group to remove</param>
-        public void RemoveButtonRow(ButtonRow buttonrow)
-        {
-            _buttonRows.Remove(buttonrow);
-            GameObject.DestroyImmediate(buttonrow.gameObject);
-        }
-
-        /// <summary>
-        /// Removes all button groups from the submenu.
-        /// </summary>
-        public void ClearButtonRows()
-        {
-            foreach (ButtonRow buttonRow in _buttonRows)
-            {
-                if (buttonRow.Header != null)
-                    GameObject.DestroyImmediate(buttonRow.Header.gameObject);
-                GameObject.DestroyImmediate(buttonRow.gameObject);
-            }
-            _buttonRows.Clear();
         }
 
         /// <summary>

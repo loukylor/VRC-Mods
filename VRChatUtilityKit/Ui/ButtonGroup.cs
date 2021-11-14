@@ -8,7 +8,6 @@ namespace VRChatUtilityKit.Ui
     /// <summary>
     /// A class that represents an optional button header and group of buttons.
     /// </summary>
-    [Obsolete("Use ButtonRow instead. Button groups could cause overlaps.")]
     public class ButtonGroup : ElementBase
     {
         /// <summary>
@@ -45,7 +44,6 @@ namespace VRChatUtilityKit.Ui
             ButtonLayoutGroup = gameObject.GetComponent<GridLayoutGroup>();
             for (int i = ButtonLayoutGroup.transform.childCount - 1; i >= 0; i--)
                 GameObject.DestroyImmediate(ButtonLayoutGroup.transform.GetChild(i).gameObject);
-            ButtonLayoutGroup.padding.bottom = 32;
 
             if (headerText != null)
                 AddButtonHeader(headerText, $"Header_{name}");
