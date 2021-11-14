@@ -417,6 +417,8 @@ namespace VRChatUtilityKit.Ui
         /// <param name="active">Whether to enable or disable the scrollbar</param>
         public static void ToggleScrollRectOnExistingMenu(GameObject menuGameObject, bool active)
         {
+            menuGameObject.transform.parent.GetComponent<RectMask2D>().enabled = active;
+
             ScrollRect scrollRect = menuGameObject.transform.parent.parent.GetComponent<ScrollRect>();
             Scrollbar scrollbar = menuGameObject.transform.parent.parent.Find("Scrollbar").GetComponent<Scrollbar>();
 
