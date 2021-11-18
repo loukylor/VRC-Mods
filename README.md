@@ -1,3 +1,15 @@
+# Archive Notice
+
+Hi, so uh, I've decided to archive all my work here as it takes far too much time to maintain.<br>
+Anything that isn't updated as of this moment will not be updated unless a good soul wants to update it by forking this repo.<br>
+As far as I know, there are 2 mods that other people decided to update:
+ - [PlayerList by Adnezz](https://github.com/Adnezz/PlayerList)
+ - [InstanceHistory by Nirvash](https://github.com/Nirv-git/VRC-Mods/)
+
+Thanks for all the support over the past yearish, you're all great, and have a good life. :)
+
+- louky
+
 # Disclaimer!!!
 VRChat does **not** condone the use of mods, and, if found to be modifying the client, then you **will** be punished.
 
