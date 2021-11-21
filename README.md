@@ -126,7 +126,7 @@ A basic instance history mod
 
 ## Features
 It has an optinal dependency for UIX when opening the instance history menu. This means you can run with or without it.
-It is highly recommnded to use UIX because it's just easier, although there are preferences to change the position of the regular button if you don't like UIX.
+It is highly recommended to use UIX because it's just easier, although there are preferences to change the position of the regular button if you don't like UIX.
 
 ## Requirements
  - [VRChatUtilityKit](https://github.com/loukylor/VRC-Mods/releases)
@@ -256,7 +256,7 @@ Note that it disables itself in worlds that don't allow risky functions.
  - [UIExpansionKit](https://github.com/knah/VRCMods/)
  - [VRChatUtilityKit](https://github.com/loukylor/VRC-Mods/releases)
 
-## Credites
+## Credits
  - The shader used was a heavily modified version of the "Distance Fade Outline Shader" found in https://github.com/netri/Neitri-Unity-Shaders
 
 # UserHistory
